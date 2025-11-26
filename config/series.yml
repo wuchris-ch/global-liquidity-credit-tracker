@@ -1,0 +1,267 @@
+# Global Liquidity Tracker - Series Configuration
+# Each series defines: source, source_id, country, frequency, type, description
+
+series:
+  # ===================
+  # Central Bank Balance Sheets
+  # ===================
+  fed_total_assets:
+    source: fred
+    source_id: WALCL
+    country: US
+    frequency: weekly
+    type: stock
+    unit: millions_usd
+    description: "Federal Reserve Total Assets"
+
+  fed_treasury_general_account:
+    source: fred
+    source_id: WTREGEN
+    country: US
+    frequency: weekly
+    type: stock
+    unit: millions_usd
+    description: "Treasury General Account at Fed"
+
+  fed_reverse_repo:
+    source: fred
+    source_id: RRPONTSYD
+    country: US
+    frequency: daily
+    type: stock
+    unit: billions_usd
+    description: "Overnight Reverse Repurchase Agreements"
+
+  ecb_total_assets:
+    source: fred
+    source_id: ECBASSETSW
+    country: EU
+    frequency: weekly
+    type: stock
+    unit: millions_eur
+    description: "ECB Total Assets"
+
+  boj_total_assets:
+    source: fred
+    source_id: JPNASSETS
+    country: JP
+    frequency: monthly
+    type: stock
+    unit: millions_jpy
+    description: "Bank of Japan Total Assets"
+
+  # ===================
+  # Funding Rates
+  # ===================
+  sofr:
+    source: fred
+    source_id: SOFR
+    country: US
+    frequency: daily
+    type: rate
+    unit: percent
+    description: "Secured Overnight Financing Rate"
+
+  fed_funds_rate:
+    source: fred
+    source_id: DFF
+    country: US
+    frequency: daily
+    type: rate
+    unit: percent
+    description: "Effective Federal Funds Rate"
+
+  euro_short_term_rate:
+    source: fred
+    source_id: ECBESTRVOLWGTTRMDMNRT
+    country: EU
+    frequency: daily
+    type: rate
+    unit: percent
+    description: "Euro Short-Term Rate (€STR)"
+
+  # ===================
+  # Monetary Aggregates
+  # ===================
+  us_m2:
+    source: fred
+    source_id: M2SL
+    country: US
+    frequency: monthly
+    type: stock
+    unit: billions_usd
+    description: "US M2 Money Stock"
+
+  eu_m3:
+    source: fred
+    source_id: MYAGM3EZM196N
+    country: EU
+    frequency: monthly
+    type: stock
+    unit: index
+    description: "Euro Area M3 Money Supply"
+
+  china_m2:
+    source: fred
+    source_id: MYAGM2CNM189N
+    country: CN
+    frequency: monthly
+    type: stock
+    unit: index
+    description: "China M2 Money Supply"
+
+  japan_m2:
+    source: fred
+    source_id: MYAGM2JPM189N
+    country: JP
+    frequency: monthly
+    type: stock
+    unit: index
+    description: "Japan M2 Money Supply"
+
+  # ===================
+  # Credit Spreads & Stress
+  # ===================
+  ted_spread:
+    source: fred
+    source_id: TEDRATE
+    country: US
+    frequency: daily
+    type: spread
+    unit: percent
+    description: "TED Spread (3M LIBOR - 3M T-Bill)"
+
+  ice_bofa_us_high_yield_spread:
+    source: fred
+    source_id: BAMLH0A0HYM2
+    country: US
+    frequency: daily
+    type: spread
+    unit: percent
+    description: "ICE BofA US High Yield Index Option-Adjusted Spread"
+
+  ice_bofa_us_ig_spread:
+    source: fred
+    source_id: BAMLC0A0CM
+    country: US
+    frequency: daily
+    type: spread
+    unit: percent
+    description: "ICE BofA US Corporate Index Option-Adjusted Spread"
+
+  # ===================
+  # Credit to Non-Financial Sector (BIS)
+  # ===================
+  bis_credit_us:
+    source: bis
+    source_id: "Q:US:P:A:M:XDC:A"
+    country: US
+    frequency: quarterly
+    type: stock
+    unit: local_currency
+    description: "BIS Credit to Private Non-Financial Sector - US"
+
+  bis_credit_eu:
+    source: bis
+    source_id: "Q:XM:P:A:M:XDC:A"
+    country: EU
+    frequency: quarterly
+    type: stock
+    unit: local_currency
+    description: "BIS Credit to Private Non-Financial Sector - Euro Area"
+
+  bis_credit_cn:
+    source: bis
+    source_id: "Q:CN:P:A:M:XDC:A"
+    country: CN
+    frequency: quarterly
+    type: stock
+    unit: local_currency
+    description: "BIS Credit to Private Non-Financial Sector - China"
+
+  bis_credit_jp:
+    source: bis
+    source_id: "Q:JP:P:A:M:XDC:A"
+    country: JP
+    frequency: quarterly
+    type: stock
+    unit: local_currency
+    description: "BIS Credit to Private Non-Financial Sector - Japan"
+
+  # ===================
+  # World Bank Credit Indicators
+  # ===================
+  wb_credit_gdp_us:
+    source: worldbank
+    source_id: FS.AST.PRVT.GD.ZS
+    country: US
+    frequency: annual
+    type: ratio
+    unit: percent_gdp
+    description: "Domestic Credit to Private Sector (% of GDP) - US"
+
+  wb_credit_gdp_cn:
+    source: worldbank
+    source_id: FS.AST.PRVT.GD.ZS
+    country: CN
+    frequency: annual
+    type: ratio
+    unit: percent_gdp
+    description: "Domestic Credit to Private Sector (% of GDP) - China"
+
+# ===================
+# Composite Index Definitions
+# ===================
+indices:
+  fed_net_liquidity:
+    description: "Fed Net Liquidity = Total Assets - TGA - Reverse Repo"
+    frequency: weekly
+    components:
+      - series: fed_total_assets
+        operation: add
+        weight: 1.0
+      - series: fed_treasury_general_account
+        operation: subtract
+        weight: 1.0
+      - series: fed_reverse_repo
+        operation: subtract
+        weight: 1000.0  # Convert billions to millions
+
+  usd_funding_stress:
+    description: "USD Funding Stress Index (z-score average of spreads)"
+    frequency: daily
+    method: zscore_average
+    components:
+      - series: ted_spread
+        weight: 1.0
+      - series: ice_bofa_us_high_yield_spread
+        weight: 1.0
+      - series: ice_bofa_us_ig_spread
+        weight: 0.5
+
+  global_cb_assets:
+    description: "Major Central Bank Total Assets (USD-normalized)"
+    frequency: monthly
+    method: sum_normalized
+    components:
+      - series: fed_total_assets
+        weight: 1.0
+      - series: ecb_total_assets
+        weight: 1.1  # Approx EUR/USD
+      - series: boj_total_assets
+        weight: 0.0067  # Approx JPY/USD
+
+# ===================
+# Country GDP Weights (for weighted indices)
+# ===================
+country_weights:
+  US: 0.35
+  EU: 0.22
+  CN: 0.18
+  JP: 0.08
+  GB: 0.05
+  CA: 0.03
+  AU: 0.02
+  KR: 0.02
+  IN: 0.03
+  BR: 0.02

@@ -1,0 +1,26 @@
+[project]
+name = "global-liquidity-tracker"
+version = "0.1.0"
+description = "Track global liquidity and credit metrics from central banks and financial institutions"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0.0",
+    "requests>=2.28.0",
+    "fredapi>=0.5.0",
+    "pandasdmx>=1.0.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "plotly>=5.15.0",
+    "streamlit>=1.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

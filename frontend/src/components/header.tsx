@@ -59,19 +59,19 @@ export function Header({
       <div className="flex items-center gap-3">
         {showDateSelector && (
           <Select value={timeRange} onValueChange={(value) => onTimeRangeChange?.(value as TimeRange)}>
-            <SelectTrigger className="w-[140px] h-9 text-xs">
+            <SelectTrigger className="w-auto min-w-[100px] h-9 text-xs">
               <Calendar className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <SelectValue placeholder="Select range" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1m">Last Month</SelectItem>
-              <SelectItem value="3m">Last 3 Months</SelectItem>
-              <SelectItem value="6m">Last 6 Months</SelectItem>
-              <SelectItem value="1y">Last Year</SelectItem>
-              <SelectItem value="2y">Last 2 Years</SelectItem>
-              <SelectItem value="5y">Last 5 Years</SelectItem>
-              <SelectItem value="10y">Last 10 Years</SelectItem>
-              <SelectItem value="15y">Last 15 Years</SelectItem>
+              <SelectItem value="1m">1 Mo</SelectItem>
+              <SelectItem value="3m">3 Mo</SelectItem>
+              <SelectItem value="6m">6 Mo</SelectItem>
+              <SelectItem value="1y">1 Yr</SelectItem>
+              <SelectItem value="2y">2 Yr</SelectItem>
+              <SelectItem value="5y">5 Yr</SelectItem>
+              <SelectItem value="10y">10 Yr</SelectItem>
+              <SelectItem value="15y">15 Yr</SelectItem>
               <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>

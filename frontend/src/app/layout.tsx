@@ -1,22 +1,11 @@
 import type { Metadata } from "next";
-import { Sora, IBM_Plex_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/components/query-provider";
-
-const sora = Sora({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   title: "Global Liquidity Tracker",
@@ -30,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${sora.variable} ${ibmPlexMono.variable} font-sans`}>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
         <QueryProvider>
           <TooltipProvider delayDuration={0}>
             <SidebarProvider defaultOpen={true}>

@@ -36,7 +36,9 @@ class BISClient(BaseClient):
         """Fetch a series from BIS.
         
         Args:
-            series_id: BIS series key (e.g., 'Q:US:P:A:M:XDC:A' for US private credit)
+            series_id: BIS series key (e.g., 'Q.US.P.A.M.XDC.A' for US private credit)
+                       Note: Both colon (:) and dot (.) separators are accepted,
+                       but the API uses dots internally.
             start_date: Start date in 'YYYY-MM-DD' format
             end_date: End date in 'YYYY-MM-DD' format
             
@@ -46,7 +48,10 @@ class BISClient(BaseClient):
         # Default to credit dataflow
         dataflow = self.DATAFLOWS["credit"]
         
-        url = f"{self.BASE_URL}/data/{dataflow}/{series_id}"
+        # BIS SDMX API requires dots as separators, not colons
+        normalized_series_id = series_id.replace(":", ".")
+        
+        url = f"{self.BASE_URL}/data/{dataflow}/{normalized_series_id}"
         
         params = {}
         if start_date:
@@ -69,8 +74,10 @@ class BISClient(BaseClient):
     def _parse_sdmx_json(self, data: dict) -> pd.DataFrame:
         """Parse SDMX JSON response into DataFrame."""
         try:
-            # Navigate SDMX JSON structure
-            datasets = data.get("dataSets", [])
+            # Navigate SDMX JSON structure - data is nested under 'data' key
+            data_section = data.get("data", data)  # Fallback to data itself for older format
+            
+            datasets = data_section.get("dataSets", [])
             if not datasets:
                 return pd.DataFrame(columns=["date", "value"])
             
@@ -78,8 +85,8 @@ class BISClient(BaseClient):
             if not observations:
                 return pd.DataFrame(columns=["date", "value"])
             
-            # Get time dimension
-            structure = data.get("structure", {})
+            # Get time dimension from structure (also under 'data')
+            structure = data_section.get("structure", {})
             dimensions = structure.get("dimensions", {})
             observation_dims = dimensions.get("observation", [])
             
@@ -135,8 +142,8 @@ class BISClient(BaseClient):
         Args:
             country: ISO 2-letter country code (e.g., 'US', 'CN', 'JP')
         """
-        # Credit to GDP ratio key format
-        series_id = f"Q:{country}:P:A:M:770:A"
+        # Credit to GDP ratio key format (dots as separators)
+        series_id = f"Q.{country}.P.A.M.770.A"
         return self.get_series(series_id, start_date, end_date)
     
     def get_private_credit(self, country: str, start_date: str | None = None,
@@ -146,7 +153,7 @@ class BISClient(BaseClient):
         Args:
             country: ISO 2-letter country code
         """
-        series_id = f"Q:{country}:P:A:M:XDC:A"
+        series_id = f"Q.{country}.P.A.M.XDC.A"
         return self.get_series(series_id, start_date, end_date)
 
 

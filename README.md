@@ -12,10 +12,18 @@ pip install -e .
 cp .env.example .env
 # Edit .env and add your FRED API key (get one free at https://fred.stlouisfed.org/docs/api/api_key.html)
 
-# Run the dashboard
-streamlit run app.py
+# Start the API server (required for frontend)
+uvicorn src.api:app --reload --port 8000
 
-# Or use the CLI
+# In another terminal, run the frontend
+cd frontend && npm run dev
+```
+
+The frontend will be available at http://localhost:3000 and will fetch live data from the Python API.
+
+### CLI Usage
+
+```bash
 python cli.py list series
 python cli.py fetch --series fed_total_assets sofr --save
 python cli.py compute --index fed_net_liquidity
@@ -80,7 +88,7 @@ global_liquidity_tracker/
 ├── data/
 │   ├── raw/                # Raw fetched data (parquet)
 │   └── curated/            # Computed indices (parquet)
-├── app.py                  # Streamlit dashboard
+├── frontend/               # Next.js dashboard
 ├── cli.py                  # Command-line interface
 └── pyproject.toml
 ```

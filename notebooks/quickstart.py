@@ -109,7 +109,7 @@ except Exception as e:
 # Summary
 print("\n" + "=" * 60)
 print("Setup complete! You can now:")
-print("  • Run the dashboard: streamlit run app.py")
+print("  • Run the frontend: cd frontend && npm run dev")
 print("  • Use the CLI: python cli.py --help")
 print("  • Explore in notebooks")
 print("=" * 60)

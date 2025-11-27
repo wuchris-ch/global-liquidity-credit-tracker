@@ -43,7 +43,17 @@ class Aggregator:
         
         method = config.get("method", "arithmetic")
         components = config.get("components", [])
-        frequency = config.get("frequency", "M")
+        raw_frequency = config.get("frequency", "M")
+        
+        # Map human-readable frequencies to pandas codes
+        freq_map = {
+            "daily": "D",
+            "weekly": "W",
+            "monthly": "M",
+            "quarterly": "Q",
+            "annual": "A",
+        }
+        frequency = freq_map.get(raw_frequency, raw_frequency)
         
         # Fetch component series
         component_data = {}

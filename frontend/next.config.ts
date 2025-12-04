@@ -15,10 +15,11 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
   },
 
-  // Explicit webpack alias to ensure @/ resolves correctly in all environments
-  webpack: (config) => {
-    config.resolve.alias["@"] = path.resolve(__dirname, "src");
-    return config;
+  // Explicit Turbopack alias to ensure @/ resolves correctly in all environments
+  turbopack: {
+    resolveAlias: {
+      "@/*": ["./src/*"],
+    },
   },
 };
 

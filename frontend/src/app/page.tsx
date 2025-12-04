@@ -8,6 +8,7 @@ import { MultiLineChart } from "@/components/multi-line-chart";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoTooltip } from "@/components/info-tooltip";
 import {
   Activity,
   Building2,
@@ -18,6 +19,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
+import { formatCurrency, UNIT_SCALES } from "@/lib/utils";
+import { metricDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
 
 function getDateRange(range: TimeRange): { start: string; end: string } {
   const end = new Date();
@@ -74,16 +77,12 @@ export default function DashboardPage() {
     setTimeRange(range);
   }, []);
 
-  const formatCurrency = (value: number, decimals = 2) => {
-    if (value >= 1e12) return `$${(value / 1e12).toFixed(decimals)}T`;
-    if (value >= 1e9) return `$${(value / 1e9).toFixed(decimals)}B`;
-    if (value >= 1e6) return `$${(value / 1e6).toFixed(decimals)}M`;
-    return `$${value.toLocaleString()}`;
-  };
+  // Scale factors for different unit types
+  const scaleMillions = UNIT_SCALES.millions_usd;
 
-  // Get latest values
-  const latestFed = fedAssets.data[fedAssets.data.length - 1]?.value ?? 0;
-  const latestNet = netLiquidity.data[netLiquidity.data.length - 1]?.value ?? 0;
+  // Get latest values (scaled to base currency)
+  const latestFed = (fedAssets.data[fedAssets.data.length - 1]?.value ?? 0) * scaleMillions;
+  const latestNet = (netLiquidity.data[netLiquidity.data.length - 1]?.value ?? 0) * scaleMillions;
   const latestSofr = sofr.data[sofr.data.length - 1]?.value ?? 0;
   const latestHY = (hySpread.data[hySpread.data.length - 1]?.value ?? 0) * 100; // Convert to bps
 
@@ -181,6 +180,7 @@ export default function DashboardPage() {
                 trend={calcChange(fedAssets.data) >= 0 ? "up" : "down"}
                 icon={<Building2 className="h-5 w-5" />}
                 variant="highlight"
+                info={metricDefinitions.fed_balance_sheet}
               />
               <MetricCard
                 title="SOFR Rate"
@@ -189,6 +189,7 @@ export default function DashboardPage() {
                 changeLabel="vs last week"
                 trend="neutral"
                 icon={<CircleDollarSign className="h-5 w-5" />}
+                info={metricDefinitions.sofr_rate}
               />
               <MetricCard
                 title="HY Spread"
@@ -197,6 +198,7 @@ export default function DashboardPage() {
                 changeLabel="bps"
                 trend={calcChange(hySpread.data) <= 0 ? "up" : "down"}
                 icon={<TrendingUp className="h-5 w-5" />}
+                info={metricDefinitions.hy_spread}
               />
               <MetricCard
                 title="Net Liquidity"
@@ -204,6 +206,7 @@ export default function DashboardPage() {
                 change={calcChange(netLiquidity.data)}
                 trend={calcChange(netLiquidity.data) >= 0 ? "up" : "down"}
                 icon={<Activity className="h-5 w-5" />}
+                info={metricDefinitions.net_liquidity}
               />
             </div>
 
@@ -223,18 +226,20 @@ export default function DashboardPage() {
                   <LiquidityChart
                     title="Federal Reserve Balance Sheet"
                     description="Total assets held by the Federal Reserve"
-                    data={fedAssets.data}
+                    data={fedAssets.data.map(d => ({ ...d, value: d.value * scaleMillions }))}
                     color="var(--chart-1)"
                     height={320}
                     valueFormatter={(v) => formatCurrency(v)}
+                    info={chartDefinitions.fed_balance_sheet_chart}
                   />
                   <LiquidityChart
                     title="Fed Net Liquidity"
                     description="Total Assets - TGA - Reverse Repo"
-                    data={netLiquidity.data}
+                    data={netLiquidity.data.map(d => ({ ...d, value: d.value * scaleMillions }))}
                     color="var(--chart-2)"
                     height={320}
                     valueFormatter={(v) => formatCurrency(v)}
+                    info={chartDefinitions.net_liquidity_chart}
                   />
                 </>
               )}
@@ -271,6 +276,7 @@ export default function DashboardPage() {
                           { key: "effr", label: "EFFR", color: "var(--chart-2)" },
                         ]}
                         height={350}
+                        info={chartDefinitions.funding_rates_chart}
                       />
                     )}
                   </div>
@@ -282,7 +288,10 @@ export default function DashboardPage() {
                       <div className="space-y-3">
                         <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
                           <div>
-                            <p className="text-xs text-muted-foreground">SOFR</p>
+                            <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                              SOFR
+                              <InfoTooltip {...metricDefinitions.sofr_rate} size="xs" />
+                            </p>
                             <p className="font-mono text-lg font-bold">
                               {isLoading ? "..." : `${latestSofr.toFixed(2)}%`}
                             </p>
@@ -293,7 +302,10 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
                           <div>
-                            <p className="text-xs text-muted-foreground">EFFR</p>
+                            <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                              EFFR
+                              <InfoTooltip {...metricDefinitions.effr} size="xs" />
+                            </p>
                             <p className="font-mono text-lg font-bold">
                               {isLoading ? "..." : `${(fedFunds.data[fedFunds.data.length - 1]?.value ?? 0).toFixed(2)}%`}
                             </p>
@@ -326,6 +338,7 @@ export default function DashboardPage() {
                         ]}
                         height={350}
                         valueFormatter={(v) => `${Math.round(v)} bps`}
+                        info={chartDefinitions.credit_spreads_chart}
                       />
                     )}
                   </div>
@@ -336,7 +349,10 @@ export default function DashboardPage() {
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         <div className="rounded-lg border border-negative/20 bg-negative/5 p-3">
-                          <p className="text-xs text-muted-foreground">High Yield OAS</p>
+                          <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                            High Yield OAS
+                            <InfoTooltip {...metricDefinitions.hy_spread} size="xs" />
+                          </p>
                           <div className="flex items-baseline gap-2">
                             <p className="font-mono text-2xl font-bold text-negative">
                               {isLoading ? "..." : Math.round(latestHY)}
@@ -345,7 +361,10 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="rounded-lg border border-positive/20 bg-positive/5 p-3">
-                          <p className="text-xs text-muted-foreground">Investment Grade OAS</p>
+                          <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                            Investment Grade OAS
+                            <InfoTooltip {...metricDefinitions.ig_spread} size="xs" />
+                          </p>
                           <div className="flex items-baseline gap-2">
                             <p className="font-mono text-2xl font-bold text-positive">
                               {isLoading ? "..." : Math.round((igSpread.data[igSpread.data.length - 1]?.value ?? 0) * 100)}
@@ -378,6 +397,7 @@ export default function DashboardPage() {
                         ]}
                         height={350}
                         normalized
+                        info={chartDefinitions.central_banks_chart}
                       />
                     )}
                   </div>
@@ -407,7 +427,7 @@ export default function DashboardPage() {
                             <div>
                               <p className="text-xs font-medium">ECB</p>
                               <p className="font-mono text-sm font-bold">
-                                {isLoading || ecbAssets.data.length === 0 ? "..." : `€${(ecbAssets.data[ecbAssets.data.length - 1]?.value / 1e6).toFixed(2)}T`}
+                                {isLoading || ecbAssets.data.length === 0 ? "..." : formatCurrency((ecbAssets.data[ecbAssets.data.length - 1]?.value ?? 0) * scaleMillions, 2, "€")}
                               </p>
                             </div>
                           </div>
@@ -421,7 +441,7 @@ export default function DashboardPage() {
                             <div>
                               <p className="text-xs font-medium">Bank of Japan</p>
                               <p className="font-mono text-sm font-bold">
-                                {isLoading || bojAssets.data.length === 0 ? "..." : `¥${(bojAssets.data[bojAssets.data.length - 1]?.value / 1e6).toFixed(0)}T`}
+                                {isLoading || bojAssets.data.length === 0 ? "..." : formatCurrency((bojAssets.data[bojAssets.data.length - 1]?.value ?? 0) * scaleMillions, 0, "¥")}
                               </p>
                             </div>
                           </div>
@@ -457,6 +477,7 @@ export default function DashboardPage() {
                     color="var(--chart-2)"
                     height={250}
                     valueFormatter={(v) => `${v.toFixed(2)}%`}
+                    info={chartDefinitions.sofr_rate_chart}
                   />
                   <LiquidityChart
                     title="High Yield Spread"
@@ -465,6 +486,7 @@ export default function DashboardPage() {
                     color="var(--chart-5)"
                     height={250}
                     valueFormatter={(v) => `${Math.round(v)} bps`}
+                    info={chartDefinitions.hy_spread_chart}
                   />
                 </>
               )}

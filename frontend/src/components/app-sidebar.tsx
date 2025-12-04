@@ -36,6 +36,12 @@ const mainNavItems = [
     icon: LayoutDashboard,
   },
   {
+    title: "GLCI",
+    url: "/glci",
+    icon: Gauge,
+    badge: "NEW",
+  },
+  {
     title: "Liquidity Monitor",
     url: "/liquidity",
     icon: Activity,
@@ -66,7 +72,7 @@ export function AppSidebar() {
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-3 px-2 py-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--chart-1)] to-[var(--chart-2)] shadow-lg glow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground shadow-lg">
             <Gauge className="h-5 w-5 text-background" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
@@ -96,6 +102,14 @@ export function AppSidebar() {
                     <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span className="font-medium">{item.title}</span>
+                      {"badge" in item && item.badge && (
+                        <Badge
+                          variant="outline"
+                          className="ml-auto h-5 border-primary/30 bg-primary/10 px-1.5 text-[9px] font-semibold uppercase tracking-wider text-primary group-data-[collapsible=icon]:hidden"
+                        >
+                          {item.badge}
+                        </Badge>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -179,5 +193,9 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+
+
+
 
 

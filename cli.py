@@ -35,6 +35,8 @@ def main():
     compute_parser.add_argument("--start", help="Start date (YYYY-MM-DD)")
     compute_parser.add_argument("--end", help="End date (YYYY-MM-DD)")
     compute_parser.add_argument("--save", action="store_true", help="Save to storage")
+    compute_parser.add_argument("--pillars", action="store_true", help="Output pillar subindices (GLCI only)")
+    compute_parser.add_argument("--regime", action="store_true", help="Include regime classification (GLCI only)")
     
     # List command
     list_parser = subparsers.add_parser("list", help="List available series/indices")
@@ -117,9 +119,43 @@ def cmd_compute(args):
         results = {}
         for idx in args.index:
             try:
-                results[idx] = aggregator.compute_index(idx, start, end)
+                # Special handling for GLCI with pillars/regime flags
+                if idx == "global_liquidity_credit_index" and (args.pillars or args.regime):
+                    full_result = aggregator.compute_glci(
+                        start, end, 
+                        save=args.save, 
+                        include_pillars=True
+                    )
+                    results[idx] = full_result["glci"]
+                    
+                    # Print pillar info if requested
+                    if args.pillars:
+                        print(f"\n  Pillar breakdown:")
+                        pillars_df = full_result["pillars"]
+                        latest_pillars = pillars_df.iloc[-1]
+                        for col in pillars_df.columns:
+                            if col != "date":
+                                weight = full_result["weights"]["pillar_weights"].get(col, 0)
+                                print(f"    {col}: {latest_pillars[col]:.2f} (weight: {weight:.0%})")
+                    
+                    # Print regime info if requested
+                    if args.regime:
+                        regimes_df = full_result["regimes"]
+                        latest_regime = regimes_df.iloc[-1]
+                        print(f"\n  Current regime: {latest_regime['regime_label']} (zscore: {latest_regime['zscore']:.2f})")
+                        
+                        # Regime distribution
+                        regime_counts = regimes_df["regime_label"].value_counts()
+                        print(f"  Regime distribution:")
+                        for regime, count in regime_counts.items():
+                            pct = count / len(regimes_df) * 100
+                            print(f"    {regime}: {count} periods ({pct:.1f}%)")
+                else:
+                    results[idx] = aggregator.compute_index(idx, start, end)
             except Exception as e:
                 print(f"  Error computing {idx}: {e}")
+                import traceback
+                traceback.print_exc()
     else:
         print("Specify --index or --all")
         return
@@ -129,7 +165,8 @@ def cmd_compute(args):
             latest = df.iloc[-1]["value"]
             print(f"  {index_id}: {len(df)} observations, latest={latest:,.2f}")
             
-            if args.save:
+            if args.save and index_id != "global_liquidity_credit_index":
+                # GLCI saves are handled separately with full results
                 storage.save_curated(df, "indices", index_id)
                 print(f"    Saved to storage")
     

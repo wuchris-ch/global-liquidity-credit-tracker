@@ -2,7 +2,7 @@
  * React hooks for fetching series and index data.
  */
 import { useState, useEffect, useCallback } from "react";
-import api, { DataPoint, SeriesInfo, SeriesResponse, IndexResponse } from "@/lib/api";
+import api, { DataPoint, SeriesInfo, SeriesResponse, IndexResponse, GLCIResponse } from "@/lib/api";
 
 export interface UseSeriesDataOptions {
   start?: string;
@@ -146,4 +146,43 @@ export function useSeriesList(): UseSeriesListResult {
   }, []);
 
   return { series, isLoading, error };
+}
+
+export interface UseGLCIDataResult {
+  data: GLCIResponse | null;
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+}
+
+export function useGLCIData(
+  options: UseSeriesDataOptions = {}
+): UseGLCIDataResult {
+  const { start, end, enabled = true } = options;
+  const [data, setData] = useState<GLCIResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!enabled) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.getGLCI(start, end);
+      setData(response);
+    } catch (e) {
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setData(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [start, end, enabled]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return { data, isLoading, error, refetch: fetchData };
 }

@@ -32,6 +32,15 @@ series:
     unit: billions_usd
     description: "Overnight Reverse Repurchase Agreements"
 
+  fed_reserve_balances:
+    source: fred
+    source_id: WRBWFRBL
+    country: US
+    frequency: weekly
+    type: stock
+    unit: millions_usd
+    description: "Reserve Balances with Federal Reserve Banks"
+
   ecb_total_assets:
     source: fred
     source_id: ECBASSETSW
@@ -49,6 +58,87 @@ series:
     type: stock
     unit: millions_jpy
     description: "Bank of Japan Total Assets"
+
+  boe_total_assets:
+    source: fred
+    source_id: BOGZ1FL714090005Q
+    country: GB
+    frequency: quarterly
+    type: stock
+    unit: millions_gbp
+    description: "Bank of England Total Assets"
+
+  # Note: PBoC balance sheet data not available on FRED
+  # Using China M2 as proxy for Chinese liquidity conditions
+
+  # ===================
+  # Exchange Rates (for USD normalization)
+  # ===================
+  fx_eurusd:
+    source: fred
+    source_id: DEXUSEU
+    country: US
+    frequency: daily
+    type: rate
+    unit: usd_per_eur
+    description: "EUR/USD Exchange Rate"
+
+  fx_usdjpy:
+    source: fred
+    source_id: DEXJPUS
+    country: US
+    frequency: daily
+    type: rate
+    unit: jpy_per_usd
+    description: "USD/JPY Exchange Rate"
+
+  fx_gbpusd:
+    source: fred
+    source_id: DEXUSUK
+    country: US
+    frequency: daily
+    type: rate
+    unit: usd_per_gbp
+    description: "GBP/USD Exchange Rate"
+
+  fx_usdcny:
+    source: fred
+    source_id: DEXCHUS
+    country: US
+    frequency: daily
+    type: rate
+    unit: cny_per_usd
+    description: "USD/CNY Exchange Rate"
+
+  # ===================
+  # Inflation / Deflators (for real adjustments)
+  # ===================
+  us_cpi:
+    source: fred
+    source_id: CPIAUCSL
+    country: US
+    frequency: monthly
+    type: index
+    unit: index_1982_84
+    description: "US Consumer Price Index for All Urban Consumers"
+
+  eu_hicp:
+    source: fred
+    source_id: CP0000EZ19M086NEST
+    country: EU
+    frequency: monthly
+    type: index
+    unit: index_2015
+    description: "Euro Area Harmonized Index of Consumer Prices"
+
+  jp_cpi:
+    source: fred
+    source_id: JPNCPIALLMINMEI
+    country: JP
+    frequency: monthly
+    type: index
+    unit: index_2020
+    description: "Japan Consumer Price Index"
 
   # ===================
   # Funding Rates
@@ -149,12 +239,98 @@ series:
     unit: percent
     description: "ICE BofA US Corporate Index Option-Adjusted Spread"
 
+  treasury_3m:
+    source: fred
+    source_id: DGS3MO
+    country: US
+    frequency: daily
+    type: rate
+    unit: percent
+    description: "3-Month Treasury Constant Maturity Rate"
+
+  treasury_10y:
+    source: fred
+    source_id: DGS10
+    country: US
+    frequency: daily
+    type: rate
+    unit: percent
+    description: "10-Year Treasury Constant Maturity Rate"
+
+  treasury_2y:
+    source: fred
+    source_id: DGS2
+    country: US
+    frequency: daily
+    type: rate
+    unit: percent
+    description: "2-Year Treasury Constant Maturity Rate"
+
+  # Volatility Indices
+  vix:
+    source: fred
+    source_id: VIXCLS
+    country: US
+    frequency: daily
+    type: index
+    unit: index
+    description: "CBOE Volatility Index (VIX)"
+
+  # Financial Conditions
+  nfci:
+    source: fred
+    source_id: NFCI
+    country: US
+    frequency: weekly
+    type: index
+    unit: index
+    description: "Chicago Fed National Financial Conditions Index"
+
   # ===================
-  # Credit to Non-Financial Sector (BIS)
+  # Higher-Frequency Credit Proxies (Weekly/Monthly)
+  # ===================
+  us_bank_credit_total:
+    source: fred
+    source_id: TOTBKCR
+    country: US
+    frequency: weekly
+    type: stock
+    unit: billions_usd
+    description: "Total Bank Credit at US Commercial Banks"
+
+  us_bank_loans_leases:
+    source: fred
+    source_id: TOTLL
+    country: US
+    frequency: weekly
+    type: stock
+    unit: billions_usd
+    description: "Total Loans and Leases at US Commercial Banks"
+
+  us_consumer_credit:
+    source: fred
+    source_id: TOTALSL
+    country: US
+    frequency: monthly
+    type: stock
+    unit: billions_usd
+    description: "Total Consumer Credit Owned and Securitized"
+
+  us_commercial_paper:
+    source: fred
+    source_id: COMPOUT
+    country: US
+    frequency: weekly
+    type: stock
+    unit: billions_usd
+    description: "Commercial Paper Outstanding"
+
+  # ===================
+  # Credit to Non-Financial Sector (BIS) - Quarterly
   # ===================
   bis_credit_us:
     source: bis
-    source_id: "Q:US:P:A:M:XDC:A"
+    source_id: "Q.US.P.A.M.XDC.A"
     country: US
     frequency: quarterly
     type: stock
@@ -163,7 +339,7 @@ series:
 
   bis_credit_eu:
     source: bis
-    source_id: "Q:XM:P:A:M:XDC:A"
+    source_id: "Q.XM.P.A.M.XDC.A"
     country: EU
     frequency: quarterly
     type: stock
@@ -172,7 +348,7 @@ series:
 
   bis_credit_cn:
     source: bis
-    source_id: "Q:CN:P:A:M:XDC:A"
+    source_id: "Q.CN.P.A.M.XDC.A"
     country: CN
     frequency: quarterly
     type: stock
@@ -181,15 +357,18 @@ series:
 
   bis_credit_jp:
     source: bis
-    source_id: "Q:JP:P:A:M:XDC:A"
+    source_id: "Q.JP.P.A.M.XDC.A"
     country: JP
     frequency: quarterly
     type: stock
     unit: local_currency
     description: "BIS Credit to Private Non-Financial Sector - Japan"
 
+  # Note: BIS credit gap series (771) require different API access
+  # Using credit levels with impulse transforms instead
+
   # ===================
-  # World Bank Credit Indicators
+  # World Bank Credit Indicators (Annual - for longer-term context)
   # ===================
   wb_credit_gdp_us:
     source: worldbank
@@ -208,6 +387,24 @@ series:
     type: ratio
     unit: percent_gdp
     description: "Domestic Credit to Private Sector (% of GDP) - China"
+
+  wb_credit_gdp_eu:
+    source: worldbank
+    source_id: FS.AST.PRVT.GD.ZS
+    country: EU
+    frequency: annual
+    type: ratio
+    unit: percent_gdp
+    description: "Domestic Credit to Private Sector (% of GDP) - Euro Area"
+
+  wb_credit_gdp_jp:
+    source: worldbank
+    source_id: FS.AST.PRVT.GD.ZS
+    country: JP
+    frequency: annual
+    type: ratio
+    unit: percent_gdp
+    description: "Domestic Credit to Private Sector (% of GDP) - Japan"
 
 # ===================
 # Composite Index Definitions
@@ -251,6 +448,113 @@ indices:
       - series: boj_total_assets
         weight: 0.0067  # Approx JPY/USD
 
+  global_liquidity_credit_index:
+    description: "Tri-pillar Global Liquidity & Credit Index (GLCI)"
+    frequency: weekly
+    method: latent_factor
+    normalize:
+      mean: 100
+      stdev: 10
+    # Pillar weights calibrated for predictive power
+    pillar_weights:
+      liquidity: 0.40
+      credit: 0.35
+      stress: 0.25
+    pillars:
+      liquidity:
+        weight: 0.40
+        sign: 1  # Higher liquidity = higher index
+        transforms: ["zscore", "growth"]
+        components:
+          # US Fed
+          - series: fed_total_assets
+            country: US
+            sign: 1
+          - series: fed_reserve_balances
+            country: US
+            sign: 1
+          - series: fed_reverse_repo
+            sign: -1  # Drains liquidity (NEGATIVE effect)
+          - series: fed_treasury_general_account
+            sign: -1  # Drains liquidity (NEGATIVE effect)
+          # ECB
+          - series: ecb_total_assets
+            country: EU
+            sign: 1
+          # BoJ
+          - series: boj_total_assets
+            country: JP
+            sign: 1
+          # BoE
+          - series: boe_total_assets
+            country: GB
+            sign: 1
+          # Monetary Aggregates
+          - series: us_m2
+            country: US
+            sign: 1
+      credit:
+        weight: 0.35
+        sign: 1  # Higher credit = higher index
+        transforms: ["zscore", "growth"]
+        components:
+          # Higher-frequency US proxies (weekly/monthly)
+          - series: us_bank_credit_total
+            country: US
+            sign: 1
+          - series: us_bank_loans_leases
+            country: US
+            sign: 1
+          - series: us_consumer_credit
+            country: US
+            sign: 1
+          - series: us_commercial_paper
+            country: US
+            sign: 1
+          # BIS Credit Levels
+          - series: bis_credit_us
+            country: US
+            sign: 1
+          - series: bis_credit_eu
+            country: EU
+            sign: 1
+          - series: bis_credit_cn
+            country: CN
+            sign: 1
+          - series: bis_credit_jp
+            country: JP
+            sign: 1
+          # World Bank Credit to GDP
+          - series: wb_credit_gdp_us
+            country: US
+            sign: 1
+          - series: wb_credit_gdp_cn
+            country: CN
+            sign: 1
+      stress:
+        weight: 0.25
+        sign: -1  # Higher stress = LOWER index (inverted)
+        transforms: ["zscore"]
+        components:
+          # Credit Spreads
+          - series: ice_bofa_us_high_yield_spread
+            sign: 1  # Higher spread = more stress
+          - series: ice_bofa_us_ig_spread
+            sign: 1
+          - series: ted_spread
+            sign: 1
+          # Funding Rates (level indicates tightness)
+          - series: sofr
+            sign: 1
+          - series: fed_funds_rate
+            sign: 1
+          # Volatility (stress indicator)
+          - series: vix
+            sign: 1
+          # Financial Conditions (higher = tighter)
+          - series: nfci
+            sign: 1
+
 # ===================
 # Country GDP Weights (for weighted indices)
 # ===================
@@ -265,3 +569,26 @@ country_weights:
   KR: 0.02
   IN: 0.03
   BR: 0.02
+
+# ===================
+# Transform Configuration
+# ===================
+transform_config:
+  zscore:
+    window: 104  # 2 years for weekly data
+    min_periods: 26
+  growth:
+    periods:
+      weekly: 52
+      monthly: 12
+      quarterly: 4
+    annualize: true
+  impulse:
+    periods:
+      quarterly: 4
+      monthly: 12
+  gap:
+    window:
+      weekly: 104
+      monthly: 24
+      quarterly: 8

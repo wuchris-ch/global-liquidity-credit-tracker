@@ -5,6 +5,7 @@ import { Header, TimeRange } from "@/components/header";
 import { MetricCard } from "@/components/metric-card";
 import { LiquidityChart } from "@/components/liquidity-chart";
 import { MultiLineChart } from "@/components/multi-line-chart";
+import { InfoTooltip } from "@/components/info-tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
+import { metricDefinitions, chartDefinitions, spreadDefinitions } from "@/lib/indicator-definitions";
 
 function getDateRange(range: TimeRange): { start: string; end: string } {
   const end = new Date();
@@ -172,8 +174,9 @@ export default function SpreadsPage() {
                       {stressLevel.label}
                     </Badge>
                   </div>
-                  <p className="mt-4 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  <p className="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                     Funding Stress Index
+                    <InfoTooltip {...chartDefinitions.stress_index_chart} size="xs" />
                   </p>
                   <p className="mt-2 font-mono text-4xl font-bold tracking-tight">
                     {isLoading ? "..." : latestStress.toFixed(2)}
@@ -228,6 +231,7 @@ export default function SpreadsPage() {
                 trend={latestHY > avgHY ? "down" : "up"}
                 icon={<TrendingUp className="h-5 w-5" />}
                 variant="highlight"
+                info={metricDefinitions.hy_spread}
               />
               <MetricCard
                 title="Investment Grade OAS"
@@ -235,6 +239,7 @@ export default function SpreadsPage() {
                 change={-2.1}
                 trend="up"
                 icon={<TrendingDown className="h-5 w-5" />}
+                info={metricDefinitions.ig_spread}
               />
               <MetricCard
                 title="HY/IG Ratio"
@@ -242,6 +247,7 @@ export default function SpreadsPage() {
                 change={0.8}
                 trend="neutral"
                 icon={<Activity className="h-5 w-5" />}
+                info={spreadDefinitions.hy_ig_ratio}
               />
               <MetricCard
                 title="vs Period Average"
@@ -274,6 +280,7 @@ export default function SpreadsPage() {
                     ]}
                     height={350}
                     valueFormatter={(v) => `${Math.round(v)} bps`}
+                    info={chartDefinitions.credit_spreads_chart}
                   />
                   <MultiLineChart
                     title="Funding Rates"
@@ -285,6 +292,7 @@ export default function SpreadsPage() {
                     ]}
                     height={350}
                     valueFormatter={(v) => `${v.toFixed(2)}%`}
+                    info={chartDefinitions.funding_rates_chart}
                   />
                 </>
               )}
@@ -294,7 +302,10 @@ export default function SpreadsPage() {
             <div className="grid gap-6 lg:grid-cols-3">
               <Card className="lg:col-span-2">
                 <CardHeader>
-                  <CardTitle className="text-sm font-semibold">Spread Decomposition</CardTitle>
+                  <CardTitle className="inline-flex items-center gap-2 text-sm font-semibold">
+                    Spread Decomposition
+                    <InfoTooltip {...spreadDefinitions.spread_decomposition} size="sm" />
+                  </CardTitle>
                   <CardDescription className="text-xs">
                     Components of credit risk premium (estimated)
                   </CardDescription>
@@ -378,8 +389,9 @@ export default function SpreadsPage() {
                       </div>
                     </div>
                     <div className="rounded-lg border border-border p-3">
-                      <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      <p className="inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                         Recession Average
+                        <InfoTooltip {...spreadDefinitions.recession_comparison} size="xs" />
                       </p>
                       <p className="mt-1 font-mono text-lg font-semibold">750 bps</p>
                       <p className="text-xs text-muted-foreground">

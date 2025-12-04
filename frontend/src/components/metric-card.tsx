@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { InfoTooltip, InfoTooltipProps } from "@/components/info-tooltip";
 import { cn } from "@/lib/utils";
 import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 
@@ -13,6 +14,8 @@ interface MetricCardProps {
   icon?: React.ReactNode;
   className?: string;
   variant?: "default" | "highlight" | "compact";
+  /** Info tooltip content - displays (i) icon when provided */
+  info?: InfoTooltipProps;
 }
 
 export function MetricCard({
@@ -24,6 +27,7 @@ export function MetricCard({
   icon,
   className,
   variant = "default",
+  info,
 }: MetricCardProps) {
   const getTrendColor = () => {
     switch (trend) {
@@ -50,7 +54,10 @@ export function MetricCard({
   if (variant === "compact") {
     return (
       <div className={cn("flex items-center justify-between py-2", className)}>
-        <span className="text-sm text-muted-foreground">{title}</span>
+        <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+          {title}
+          {info && <InfoTooltip {...info} size="xs" />}
+        </span>
         <div className="flex items-center gap-2">
           <span className="font-mono text-sm font-semibold">{value}</span>
           {change !== undefined && (
@@ -78,8 +85,9 @@ export function MetricCard({
       <CardContent className="relative p-5">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
               {title}
+              {info && <InfoTooltip {...info} size="xs" />}
             </p>
             <p className="font-mono text-2xl font-bold tracking-tight">{value}</p>
             {(change !== undefined || changeLabel) && (
@@ -102,5 +110,9 @@ export function MetricCard({
     </Card>
   );
 }
+
+
+
+
 
 

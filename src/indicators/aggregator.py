@@ -10,6 +10,7 @@ from .transforms import (
     compute_zscore,
     align_series,
 )
+from .glci import GLCIComputer
 
 
 class Aggregator:
@@ -78,6 +79,8 @@ class Aggregator:
             return self._compute_sum_normalized(index_id, component_data, components, frequency)
         elif method == "weighted_average":
             return self._compute_weighted_average(index_id, component_data, components, frequency)
+        elif method == "latent_factor":
+            return self._compute_latent_factor(index_id, start_date, end_date)
         else:
             raise ValueError(f"Unknown aggregation method: {method}")
     
@@ -240,6 +243,55 @@ class Aggregator:
             "value": result,
             "index_id": index_id
         })
+    
+    def _compute_latent_factor(
+        self,
+        index_id: str,
+        start_date: str | None,
+        end_date: str | None
+    ) -> pd.DataFrame:
+        """Compute latent factor model index (e.g., GLCI).
+        
+        This method delegates to specialized factor model implementations.
+        """
+        # Currently only GLCI uses this method
+        computer = GLCIComputer(fetcher=self.fetcher)
+        result = computer.compute(start_date, end_date, save_output=False)
+        
+        # Return just the main GLCI DataFrame in standard format
+        return result.glci[["date", "value", "index_id"]]
+    
+    def compute_glci(
+        self,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        save: bool = False,
+        include_pillars: bool = False
+    ) -> pd.DataFrame | dict:
+        """Convenience method for computing the Global Liquidity Credit Index.
+        
+        Args:
+            start_date: Optional start date
+            end_date: Optional end date
+            save: Whether to save results to storage
+            include_pillars: If True, return full result dict with pillars
+            
+        Returns:
+            DataFrame with GLCI, or dict with full results if include_pillars=True
+        """
+        computer = GLCIComputer(fetcher=self.fetcher)
+        result = computer.compute(start_date, end_date, save_output=save)
+        
+        if include_pillars:
+            return {
+                "glci": result.glci,
+                "pillars": result.pillars,
+                "regimes": result.regimes,
+                "weights": result.weights,
+                "metadata": result.metadata
+            }
+        
+        return result.glci
     
     def compute_all_indices(
         self,

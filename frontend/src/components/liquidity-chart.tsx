@@ -7,6 +7,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { InfoTooltip, InfoTooltipProps } from "@/components/info-tooltip";
 import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis, YAxis, ReferenceLine } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +71,8 @@ interface LiquidityChartProps {
   valueFormatter?: (value: number) => string;
   referenceLine?: number;
   referenceLabel?: string;
+  /** Info tooltip content - displays (i) icon when provided */
+  info?: InfoTooltipProps;
 }
 
 export function LiquidityChart({
@@ -86,6 +89,7 @@ export function LiquidityChart({
   valueFormatter = (v) => v.toLocaleString(),
   referenceLine,
   referenceLabel,
+  info,
 }: LiquidityChartProps) {
   const chartConfig = {
     [dataKey]: {
@@ -101,7 +105,10 @@ export function LiquidityChart({
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-base font-semibold">{title}</CardTitle>
+            <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
+              {title}
+              {info && <InfoTooltip {...info} size="sm" />}
+            </CardTitle>
             {description && (
               <CardDescription className="text-xs">{description}</CardDescription>
             )}
@@ -228,5 +235,9 @@ export function LiquidityChart({
     </Card>
   );
 }
+
+
+
+
 
 

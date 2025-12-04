@@ -46,85 +46,105 @@
   --color-positive: var(--positive);
   --color-negative: var(--negative);
   --color-glow: var(--glow);
+  
+  /* Pillar semantic colors */
+  --color-pillar-liquidity: var(--pillar-liquidity);
+  --color-pillar-credit: var(--pillar-credit);
+  --color-pillar-stress: var(--pillar-stress);
+  
+  /* Regime semantic colors */
+  --color-regime-loose: var(--regime-loose);
+  --color-regime-neutral: var(--regime-neutral);
+  --color-regime-tight: var(--regime-tight);
 }
 
-/* shadcn default dark theme - pure black and white */
+/* Clean dark theme - black and white with finance accent colors */
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.556 0 0);
+  --background: oklch(0.09 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.12 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.09 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.55 0 0);
+  --accent: oklch(0.18 0 0);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.2 25);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.18 0 0);
+  --ring: oklch(0.55 0 0);
   
-  /* Neutral grayscale chart colors */
-  --chart-1: oklch(0.985 0 0);
-  --chart-2: oklch(0.708 0 0);
-  --chart-3: oklch(0.556 0 0);
-  --chart-4: oklch(0.439 0 0);
-  --chart-5: oklch(0.371 0 0);
+  /* Pillar colors - distinct semantic colors */
+  --pillar-liquidity: oklch(0.65 0.12 230);    /* Steel blue - money flow */
+  --pillar-credit: oklch(0.72 0.10 85);        /* Warm gold - value/credit */
+  --pillar-stress: oklch(0.60 0.20 20);        /* Crimson red - danger/stress */
   
-  /* Sidebar - matches background */
-  --sidebar: oklch(0.145 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.985 0 0);
-  --sidebar-primary-foreground: oklch(0.205 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Chart colors - grayscale with finance accents */
+  --chart-1: oklch(0.85 0 0);                   /* Light gray */
+  --chart-2: oklch(0.60 0 0);                   /* Medium gray */
+  --chart-3: oklch(0.45 0 0);                   /* Dark gray */
+  --chart-4: oklch(0.35 0 0);                   /* Darker gray */
+  --chart-5: var(--pillar-stress);
   
-  /* Financial indicators - subtle */
-  --positive: oklch(0.72 0.17 142);
-  --negative: oklch(0.577 0.245 27.325);
-  --glow: oklch(0.985 0 0 / 0.15);
+  /* Sidebar - pure dark */
+  --sidebar: oklch(0.07 0 0);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.98 0 0);
+  --sidebar-primary-foreground: oklch(0.09 0 0);
+  --sidebar-accent: oklch(0.15 0 0);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.18 0 0);
+  --sidebar-ring: oklch(0.45 0 0);
+  
+  /* Financial indicators - keep green/red/amber */
+  --positive: oklch(0.72 0.19 150);
+  --negative: oklch(0.62 0.22 25);
+  --glow: oklch(0.98 0 0 / 0.1);
+  
+  /* Regime colors */
+  --regime-loose: oklch(0.72 0.19 150);        /* Green - expansionary */
+  --regime-neutral: oklch(0.70 0.04 250);      /* Cool blue-gray - balanced */
+  --regime-tight: oklch(0.60 0.20 20);         /* Crimson - restrictive */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.985 0 0);
-  --chart-2: oklch(0.708 0 0);
-  --chart-3: oklch(0.556 0 0);
-  --chart-4: oklch(0.439 0 0);
-  --chart-5: oklch(0.371 0 0);
-  --sidebar: oklch(0.145 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.985 0 0);
-  --sidebar-primary-foreground: oklch(0.205 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.09 0 0);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.12 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.09 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.55 0 0);
+  --accent: oklch(0.18 0 0);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.2 25);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.18 0 0);
+  --ring: oklch(0.55 0 0);
+  --chart-1: oklch(0.85 0 0);
+  --chart-2: oklch(0.60 0 0);
+  --chart-3: oklch(0.45 0 0);
+  --chart-4: oklch(0.35 0 0);
+  --chart-5: var(--pillar-stress);
+  --sidebar: oklch(0.07 0 0);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.98 0 0);
+  --sidebar-primary-foreground: oklch(0.09 0 0);
+  --sidebar-accent: oklch(0.15 0 0);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.18 0 0);
+  --sidebar-ring: oklch(0.45 0 0);
 }
 
 @layer base {
@@ -157,6 +177,31 @@
 }
 
 @layer utilities {
+  /* Pillar-specific styling */
+  .pillar-liquidity {
+    --pillar-color: var(--pillar-liquidity);
+  }
+  
+  .pillar-credit {
+    --pillar-color: var(--pillar-credit);
+  }
+  
+  .pillar-stress {
+    --pillar-color: var(--pillar-stress);
+  }
+  
+  .pillar-bg {
+    background-color: color-mix(in oklch, var(--pillar-color) 15%, transparent);
+  }
+  
+  .pillar-border {
+    border-color: color-mix(in oklch, var(--pillar-color) 40%, transparent);
+  }
+  
+  .pillar-text {
+    color: var(--pillar-color);
+  }
+  
   /* Glow effects */
   .glow-primary {
     box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow);
@@ -164,6 +209,10 @@
   
   .glow-sm {
     box-shadow: 0 0 10px var(--glow);
+  }
+  
+  .glow-pillar {
+    box-shadow: 0 0 15px color-mix(in oklch, var(--pillar-color) 30%, transparent);
   }
   
   /* Gradient text */
@@ -174,9 +223,16 @@
     background-clip: text;
   }
   
+  .text-gradient-pillar {
+    background: linear-gradient(135deg, var(--pillar-color) 0%, color-mix(in oklch, var(--pillar-color) 70%, white) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
   /* Glass effect */
   .glass {
-    background: oklch(0.145 0 0 / 0.8);
+    background: oklch(0.12 0 0 / 0.8);
     backdrop-filter: blur(12px);
     border: 1px solid oklch(1 0 0 / 0.05);
   }
@@ -193,7 +249,7 @@
     position: absolute;
     inset: -1px;
     border-radius: calc(var(--radius) + 1px);
-    background: linear-gradient(135deg, var(--foreground), var(--muted-foreground), var(--border));
+    background: linear-gradient(135deg, oklch(0.4 0 0), oklch(0.3 0 0));
     z-index: -1;
     opacity: 0.3;
   }
@@ -227,8 +283,34 @@
   
   /* Dot pattern background */
   .bg-dots {
-    background-image: radial-gradient(oklch(1 0 0 / 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(oklch(1 0 0 / 0.06) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+  
+  /* Regime-specific backgrounds */
+  .regime-loose {
+    background: linear-gradient(135deg, oklch(0.72 0.19 150 / 0.1) 0%, transparent 100%);
+  }
+  
+  .regime-neutral {
+    background: linear-gradient(135deg, oklch(0.75 0.12 85 / 0.1) 0%, transparent 100%);
+  }
+  
+  .regime-tight {
+    background: linear-gradient(135deg, oklch(0.62 0.22 25 / 0.1) 0%, transparent 100%);
+  }
+  
+  /* Data freshness indicators */
+  .freshness-fresh {
+    color: var(--positive);
+  }
+  
+  .freshness-stale {
+    color: var(--regime-neutral);
+  }
+  
+  .freshness-old {
+    color: var(--negative);
   }
 }
 
@@ -240,4 +322,31 @@
 /* Smooth transitions for theme changes */
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.1s ease;
+}
+
+/* Animation for value changes */
+@keyframes value-flash {
+  0% {
+    background-color: var(--primary);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.value-changed {
+  animation: value-flash 0.5s ease-out;
+}
+
+/* Waterfall chart specific */
+.waterfall-increase {
+  fill: var(--positive);
+}
+
+.waterfall-decrease {
+  fill: var(--negative);
+}
+
+.waterfall-total {
+  fill: var(--primary);
 }

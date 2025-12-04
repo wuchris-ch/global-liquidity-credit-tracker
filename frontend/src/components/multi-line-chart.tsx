@@ -7,6 +7,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { InfoTooltip, InfoTooltipProps } from "@/components/info-tooltip";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Legend } from "recharts";
 import { cn } from "@/lib/utils";
 
@@ -68,6 +69,8 @@ interface MultiLineChartProps {
   className?: string;
   valueFormatter?: (value: number) => string;
   normalized?: boolean;
+  /** Info tooltip content - displays (i) icon when provided */
+  info?: InfoTooltipProps;
 }
 
 export function MultiLineChart({
@@ -82,6 +85,7 @@ export function MultiLineChart({
   className,
   valueFormatter = (v) => v.toLocaleString(),
   normalized = false,
+  info,
 }: MultiLineChartProps) {
   const chartConfig = series.reduce((acc, s) => {
     acc[s.key] = {
@@ -94,7 +98,10 @@ export function MultiLineChart({
   return (
     <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">{title}</CardTitle>
+        <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
+          {title}
+          {info && <InfoTooltip {...info} size="sm" />}
+        </CardTitle>
         {description && (
           <CardDescription className="text-xs">{description}</CardDescription>
         )}
@@ -186,5 +193,9 @@ export function MultiLineChart({
     </Card>
   );
 }
+
+
+
+
 
 

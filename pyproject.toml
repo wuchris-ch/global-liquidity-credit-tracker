@@ -2,7 +2,7 @@
 name = "global-liquidity-tracker"
 version = "0.1.0"
 description = "Track global liquidity and credit metrics from central banks and financial institutions"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "pandas>=2.0.0",
     "numpy>=1.24.0",
@@ -16,6 +16,7 @@ dependencies = [
     "pyarrow>=14.0.0",
     "statsmodels>=0.14.0",
     "scipy>=1.11.0",
+    "pydantic>=2.0.0",
 ]
 
 [project.optional-dependencies]

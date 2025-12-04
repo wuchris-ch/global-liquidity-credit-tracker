@@ -15,12 +15,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
   },
 
-  // Explicit Turbopack alias to ensure @/ resolves correctly in all environments
-  turbopack: {
-    resolveAlias: {
-      "@/*": ["./src/*"],
-    },
-  },
+  // Empty turbopack config - paths should be read from tsconfig.json
+  turbopack: {},
 };
 
 export default nextConfig;

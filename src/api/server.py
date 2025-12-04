@@ -1,4 +1,5 @@
 """FastAPI server exposing liquidity data."""
+import os
 from datetime import datetime, timedelta
 from typing import Literal
 import warnings
@@ -15,6 +16,20 @@ from ..indicators import Aggregator, GLCIComputer
 # Suppress noisy sklearn/statsmodels warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning, module="sklearn")
 warnings.filterwarnings("ignore", message="DFM fitting failed")
+
+
+def get_allowed_origins() -> list[str]:
+    """Get CORS allowed origins from environment or defaults."""
+    # Check for explicit origins in env var (comma-separated)
+    env_origins = os.getenv("CORS_ORIGINS", "")
+    if env_origins:
+        return [o.strip() for o in env_origins.split(",") if o.strip()]
+    
+    # Default origins for local development
+    return [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
 
 
 # Simple in-memory cache for GLCI results
@@ -61,10 +76,10 @@ app = FastAPI(
     version="0.2.0",
 )
 
-# CORS for frontend
+# CORS for frontend - configured via CORS_ORIGINS env var for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

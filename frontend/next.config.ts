@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+const frontendRoot = __dirname; // ensures alias points to this package even if cwd is repo root
+
 const nextConfig: NextConfig = {
   reactCompiler: true,
   devIndicators: false,
@@ -16,7 +18,7 @@ const nextConfig: NextConfig = {
   },
 
   webpack: (config) => {
-    config.resolve.alias["@"] = path.join(process.cwd(), "src");
+    config.resolve.alias["@"] = path.resolve(frontendRoot, "src");
     return config;
   },
 };

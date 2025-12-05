@@ -392,32 +392,36 @@
   }
 }
 
-/* Mobile: zoom out content to fit screen */
+/* Mobile: zoom out page content to fit screen */
 @media (max-width: 500px) {
-  /* Use CSS zoom to scale everything down */
-  main {
+  /* Target the background wrapper divs used in all pages */
+  .bg-dots,
+  .bg-grid {
     zoom: 0.9;
   }
 }
 
 @media (max-width: 430px) {
-  /* iPhone Pro Max and similar */
-  main {
-    zoom: 0.85;
+  /* iPhone Pro Max (430px) and similar */
+  .bg-dots,
+  .bg-grid {
+    zoom: 0.8;
   }
 }
 
 @media (max-width: 390px) {
-  /* Smaller phones */
-  main {
-    zoom: 0.8;
+  /* iPhone 14/15 (390px) and smaller */
+  .bg-dots,
+  .bg-grid {
+    zoom: 0.75;
   }
 }
 
 @media (max-width: 360px) {
   /* Very small phones */
-  main {
-    zoom: 0.75;
+  .bg-dots,
+  .bg-grid {
+    zoom: 0.7;
   }
 }
 

@@ -34,9 +34,9 @@ def main():
     storage = DataStorage()
     aggregator = Aggregator(fetcher)
     
-    # Date range: last 3 years
-    start_date = (datetime.now() - timedelta(days=365*3)).strftime("%Y-%m-%d")
-    end_date = datetime.now().strftime("%Y-%m-%d")
+    # Date range: full history (None = fetch all available from sources)
+    start_date = None
+    end_date = None
     
     # 1. Fetch all series
     print("\n[1/3] Fetching raw data...")

@@ -105,7 +105,7 @@ export default function LiquidityPage() {
       <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} />
       <ScrollArea className="flex-1 w-full">
         <div className="bg-grid min-h-full w-full overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1600px] space-y-4 p-3 sm:space-y-6 sm:p-6 overflow-hidden">
+          <div className="mx-auto w-full max-w-[1600px] space-y-3 p-2 min-[360px]:p-3 sm:space-y-6 sm:p-6 overflow-hidden">
             <Card className="border-primary/20 bg-gradient-to-r from-primary/5 via-card to-card">
               <CardContent className="p-3 sm:p-6">
                 <div className="flex flex-col gap-3 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -139,7 +139,7 @@ export default function LiquidityPage() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
               <MetricCard title="Fed Total Assets" value={isLoading ? "Loading..." : formatCurrency(latestFed)} change={calcChange(fedAssets.data)} trend={calcChange(fedAssets.data) >= 0 ? "up" : "down"} icon={<Building2 className="h-5 w-5" />} variant="highlight" info={metricDefinitions.fed_balance_sheet} />
               <MetricCard title="Treasury General Account" value={isLoading ? "Loading..." : formatCurrency(latestTga)} change={calcChange(tga.data)} trend={calcChange(tga.data) >= 0 ? "up" : "down"} icon={<Landmark className="h-5 w-5" />} info={metricDefinitions.tga} />
               <MetricCard title="Reverse Repo Facility" value={isLoading ? "Loading..." : formatCurrency(latestRrp)} change={calcChange(rrp.data)} trend={calcChange(rrp.data) >= 0 ? "up" : "down"} icon={<Wallet className="h-5 w-5" />} info={metricDefinitions.rrp} />

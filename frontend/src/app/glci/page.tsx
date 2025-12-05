@@ -199,7 +199,7 @@ export default function GLCIPage() {
 
       <ScrollArea className="flex-1 w-full">
         <div className="bg-dots min-h-full w-full overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1800px] space-y-4 p-3 sm:space-y-6 sm:p-6 overflow-hidden">
+          <div className="mx-auto w-full max-w-[1800px] space-y-3 p-2 min-[360px]:p-3 sm:space-y-6 sm:p-6 overflow-hidden">
             {/* Hero Section */}
             <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
               {/* Main GLCI Value */}
@@ -351,7 +351,7 @@ export default function GLCIPage() {
                 )}
 
                 {/* Statistics Row */}
-                <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
+                <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 md:grid-cols-4">
                   <MetricCard
                     title="Current Value"
                     value={isLoading ? "Loading..." : glciData?.value.toFixed(1) ?? "—"}

@@ -82,16 +82,16 @@ export function MetricCard({
       {variant === "highlight" && (
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       )}
-      <CardContent className="relative p-3 sm:p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="space-y-1 sm:space-y-2 min-w-0 flex-1">
-            <p className="inline-flex items-center gap-1 text-[9px] sm:text-[11px] font-semibold uppercase tracking-widest text-muted-foreground truncate">
-              {title}
+      <CardContent className="relative p-2.5 min-[360px]:p-3 sm:p-5">
+        <div className="flex items-start justify-between gap-1.5">
+          <div className="space-y-0.5 sm:space-y-2 min-w-0 flex-1">
+            <p className="inline-flex items-center gap-1 text-[8px] min-[360px]:text-[9px] sm:text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <span className="truncate">{title}</span>
               {info && <InfoTooltip {...info} size="xs" />}
             </p>
-            <p className="font-mono text-lg sm:text-2xl font-bold tracking-tight truncate">{value}</p>
+            <p className="font-mono text-base min-[360px]:text-lg sm:text-2xl font-bold tracking-tight truncate">{value}</p>
             {(change !== undefined || changeLabel) && (
-              <div className={cn("flex items-center gap-1 font-mono text-[10px] sm:text-xs", getTrendColor())}>
+              <div className={cn("flex items-center gap-0.5 font-mono text-[9px] min-[360px]:text-[10px] sm:text-xs", getTrendColor())}>
                 {getTrendIcon()}
                 <span className="font-medium truncate">
                   {change !== undefined && `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`}

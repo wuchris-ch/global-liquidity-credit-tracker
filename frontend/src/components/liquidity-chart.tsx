@@ -107,30 +107,30 @@ export function LiquidityChart({
 
   return (
     <Card className={cn("overflow-hidden", className)}>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
-              {title}
+      <CardHeader className="pb-2 px-3 sm:px-6">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold">
+              <span className="truncate">{title}</span>
               {info && <InfoTooltip {...info} size="sm" />}
             </CardTitle>
             {description && (
-              <CardDescription className="text-xs">{description}</CardDescription>
+              <CardDescription className="text-[10px] sm:text-xs truncate">{description}</CardDescription>
             )}
           </div>
           {data.length > 0 && (
-            <div className="text-right">
-              <p className="font-mono text-xl font-bold">
+            <div className="text-right shrink-0 hidden min-[400px]:block">
+              <p className="font-mono text-sm sm:text-xl font-bold">
                 {valueFormatter(data[data.length - 1]?.[dataKey] as number)}
               </p>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              <p className="text-[8px] sm:text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 Latest
               </p>
             </div>
           )}
         </div>
       </CardHeader>
-      <CardContent className="pb-4">
+      <CardContent className="pb-3 px-2 sm:px-6 sm:pb-4">
         <ChartContainer 
           config={chartConfig} 
           className="w-full" 
@@ -141,7 +141,7 @@ export function LiquidityChart({
         >
           <ChartComponent
             data={data}
-            margin={{ top: 10, right: 10, left: showYAxis ? 0 : -20, bottom: 0 }}
+            margin={{ top: 5, right: 5, left: showYAxis ? -10 : -25, bottom: 0 }}
           >
             {showGrid && (
               <CartesianGrid
@@ -164,16 +164,16 @@ export function LiquidityChart({
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
-                tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+                tickMargin={4}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
                 tickFormatter={(value) => {
                   if (value >= 1e12) return `${(value / 1e12).toFixed(1)}T`;
-                  if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
-                  if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
-                  if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
-                  return value.toFixed(1);
+                  if (value >= 1e9) return `${(value / 1e9).toFixed(0)}B`;
+                  if (value >= 1e6) return `${(value / 1e6).toFixed(0)}M`;
+                  if (value >= 1e3) return `${(value / 1e3).toFixed(0)}K`;
+                  return value.toFixed(0);
                 }}
-                width={50}
+                width={40}
               />
             )}
             <ChartTooltip

@@ -362,7 +362,7 @@ export default function ExplorerPage() {
 
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full w-full">
-                <div className="bg-grid min-h-full p-3 sm:p-6 w-full overflow-x-hidden">
+                <div className="bg-grid min-h-full p-2 min-[360px]:p-3 sm:p-6 w-full overflow-x-hidden">
                 {selectedSeries.length === 0 ? (
                   <Card className="flex h-[500px] items-center justify-center">
                     <div className="text-center">

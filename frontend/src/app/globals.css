@@ -397,6 +397,27 @@
   }
 }
 
+/* Extra small screen optimizations (< 400px) */
+@media (max-width: 400px) {
+  html {
+    font-size: 13px;
+  }
+  
+  /* Even tighter spacing on very small screens */
+  .p-3 {
+    padding: 0.5rem;
+  }
+  
+  /* Make charts fit narrow screens */
+  .recharts-wrapper {
+    max-width: 100% !important;
+  }
+  
+  .recharts-surface {
+    max-width: 100% !important;
+  }
+}
+
 /* Ensure charts are visible and scrollable on small screens */
 .recharts-wrapper {
   touch-action: pan-x pan-y;

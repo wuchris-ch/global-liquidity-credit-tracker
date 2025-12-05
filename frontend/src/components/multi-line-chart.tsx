@@ -102,16 +102,16 @@ export function MultiLineChart({
 
   return (
     <Card className={cn("overflow-hidden", className)}>
-      <CardHeader className="pb-2">
-        <CardTitle className="inline-flex items-center gap-2 text-base font-semibold">
-          {title}
+      <CardHeader className="pb-2 px-3 sm:px-6">
+        <CardTitle className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold">
+          <span className="truncate">{title}</span>
           {info && <InfoTooltip {...info} size="sm" />}
         </CardTitle>
         {description && (
-          <CardDescription className="text-xs">{description}</CardDescription>
+          <CardDescription className="text-[10px] sm:text-xs truncate">{description}</CardDescription>
         )}
       </CardHeader>
-      <CardContent className="pb-4">
+      <CardContent className="pb-3 px-2 sm:px-6 sm:pb-4">
         <ChartContainer 
           config={chartConfig} 
           className="w-full" 
@@ -122,7 +122,7 @@ export function MultiLineChart({
         >
           <LineChart
             data={data}
-            margin={{ top: 10, right: 10, left: showYAxis ? 0 : -20, bottom: 0 }}
+            margin={{ top: 5, right: 5, left: showYAxis ? -10 : -25, bottom: 0 }}
           >
             {showGrid && (
               <CartesianGrid
@@ -145,17 +145,17 @@ export function MultiLineChart({
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
-                tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+                tickMargin={4}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
                 tickFormatter={(value) => {
                   if (normalized) return value.toFixed(0);
                   if (value >= 1e12) return `${(value / 1e12).toFixed(1)}T`;
-                  if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
-                  if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
-                  if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+                  if (value >= 1e9) return `${(value / 1e9).toFixed(0)}B`;
+                  if (value >= 1e6) return `${(value / 1e6).toFixed(0)}M`;
+                  if (value >= 1e3) return `${(value / 1e3).toFixed(0)}K`;
                   return value.toFixed(1);
                 }}
-                width={50}
+                width={40}
               />
             )}
             <ChartTooltip
@@ -177,8 +177,8 @@ export function MultiLineChart({
                 verticalAlign="top"
                 align="right"
                 wrapperStyle={{
-                  paddingBottom: "10px",
-                  fontSize: "11px",
+                  paddingBottom: "5px",
+                  fontSize: "9px",
                 }}
               />
             )}

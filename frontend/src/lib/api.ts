@@ -2,7 +2,12 @@
  * API client for fetching data from the Python backend.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Allows pointing the frontend to static JSON (e.g., Cloudflare R2) first,
+// then falling back to a live API (dev/local).
+const API_BASE_URL =
+  (process.env.NEXT_PUBLIC_DATA_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:8000").replace(/\/$/, "");
 
 export interface DataPoint {
   date: string;

@@ -170,39 +170,30 @@ indices:
 
 ## Deployment
 
-### Recommended: Vercel (frontend) + Render (backend)
+### Static pipeline (GitHub Actions + GitHub Pages + static frontend)
 
-#### 1. Deploy Backend to Render
+For a free, low-maintenance setup, the app can publish precomputed JSON to a `gh-pages`
+branch and serve a static frontend (Vercel or GitHub Pages) without any external storage.
 
-1. Push your code to GitHub
-2. Go to [render.com](https://render.com) and create a new **Web Service**
-3. Connect your GitHub repo
-4. Configure:
-   - **Build Command:** `pip install -e .`
-   - **Start Command:** `uvicorn src.api:app --host 0.0.0.0 --port $PORT`
-5. Add environment variables:
-   - `FRED_API_KEY` = your FRED API key
-   - `CORS_ORIGINS` = your Vercel URL (add after frontend deploy)
-6. (Optional) Add a **Disk** mounted at `/opt/render/project/src/data` for data persistence
+1) Set secrets in GitHub:
+   - `FRED_API_KEY` (for fetching data)
+   - `GITHUB_TOKEN` is provided automatically by GitHub Actions.
 
-#### 2. Deploy Frontend to Vercel
+2) GitHub Actions (`.github/workflows/update-data.yml`) runs every 12h:
+   - `python scripts/update_data.py` (fetch + indices)
+   - `python - <<'PY' ... compute_glci(save=True)` (GLCI)
+   - `python scripts/export_to_json.py --output data/export/latest --snapshot` (API-shaped JSON)
+   - Force-publishes `latest/` and a few `snapshots/` to the `gh-pages` branch.
 
-1. Go to [vercel.com](https://vercel.com) and import your repo
-2. Set **Root Directory** to `frontend`
-3. Add environment variables:
-   - `NEXT_PUBLIC_API_URL` = your Render backend URL (e.g., `https://glci-api.onrender.com`)
-   - `PYTHON_BACKEND_URL` = same as above
-4. Deploy!
+3) Frontend configuration:
+   - Point to static JSON: `NEXT_PUBLIC_DATA_BASE_URL=https://<user>.github.io/<repo>/latest`
+   - Local/dev API fallback still works via `NEXT_PUBLIC_API_URL`.
 
-#### 3. Connect Them
+4) Artifacts structure (relative to the published root):
+   - `latest/api/series`, `latest/api/series/{id}`, `latest/api/series/{id}/latest`
+   - `latest/api/indices`, `latest/api/indices/{id}`
+   - `latest/api/glci`, `latest/api/glci/latest`, `latest/api/glci/pillars`, `latest/api/glci/freshness`, `latest/api/glci/regime-history`
+   - Snapshots mirror the same layout under `snapshots/YYYY-MM-DD/`.
 
-After both are deployed:
-1. Copy your Vercel frontend URL (e.g., `https://your-app.vercel.app`)
-2. Go to Render dashboard → your backend → Environment
-3. Set `CORS_ORIGINS` to your Vercel URL
-4. Redeploy the backend
-
-### Alternative: Everything on Render
-
-Use the included `render.yaml` blueprint for one-click deployment of the backend.
-For the frontend, create a second Render service as a **Static Site** or **Node** service.
+If you prefer a live backend, the previous Render+Vercel setup still works; set
+`NEXT_PUBLIC_API_URL` to the backend URL and run the FastAPI server normally.

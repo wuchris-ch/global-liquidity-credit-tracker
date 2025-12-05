@@ -1,36 +1,89 @@
-name: Update Data
+name: Update data and publish to GitHub Pages
 
 on:
   schedule:
-    # Run daily at 6am UTC (after US markets close)
-    - cron: '0 6 * * *'
-  workflow_dispatch:  # Allow manual trigger
+    - cron: "0 */12 * * *" # every 12 hours
+  workflow_dispatch: {}
 
 jobs:
-  update:
+  update-and-publish:
     runs-on: ubuntu-latest
-    
+    env:
+      DATA_PATH: ${{ github.workspace }}/data
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed to manage gh-pages branch
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
-      
+          python-version: "3.11.4"
+          cache: "pip"
+
       - name: Install dependencies
-        run: pip install -e .
-      
-      - name: Run update script
-        env:
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        run: python scripts/update_data.py
-      
-      - name: Commit updated data
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add data/
-          git diff --staged --quiet || git commit -m "Update data $(date -u +%Y-%m-%d)"
-          git push
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Update data (fetch + indices)
+        run: python scripts/update_data.py
+
+      - name: Compute GLCI and save
+        run: |
+          python - <<'PY'
+          from src.indicators.glci import compute_glci
+          compute_glci(save=True)
+          PY
+
+      - name: Export JSON artifacts
+        run: python scripts/export_to_json.py --output data/export/latest --snapshot
+
+      - name: Copy artifacts aside
+        run: |
+          mkdir -p /tmp/export
+          rm -rf /tmp/export/*
+          cp -r data/export/* /tmp/export/
+
+      - name: Publish to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git show-ref --verify --quiet refs/heads/gh-pages; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+          fi
+
+          # Clean working tree except .git
+          find . -maxdepth 1 ! -name .git -exec rm -rf {} +
+
+          # Restore artifacts
+          mkdir -p latest
+          cp -r /tmp/export/latest/* latest/
+          if [ -d /tmp/export/snapshots ]; then
+            cp -r /tmp/export/snapshots snapshots
+            # keep only the 3 most recent snapshots to limit repo size
+            SNAP_DIRS=$(find snapshots -maxdepth 1 -mindepth 1 -type d | sort)
+            COUNT=$(echo "$SNAP_DIRS" | wc -l | tr -d ' ')
+            if [ "$COUNT" -gt 3 ]; then
+              echo "$SNAP_DIRS" | head -n $(($COUNT-3)) | xargs -r rm -rf
+            fi
+          fi
+
+          touch .nojekyll
+
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Publish data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push -f origin gh-pages
+          fi

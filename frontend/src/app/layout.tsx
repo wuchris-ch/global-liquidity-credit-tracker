@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/components/query-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Global Liquidity Tracker",
@@ -26,18 +27,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
-        <QueryProvider>
-          <TooltipProvider delayDuration={0}>
-            <SidebarProvider defaultOpen={true}>
-              <AppSidebar />
-              <main className="flex-1 overflow-y-auto">
-                {children}
-              </main>
-            </SidebarProvider>
-          </TooltipProvider>
-        </QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            <TooltipProvider delayDuration={0}>
+              <SidebarProvider defaultOpen={true}>
+                <AppSidebar />
+                <main className="flex-1 overflow-y-auto">
+                  {children}
+                </main>
+              </SidebarProvider>
+            </TooltipProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

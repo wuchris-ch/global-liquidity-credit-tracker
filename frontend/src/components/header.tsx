@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Calendar } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export type TimeRange = "1m" | "3m" | "6m" | "1y" | "2y" | "5y" | "10y" | "15y" | "all";
 
@@ -82,6 +83,8 @@ export function Header({
             </Select>
           )}
           
+          <ThemeToggle />
+
           <Button
             variant="outline"
             size="icon"

@@ -58,62 +58,65 @@
   --color-regime-tight: var(--regime-tight);
 }
 
-/* Clean dark theme - black and white with finance accent colors */
+/* Dual theme: light defaults, dark override for high contrast */
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.09 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.12 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.09 0 0);
-  --secondary: oklch(0.18 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.18 0 0);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.55 0.2 25);
-  --border: oklch(0.22 0 0);
-  --input: oklch(0.18 0 0);
-  --ring: oklch(0.55 0 0);
+  --background: oklch(0.98 0.01 250);
+  --foreground: oklch(0.20 0.02 250);
+  --card: oklch(0.97 0.01 250);
+  --card-foreground: oklch(0.20 0.02 250);
+  --popover: oklch(0.99 0.01 250);
+  --popover-foreground: oklch(0.20 0.02 250);
+  --primary: oklch(0.32 0.05 250);
+  --primary-foreground: oklch(0.98 0.01 250);
+  --secondary: oklch(0.93 0.01 240);
+  --secondary-foreground: oklch(0.24 0.02 240);
+  --muted: oklch(0.94 0.01 240);
+  --muted-foreground: oklch(0.45 0.02 250);
+  --accent: oklch(0.92 0.02 240);
+  --accent-foreground: oklch(0.27 0.03 250);
+  --destructive: oklch(0.63 0.23 25);
+  --border: oklch(0.90 0.01 240);
+  --input: oklch(0.96 0.005 240);
+  --ring: oklch(0.58 0.10 250);
   
   /* Pillar colors - distinct semantic colors */
   --pillar-liquidity: oklch(0.65 0.12 230);    /* Steel blue - money flow */
   --pillar-credit: oklch(0.72 0.10 85);        /* Warm gold - value/credit */
   --pillar-stress: oklch(0.60 0.20 20);        /* Crimson red - danger/stress */
   
-  /* Chart colors - grayscale with finance accents */
-  --chart-1: oklch(0.85 0 0);                   /* Light gray */
-  --chart-2: oklch(0.60 0 0);                   /* Medium gray */
-  --chart-3: oklch(0.45 0 0);                   /* Dark gray */
-  --chart-4: oklch(0.35 0 0);                   /* Darker gray */
+  /* Chart colors tuned for light */
+  --chart-1: oklch(0.35 0 0);                   /* Dark gray */
+  --chart-2: oklch(0.50 0 0);                   /* Medium gray */
+  --chart-3: oklch(0.65 0 0);                   /* Neutral gray */
+  --chart-4: oklch(0.75 0 0);                   /* Soft gray */
   --chart-5: var(--pillar-stress);
   
-  /* Sidebar - pure dark */
-  --sidebar: oklch(0.07 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.98 0 0);
-  --sidebar-primary-foreground: oklch(0.09 0 0);
-  --sidebar-accent: oklch(0.15 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.18 0 0);
-  --sidebar-ring: oklch(0.45 0 0);
+  /* Sidebar - light */
+  --sidebar: oklch(0.97 0.005 240);
+  --sidebar-foreground: oklch(0.20 0.02 250);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.92 0.02 240);
+  --sidebar-accent-foreground: oklch(0.24 0.02 240);
+  --sidebar-border: oklch(0.90 0.01 240);
+  --sidebar-ring: oklch(0.65 0.08 250);
   
   /* Financial indicators - keep green/red/amber */
   --positive: oklch(0.72 0.19 150);
   --negative: oklch(0.62 0.22 25);
-  --glow: oklch(0.98 0 0 / 0.1);
+  --glow: oklch(0.22 0.02 250 / 0.08);
   
   /* Regime colors */
   --regime-loose: oklch(0.72 0.19 150);        /* Green - expansionary */
   --regime-neutral: oklch(0.70 0.04 250);      /* Cool blue-gray - balanced */
   --regime-tight: oklch(0.60 0.20 20);         /* Crimson - restrictive */
+  
+  color-scheme: light;
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.09 0 0);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.12 0 0);
@@ -145,6 +148,7 @@
   --sidebar-accent-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.18 0 0);
   --sidebar-ring: oklch(0.45 0 0);
+  --glow: oklch(0.98 0 0 / 0.1);
 }
 
 @layer base {
@@ -248,9 +252,9 @@
   
   /* Glass effect */
   .glass {
-    background: oklch(0.12 0 0 / 0.8);
+    background: color-mix(in oklch, var(--card) 90%, transparent);
     backdrop-filter: blur(12px);
-    border: 1px solid oklch(1 0 0 / 0.05);
+    border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
   }
   
   /* Animated gradient border */

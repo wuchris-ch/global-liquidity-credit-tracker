@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
         <QueryProvider>
           <TooltipProvider delayDuration={0}>
-            <SidebarProvider defaultOpen={false}>
+            <SidebarProvider defaultOpen={true}>
               <AppSidebar />
               <main className="flex-1 overflow-auto">
                 {children}

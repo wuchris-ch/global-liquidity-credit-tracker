@@ -2,12 +2,14 @@
  * API client for fetching data from the Python backend.
  */
 
-// Allows pointing the frontend to static JSON (e.g., Cloudflare R2) first,
+// Allows pointing the frontend to static JSON (e.g., GitHub Pages) first,
 // then falling back to a live API (dev/local).
 const API_BASE_URL =
   (process.env.NEXT_PUBLIC_DATA_BASE_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
     "http://localhost:8000").replace(/\/$/, "");
+
+const IS_STATIC = Boolean(process.env.NEXT_PUBLIC_DATA_BASE_URL);
 
 export interface DataPoint {
   date: string;
@@ -107,13 +109,24 @@ export interface RegimeHistory {
 
 class ApiClient {
   private baseUrl: string;
+  private isStatic: boolean;
 
-  constructor(baseUrl: string = API_BASE_URL) {
+  constructor(baseUrl: string = API_BASE_URL, isStatic: boolean = IS_STATIC) {
     this.baseUrl = baseUrl;
+    this.isStatic = isStatic;
+  }
+
+  private buildUrl(endpoint: string): string {
+    if (!this.isStatic) {
+      return `${this.baseUrl}${endpoint}`;
+    }
+    const clean = endpoint.replace(/\/+$/, "");
+    return `${this.baseUrl}${clean}/index.json`;
   }
 
   private async fetch<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`);
+    const url = this.buildUrl(endpoint);
+    const response = await fetch(url);
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: "Unknown error" }));
       throw new Error(error.detail || `HTTP ${response.status}`);

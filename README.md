@@ -190,9 +190,9 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
    - Local/dev API fallback still works via `NEXT_PUBLIC_API_URL`.
 
 4) Artifacts structure (relative to the published root):
-   - `latest/api/series`, `latest/api/series/{id}`, `latest/api/series/{id}/latest`
-   - `latest/api/indices`, `latest/api/indices/{id}`
-   - `latest/api/glci`, `latest/api/glci/latest`, `latest/api/glci/pillars`, `latest/api/glci/freshness`, `latest/api/glci/regime-history`
+   - `latest/api/series/index.json`, `latest/api/series/{id}/index.json`, `latest/api/series/{id}/latest/index.json`
+   - `latest/api/indices/index.json`, `latest/api/indices/{id}/index.json`
+   - `latest/api/glci/index.json`, `latest/api/glci/latest/index.json`, `latest/api/glci/pillars/index.json`, `latest/api/glci/freshness/index.json`, `latest/api/glci/regime-history/index.json`
    - Snapshots mirror the same layout under `snapshots/YYYY-MM-DD/`.
 
 If you prefer a live backend, the previous Render+Vercel setup still works; set

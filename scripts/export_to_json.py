@@ -113,7 +113,7 @@ def export_series_list(series_cfg: Dict[str, dict], output_dir: Path) -> None:
                 "unit": cfg.get("unit", ""),
             }
         )
-    write_json(output_dir / "api" / "series", items)
+    write_json(output_dir / "api" / "series" / "index.json", items)
 
 
 def export_single_series(
@@ -138,7 +138,7 @@ def export_single_series(
         "unit": cfg.get("unit", ""),
         "data": data_points,
     }
-    write_json(output_dir / "api" / "series" / series_id, payload)
+    write_json(output_dir / "api" / "series" / series_id / "index.json", payload)
 
     # Latest endpoint
     latest = df.iloc[-1]
@@ -154,7 +154,7 @@ def export_single_series(
         "change": round(change_pct, 2),
         "unit": cfg.get("unit", ""),
     }
-    write_json(output_dir / "api" / "series" / series_id / "latest", latest_payload)
+    write_json(output_dir / "api" / "series" / series_id / "latest" / "index.json", latest_payload)
     return True
 
 
@@ -170,7 +170,7 @@ def export_indices_list(index_cfg: Dict[str, dict], output_dir: Path) -> None:
                 "components": len(cfg.get("components", cfg.get("pillars", {}))),
             }
         )
-    write_json(output_dir / "api" / "indices", items)
+    write_json(output_dir / "api" / "indices" / "index.json", items)
 
 
 def export_single_index(
@@ -192,7 +192,7 @@ def export_single_index(
         "description": get_index_config(index_id).get("description", ""),
         "data": data_points,
     }
-    write_json(output_dir / "api" / "indices" / index_id, payload)
+    write_json(output_dir / "api" / "indices" / index_id / "index.json", payload)
     return True
 
 
@@ -260,9 +260,9 @@ def export_glci(storage: DataStorage, output_dir: Path) -> bool:
         "pillar_data": pillar_data,
     }
 
-    write_json(output_dir / "api" / "glci", payload)
+    write_json(output_dir / "api" / "glci" / "index.json", payload)
     write_json(
-        output_dir / "api" / "glci" / "latest",
+        output_dir / "api" / "glci" / "latest" / "index.json",
         {
             "date": fmt_date(latest["date"]),
             "value": float(latest["value"]),
@@ -275,7 +275,7 @@ def export_glci(storage: DataStorage, output_dir: Path) -> bool:
 
     # Pillar breakdown (latest)
     write_json(
-        output_dir / "api" / "glci" / "pillars",
+        output_dir / "api" / "glci" / "pillars" / "index.json",
         {
             "date": fmt_date(latest_pillars["date"]),
             "pillars": {
@@ -327,7 +327,7 @@ def export_glci(storage: DataStorage, output_dir: Path) -> bool:
         )
     regime_counts = regimes_df["regime_label"].value_counts().to_dict()
     write_json(
-        output_dir / "api" / "glci" / "regime-history",
+        output_dir / "api" / "glci" / "regime-history" / "index.json",
         {"periods": periods, "counts": regime_counts, "current": current_regime},
     )
 
@@ -365,7 +365,7 @@ def export_glci_freshness(
                         "is_stale": True,
                     }
                 )
-    write_json(output_dir / "api" / "glci" / "freshness", freshness)
+    write_json(output_dir / "api" / "glci" / "freshness" / "index.json", freshness)
 
 
 def export_all(output_dir: Path, add_snapshot: bool) -> None:

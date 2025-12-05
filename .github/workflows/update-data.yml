@@ -8,6 +8,10 @@ on:
 jobs:
   update-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     env:
       DATA_PATH: ${{ github.workspace }}/data
       FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
@@ -54,6 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
+          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 

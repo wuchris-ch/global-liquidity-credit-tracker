@@ -170,7 +170,7 @@ export default function DashboardPage() {
 
       <ScrollArea className="flex-1">
         <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-6">
+          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6">
             {/* Hero Metrics */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <MetricCard
@@ -247,7 +247,7 @@ export default function DashboardPage() {
 
             {/* Tabbed Section */}
             <Tabs defaultValue="rates" className="space-y-4">
-              <TabsList className="grid w-full max-w-md grid-cols-3">
+              <TabsList className="grid w-full max-w-full grid-cols-3 gap-1 sm:max-w-md">
                 <TabsTrigger value="rates" className="text-xs">
                   Funding Rates
                 </TabsTrigger>

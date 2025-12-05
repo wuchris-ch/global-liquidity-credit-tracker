@@ -160,7 +160,7 @@ export default function SpreadsPage() {
 
       <ScrollArea className="flex-1">
         <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-6">
+          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6">
             {/* Stress Indicator Hero */}
             <Card className="overflow-hidden">
               <div className="grid lg:grid-cols-3">

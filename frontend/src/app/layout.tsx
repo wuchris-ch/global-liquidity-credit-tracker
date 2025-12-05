@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
@@ -10,6 +10,11 @@ import { QueryProvider } from "@/components/query-provider";
 export const metadata: Metadata = {
   title: "Global Liquidity Tracker",
   description: "Central bank liquidity, credit conditions & funding stress",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

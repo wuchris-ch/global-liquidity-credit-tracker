@@ -105,7 +105,7 @@ export default function LiquidityPage() {
       <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} />
       <ScrollArea className="flex-1">
         <div className="bg-grid min-h-full">
-          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-6">
+          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6">
             <Card className="border-primary/20 bg-gradient-to-r from-primary/5 via-card to-card">
               <CardContent className="p-6">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">

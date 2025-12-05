@@ -199,7 +199,7 @@ export default function GLCIPage() {
 
       <ScrollArea className="flex-1">
         <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1800px] space-y-6 p-6">
+          <div className="mx-auto w-full max-w-[1800px] space-y-6 p-4 sm:p-6">
             {/* Hero Section */}
             <div className="grid gap-6 lg:grid-cols-3">
               {/* Main GLCI Value */}
@@ -308,20 +308,20 @@ export default function GLCIPage() {
 
             {/* Tabs for different views */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-              <TabsList className="grid w-full max-w-lg grid-cols-4">
-                <TabsTrigger value="overview" className="gap-2">
+              <TabsList className="grid w-full grid-cols-2 gap-2 md:max-w-lg md:grid-cols-4">
+                <TabsTrigger value="overview" className="gap-2 text-xs sm:text-sm">
                   <BarChart3 className="h-3.5 w-3.5" />
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="pillars" className="gap-2">
+                <TabsTrigger value="pillars" className="gap-2 text-xs sm:text-sm">
                   <Activity className="h-3.5 w-3.5" />
                   Pillars
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="gap-2">
+                <TabsTrigger value="analytics" className="gap-2 text-xs sm:text-sm">
                   <TrendingUp className="h-3.5 w-3.5" />
                   Analytics
                 </TabsTrigger>
-                <TabsTrigger value="data" className="gap-2">
+                <TabsTrigger value="data" className="gap-2 text-xs sm:text-sm">
                   <Clock className="h-3.5 w-3.5" />
                   Data
                 </TabsTrigger>

@@ -9,6 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -27,6 +34,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useSeriesList, useMultipleSeries } from "@/hooks/use-series-data";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const chartColors = [
   "var(--chart-1)",
@@ -64,6 +72,9 @@ export default function ExplorerPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [normalize, setNormalize] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("1y");
+  const [seriesSheetOpen, setSeriesSheetOpen] = useState(false);
+
+  const isMobile = useIsMobile();
 
   const dateRange = useMemo(() => getDateRange(timeRange), [timeRange]);
   
@@ -163,6 +174,116 @@ export default function ExplorerPage() {
     });
   }, [selectedSeries, availableSeries]);
 
+  const renderSeriesPanel = (onClose?: () => void) => (
+    <div className="flex h-full flex-col">
+      <div className="border-b border-border p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search series..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat} value={cat} className="text-xs">
+                  {cat === "all" ? "All Categories" : cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <ScrollArea className="flex-1">
+        <div className="space-y-1 p-2">
+          {seriesLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            filteredSeries.map((series) => {
+              const isSelected = selectedSeries.includes(series.id);
+              const colorIndex = selectedSeries.indexOf(series.id);
+
+              return (
+                <button
+                  key={series.id}
+                  onClick={() => {
+                    toggleSeries(series.id);
+                    onClose?.();
+                  }}
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
+                    isSelected
+                      ? "bg-primary/10 text-primary"
+                      : "hover:bg-muted/50"
+                  }`}
+                >
+                  <div
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
+                      isSelected
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border"
+                    }`}
+                  >
+                    {isSelected && <Check className="h-3 w-3" />}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-sm font-medium">
+                        {series.name}
+                      </span>
+                      {isSelected && (
+                        <div
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{
+                            backgroundColor: chartColors[colorIndex],
+                          }}
+                        />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                      <span>{series.source}</span>
+                      <span>•</span>
+                      <span>{series.category}</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+      </ScrollArea>
+
+      <div className="border-t border-border p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+          <span>{selectedSeries.length}/5 series selected</span>
+          {selectedSeries.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs"
+              onClick={() => {
+                setSelectedSeries([]);
+                onClose?.();
+              }}
+            >
+              Clear all
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   if (seriesError) {
     return (
       <div className="flex h-screen flex-col bg-background">
@@ -203,116 +324,48 @@ export default function ExplorerPage() {
         isRefreshing={dataLoading}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-80 shrink-0 border-r border-border bg-card/50">
-          <div className="flex h-full flex-col">
-            <div className="border-b border-border p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search series..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {isMobile && (
+          <div className="border-b border-border bg-card/60 px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Database className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-semibold">Series Picker</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {selectedSeries.length}/5 selected
+                  </p>
+                </div>
               </div>
-              <div className="mt-3 flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat} className="text-xs">
-                        {cat === "all" ? "All Categories" : cat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="space-y-1 p-2">
-                {seriesLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  </div>
-                ) : (
-                  filteredSeries.map((series) => {
-                    const isSelected = selectedSeries.includes(series.id);
-                    const colorIndex = selectedSeries.indexOf(series.id);
-
-                    return (
-                      <button
-                        key={series.id}
-                        onClick={() => toggleSeries(series.id)}
-                        className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
-                          isSelected
-                            ? "bg-primary/10 text-primary"
-                            : "hover:bg-muted/50"
-                        }`}
-                      >
-                        <div
-                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
-                            isSelected
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border"
-                          }`}
-                        >
-                          {isSelected && <Check className="h-3 w-3" />}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="truncate text-sm font-medium">
-                              {series.name}
-                            </span>
-                            {isSelected && (
-                              <div
-                                className="h-2 w-2 shrink-0 rounded-full"
-                                style={{
-                                  backgroundColor: chartColors[colorIndex],
-                                }}
-                              />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                            <span>{series.source}</span>
-                            <span>•</span>
-                            <span>{series.category}</span>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </ScrollArea>
-
-            <div className="border-t border-border p-4">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{selectedSeries.length}/5 series selected</span>
-                {selectedSeries.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 px-2 text-xs"
-                    onClick={() => setSelectedSeries([])}
-                  >
-                    Clear all
+              <Sheet open={seriesSheetOpen} onOpenChange={setSeriesSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button size="sm" variant="outline" className="gap-2">
+                    <Search className="h-4 w-4" />
+                    Browse
                   </Button>
-                )}
-              </div>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[320px] p-0">
+                  <SheetHeader className="sr-only">
+                    <SheetTitle>Select data series</SheetTitle>
+                  </SheetHeader>
+                  {renderSeriesPanel(() => setSeriesSheetOpen(false))}
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="bg-grid min-h-full p-6">
+        <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
+          {!isMobile && (
+            <div className="w-full max-w-[320px] shrink-0 border-b border-border bg-card/50 lg:w-80 lg:border-b-0 lg:border-r">
+              {renderSeriesPanel()}
+            </div>
+          )}
+
+          {/* Main Content */}
+          <div className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="bg-grid min-h-full p-4 sm:p-6">
               {selectedSeries.length === 0 ? (
                 <Card className="flex h-[500px] items-center justify-center">
                   <div className="text-center">
@@ -349,12 +402,12 @@ export default function ExplorerPage() {
                   </div>
 
                   {/* Controls */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <Tabs
                       value={normalize ? "normalized" : "absolute"}
                       onValueChange={(v) => setNormalize(v === "normalized")}
                     >
-                      <TabsList className="grid w-[240px] grid-cols-2">
+                      <TabsList className="grid w-full grid-cols-2 sm:w-[240px]">
                         <TabsTrigger value="normalized" className="text-xs">
                           Normalized (100)
                         </TabsTrigger>
@@ -363,7 +416,7 @@ export default function ExplorerPage() {
                         </TabsTrigger>
                       </TabsList>
                     </Tabs>
-                    <Button variant="outline" size="sm" className="gap-2">
+                    <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto">
                       <Download className="h-4 w-4" />
                       Export
                     </Button>

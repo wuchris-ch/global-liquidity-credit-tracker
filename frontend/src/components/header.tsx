@@ -35,31 +35,32 @@ export function Header({
   isRefreshing = false,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-4 border-b border-border bg-background/80 px-6 backdrop-blur-xl">
+    <header className="sticky top-0 z-10 flex min-h-16 shrink-0 items-center gap-3 border-b border-border bg-background/80 px-4 sm:gap-4 sm:px-6 backdrop-blur-xl">
       <SidebarTrigger className="-ml-2" />
-      <Separator orientation="vertical" className="h-6" />
+      <Separator orientation="vertical" className="hidden h-6 sm:flex" />
       
-      <div className="flex flex-1 items-center gap-4">
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
+      <div className="flex flex-1 min-w-0 flex-wrap items-center gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <h1 className="text-base font-semibold tracking-tight sm:text-lg line-clamp-1">{title}</h1>
           {description && (
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <p className="text-[11px] text-muted-foreground sm:text-xs line-clamp-2">{description}</p>
           )}
         </div>
         
         <Badge
           variant="outline"
-          className="ml-2 border-positive/30 bg-positive/5 text-positive"
+          className="ml-0 border-positive/30 bg-positive/5 text-positive sm:ml-2"
         >
           <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-positive pulse-live" />
-          Live
+          <span className="hidden sm:inline">Live</span>
+          <span className="sm:hidden">On</span>
         </Badge>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-1 flex-wrap items-center justify-end gap-2 sm:flex-none sm:gap-3">
         {showDateSelector && (
           <Select value={timeRange} onValueChange={(value) => onTimeRangeChange?.(value as TimeRange)}>
-            <SelectTrigger className="w-auto min-w-[100px] h-9 text-xs">
+            <SelectTrigger className="h-9 w-full min-w-[0] text-xs sm:w-auto sm:min-w-[140px]">
               <Calendar className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               <SelectValue placeholder="Select range" />
             </SelectTrigger>
@@ -80,11 +81,12 @@ export function Header({
         <Button
           variant="outline"
           size="sm"
-          className="h-9 gap-2"
+          className="h-9 w-full gap-2 sm:w-auto"
           onClick={onRefresh}
           disabled={isRefreshing}
         >
           <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+          <span className="sm:hidden">{isRefreshing ? "..." : "Refresh"}</span>
           <span className="hidden sm:inline">{isRefreshing ? "Refreshing..." : "Refresh"}</span>
         </Button>
       </div>

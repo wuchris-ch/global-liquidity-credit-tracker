@@ -40,7 +40,8 @@ jobs:
           PY
 
       - name: Export JSON artifacts
-        run: python scripts/export_to_json.py --output data/export/latest --snapshot
+        run: |
+          python scripts/export_to_json.py --output data/export/latest --snapshot
 
       - name: Copy artifacts aside
         run: |

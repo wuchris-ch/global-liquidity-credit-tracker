@@ -24,11 +24,17 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
+
+# Ensure repository root is on sys.path for module imports when run in CI
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from src.config import (
     CURATED_DATA_PATH,

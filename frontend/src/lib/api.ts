@@ -11,6 +11,24 @@ const API_BASE_URL =
 
 const IS_STATIC = Boolean(process.env.NEXT_PUBLIC_DATA_BASE_URL);
 
+type WithDate = { date: string };
+
+const isInRange = (date: string, start?: string, end?: string) => {
+  const t = new Date(date).getTime();
+  if (start && new Date(start).getTime() > t) return false;
+  if (end && new Date(end).getTime() < t) return false;
+  return true;
+};
+
+const filterSeries = <T extends WithDate>(
+  data: T[],
+  start?: string,
+  end?: string
+): T[] => {
+  if (!start && !end) return data;
+  return data.filter((d) => isInRange(d.date, start, end));
+};
+
 export interface DataPoint {
   date: string;
   value: number;
@@ -120,7 +138,9 @@ class ApiClient {
     if (!this.isStatic) {
       return `${this.baseUrl}${endpoint}`;
     }
-    const clean = endpoint.replace(/\/+$/, "");
+    // Strip query params; static JSON is full history and we filter client-side.
+    const [path] = endpoint.split("?");
+    const clean = path.replace(/\/+$/, "");
     return `${this.baseUrl}${clean}/index.json`;
   }
 
@@ -147,7 +167,11 @@ class ApiClient {
     if (start) params.set("start", start);
     if (end) params.set("end", end);
     const query = params.toString() ? `?${params.toString()}` : "";
-    return this.fetch<SeriesResponse>(`/api/series/${seriesId}${query}`);
+    const result = await this.fetch<SeriesResponse>(`/api/series/${seriesId}${query}`);
+    if (this.isStatic) {
+      result.data = filterSeries(result.data, start, end);
+    }
+    return result;
   }
 
   async getSeriesLatest(seriesId: string): Promise<LatestValue> {
@@ -167,7 +191,11 @@ class ApiClient {
     if (start) params.set("start", start);
     if (end) params.set("end", end);
     const query = params.toString() ? `?${params.toString()}` : "";
-    return this.fetch<IndexResponse>(`/api/indices/${indexId}${query}`);
+    const result = await this.fetch<IndexResponse>(`/api/indices/${indexId}${query}`);
+    if (this.isStatic) {
+      result.data = filterSeries(result.data, start, end);
+    }
+    return result;
   }
 
   async getMultipleSeries(
@@ -193,7 +221,16 @@ class ApiClient {
     if (start) params.set("start", start);
     if (end) params.set("end", end);
     const query = params.toString() ? `?${params.toString()}` : "";
-    return this.fetch<GLCIResponse>(`/api/glci${query}`);
+    const result = await this.fetch<GLCIResponse>(`/api/glci${query}`);
+    if (this.isStatic) {
+      result.data = filterSeries(result.data, start, end);
+      const filteredPillarData: Record<string, DataPoint[]> = {};
+      for (const [pillar, series] of Object.entries(result.pillar_data || {})) {
+        filteredPillarData[pillar] = filterSeries(series, start, end);
+      }
+      result.pillar_data = filteredPillarData;
+    }
+    return result;
   }
 
   async getGLCILatest(): Promise<GLCILatest> {

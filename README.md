@@ -14,13 +14,20 @@ Track global liquidity and credit metrics from central banks, BIS, World Bank, a
 
 ## 🏗️ Architecture
 
-Full-stack application with separated frontend and backend:
+Static-first architecture with scheduled data pipeline:
 
 | Layer | Stack | Hosting |
 |-------|-------|---------|
-| **Frontend** | Next.js 16, React, Tailwind, shadcn/ui, Recharts | [Vercel](https://vercel.com) |
-| **Backend** | FastAPI, pandas, statsmodels, scipy | [Render](https://render.com) |
-| **Data** | FRED, BIS, World Bank, NY Fed APIs → Parquet | Render disk |
+| **Frontend** | Next.js, React, Tailwind, shadcn/ui, Recharts | [Vercel](https://vercel.com) |
+| **Data Pipeline** | Python, pandas, statsmodels, scipy | [GitHub Actions](https://github.com/features/actions) (scheduled) |
+| **Data Storage** | Pre-computed JSON | [GitHub Pages](https://pages.github.com) |
+| **Data Sources** | FRED, BIS, World Bank, NY Fed APIs | External APIs |
+
+**How it works:**
+1. GitHub Actions runs every 12 hours
+2. Python scripts fetch data from all sources and compute indices (GLCI, Fed Net Liquidity, etc.)
+3. Results are exported as static JSON and published to GitHub Pages
+4. Frontend fetches pre-built JSON instantly—no backend computation at request time
 
 ## Quick Start
 
@@ -168,6 +175,57 @@ indices:
         weight: 1.0
 ```
 
+## Learnings
+
+### Why I moved away from Render
+
+The original architecture used a **Render backend** running FastAPI to serve data on-demand:
+
+```
+User Request → Vercel Frontend → Render Backend (Python) → Fetch from APIs → Compute → Return JSON
+```
+
+**Problems with this approach:**
+
+1. **Cold starts are brutal.** Render's free tier spins down after 15 minutes of inactivity. First request after idle would take 30-60+ seconds while the container spun up, dependencies loaded, and data was fetched/computed.
+
+2. **Every request re-computed everything.** Even with caching, computing indices like GLCI (which involves fetching from multiple APIs, resampling, factor models, etc.) took 10-20 seconds per request.
+
+3. **Unreliable for a dashboard.** Users expect dashboards to load instantly. Waiting a minute for charts to appear is a terrible experience.
+
+4. **Cost creep.** To avoid cold starts, you need a paid tier with "always on" instances. For a side project, that's unnecessary spend.
+
+### Why the new architecture is better
+
+The new architecture **pre-computes everything on a schedule**:
+
+```
+GitHub Actions (every 12h) → Fetch + Compute → Export JSON → GitHub Pages (static)
+User Request → Vercel Frontend → GitHub Pages (static JSON) → Instant response
+```
+
+**Benefits:**
+
+1. **Instant loads.** JSON is pre-built and served from GitHub Pages CDN. No computation at request time.
+
+2. **Free forever.** GitHub Actions (free for public repos), GitHub Pages (free), Vercel (free hobby tier). No payment info required.
+
+3. **Simpler mental model.** Data updates on a schedule. Frontend is just a static site that fetches JSON. No server to manage.
+
+4. **Resilient.** If an API is down during the scheduled run, you still have the previous data. Users aren't blocked by upstream failures.
+
+5. **Scalable.** Static files scale infinitely. Whether 1 user or 10,000, GitHub Pages handles it.
+
+**Trade-off:** Data is only as fresh as the last scheduled run (every 12 hours). For a macro liquidity tracker where most series update daily/weekly, this is perfectly fine.
+
+### Key design principle
+
+> **Do expensive work once, serve cheap results many times.**
+
+If your data doesn't change on every request, don't compute it on every request. Pre-compute, cache aggressively, and serve static assets whenever possible.
+
+---
+
 ## Deployment
 
 ### Static pipeline (GitHub Actions + GitHub Pages + static frontend)
@@ -195,5 +253,12 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
    - `latest/api/glci/index.json`, `latest/api/glci/latest/index.json`, `latest/api/glci/pillars/index.json`, `latest/api/glci/freshness/index.json`, `latest/api/glci/regime-history/index.json`
    - Snapshots mirror the same layout under `snapshots/YYYY-MM-DD/`.
 
-If you prefer a live backend, the previous Render+Vercel setup still works; set
-`NEXT_PUBLIC_API_URL` to the backend URL and run the FastAPI server normally.
+### Local development (optional live backend)
+
+For local development, you can still run the FastAPI server:
+
+```bash
+uvicorn src.api:app --reload --port 8000
+```
+
+Then set `NEXT_PUBLIC_API_URL=http://localhost:8000` in `frontend/.env.local` to fetch from the live backend instead of static JSON.

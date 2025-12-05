@@ -4,8 +4,8 @@ import fs from "fs";
 // Resolve the frontend src directory regardless of where the build is run
 const cwd = process.cwd();
 const aliasCandidates = [
-  path.join(cwd, "src"), // when build runs from frontend root
   path.join(cwd, "frontend", "src"), // when build runs from repo root
+  path.join(cwd, "src"), // when build runs from frontend root
 ];
 const aliasPath = aliasCandidates.find(fs.existsSync) ?? aliasCandidates[0];
 console.log("[next.config] cwd:", cwd, "alias:", aliasPath);

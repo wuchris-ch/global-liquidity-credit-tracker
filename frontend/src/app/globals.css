@@ -170,6 +170,21 @@
     max-width: 100vw;
   }
   
+  /* Mobile-first: ensure body children don't overflow */
+  @media (max-width: 767px) {
+    body {
+      overflow-x: hidden !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+    }
+    
+    body > div {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+    }
+  }
+  
   /* Mobile-first responsive text */
   @media (max-width: 640px) {
     html {
@@ -418,28 +433,45 @@
   }
 }
 
-/* Force sidebar to not take space on mobile - critical fix for layout shift */
+/* CRITICAL: Mobile main wrapper - forces full viewport width regardless of sidebar */
+.mobile-main-wrapper {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
 @media (max-width: 767px) {
-  /* Hide the sidebar gap that pushes content */
+  /* The mobile wrapper takes full viewport, breaking out of flex layout */
+  .mobile-main-wrapper {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* Dynamic viewport height for mobile */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    z-index: 1 !important;
+  }
+  
+  .mobile-main-wrapper > main {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100% !important;
+  }
+  
+  /* Hide desktop sidebar elements completely */
   [data-slot="sidebar-gap"] {
     display: none !important;
-    width: 0 !important;
   }
   
-  /* Ensure sidebar container doesn't affect layout */
-  [data-slot="sidebar-container"] {
-    display: none !important;
-  }
-  
-  /* Reset any sidebar-related CSS custom properties on mobile */
+  /* Ensure sidebar wrapper doesn't create horizontal scroll */
   [data-slot="sidebar-wrapper"] {
-    --sidebar-width: 0px !important;
-  }
-  
-  /* Ensure main content takes full width */
-  main {
-    width: 100% !important;
+    width: 100vw !important;
     max-width: 100vw !important;
+    overflow: hidden !important;
   }
 }
 

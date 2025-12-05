@@ -2,6 +2,26 @@
 
 Track global liquidity and credit metrics from central banks, BIS, World Bank, and market data sources.
 
+## 🌐 Live Demo
+
+**[global-liquidity-credit-tracker.vercel.app](https://global-liquidity-credit-tracker.vercel.app)**
+
+- [Dashboard](https://global-liquidity-credit-tracker.vercel.app/) — Overview of key liquidity metrics
+- [GLCI Index](https://global-liquidity-credit-tracker.vercel.app/glci) — Global Liquidity & Credit Index (tri-pillar composite)
+- [Liquidity Monitor](https://global-liquidity-credit-tracker.vercel.app/liquidity) — Fed balance sheet & net liquidity
+- [Credit Spreads](https://global-liquidity-credit-tracker.vercel.app/spreads) — HY/IG spread analysis
+- [Data Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer) — Compare multiple series
+
+## 🏗️ Architecture
+
+Full-stack application with separated frontend and backend:
+
+| Layer | Stack | Hosting |
+|-------|-------|---------|
+| **Frontend** | Next.js 16, React, Tailwind, shadcn/ui, Recharts | [Vercel](https://vercel.com) |
+| **Backend** | FastAPI, pandas, statsmodels, scipy | [Render](https://render.com) |
+| **Data** | FRED, BIS, World Bank, NY Fed APIs → Parquet | Render disk |
+
 ## Quick Start
 
 ```bash

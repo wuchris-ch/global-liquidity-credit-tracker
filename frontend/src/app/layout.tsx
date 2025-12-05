@@ -27,12 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased overflow-x-hidden`}>
         <QueryProvider>
           <TooltipProvider delayDuration={0}>
             <SidebarProvider defaultOpen={true}>
               <AppSidebar />
-              <main className="flex-1 overflow-auto">
+              <main className="flex-1 overflow-x-hidden overflow-y-auto w-full max-w-full">
                 {children}
               </main>
             </SidebarProvider>

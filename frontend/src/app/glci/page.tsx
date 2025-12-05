@@ -197,93 +197,95 @@ export default function GLCIPage() {
         isRefreshing={isLoading}
       />
 
-      <ScrollArea className="flex-1">
-        <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1800px] space-y-4 p-3 sm:space-y-6 sm:p-6">
+      <ScrollArea className="flex-1 w-full">
+        <div className="bg-dots min-h-full w-full overflow-x-hidden">
+          <div className="mx-auto w-full max-w-[1800px] space-y-4 p-3 sm:space-y-6 sm:p-6 overflow-hidden">
             {/* Hero Section */}
             <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
               {/* Main GLCI Value */}
               <Card className="lg:col-span-2 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card overflow-hidden">
                 <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-foreground shadow-lg">
-                          <Gauge className="h-6 w-6 text-background" />
+                  <div className="flex flex-col gap-4 sm:gap-6">
+                    {/* Top row: GLCI value and regime on mobile */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-3 sm:space-y-4 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-foreground shadow-lg shrink-0">
+                            <Gauge className="h-5 w-5 sm:h-6 sm:w-6 text-background" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground">
+                              Global Liquidity & Credit Index
+                              <InfoTooltip {...glciDefinitions.glci_index} size="sm" />
+                            </p>
+                            <p className="text-[10px] sm:text-xs text-muted-foreground/70">Tri-pillar composite indicator</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
-                            Global Liquidity & Credit Index
-                            <InfoTooltip {...glciDefinitions.glci_index} size="sm" />
-                          </p>
-                          <p className="text-xs text-muted-foreground/70">Tri-pillar composite indicator</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-baseline gap-2 sm:gap-4 flex-wrap">
-                        {isLoading ? (
-                          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        ) : (
-                          <>
-                            <span className="font-mono text-3xl sm:text-5xl font-bold tracking-tight">
-                              {glciData?.value.toFixed(1) ?? "—"}
-                            </span>
-                            <div className="flex items-center gap-1">
-                              {calcChange(glciData?.data) >= 0 ? (
-                                <ArrowUp className="h-4 w-4 text-positive" />
-                              ) : (
-                                <ArrowDown className="h-4 w-4 text-negative" />
-                              )}
-                              <span className={`font-mono text-sm ${calcChange(glciData?.data) >= 0 ? "text-positive" : "text-negative"}`}>
-                                {calcChange(glciData?.data) >= 0 ? "+" : ""}{calcChange(glciData?.data).toFixed(1)}
+                        
+                        <div className="flex items-baseline gap-2 sm:gap-4 flex-wrap">
+                          {isLoading ? (
+                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                          ) : (
+                            <>
+                              <span className="font-mono text-3xl sm:text-5xl font-bold tracking-tight">
+                                {glciData?.value.toFixed(1) ?? "—"}
                               </span>
-                              <span className="text-xs text-muted-foreground">vs last week</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                            Z-Score:
-                            <InfoTooltip {...glciDefinitions.glci_zscore} size="xs" />
-                          </span>
-                          <span className="font-mono text-sm font-semibold">
-                            {glciData?.zscore?.toFixed(2) ?? "—"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                            Momentum:
-                            <InfoTooltip {...glciDefinitions.glci_momentum} size="xs" />
-                          </span>
-                          <span className={`font-mono text-sm font-semibold ${(glciData?.momentum ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
-                            {(glciData?.momentum ?? 0) >= 0 ? "+" : ""}{(glciData?.momentum ?? 0).toFixed(2)}
-                          </span>
+                              <div className="flex items-center gap-1">
+                                {calcChange(glciData?.data) >= 0 ? (
+                                  <ArrowUp className="h-4 w-4 text-positive" />
+                                ) : (
+                                  <ArrowDown className="h-4 w-4 text-negative" />
+                                )}
+                                <span className={`font-mono text-sm ${calcChange(glciData?.data) >= 0 ? "text-positive" : "text-negative"}`}>
+                                  {calcChange(glciData?.data) >= 0 ? "+" : ""}{calcChange(glciData?.data).toFixed(1)}
+                                </span>
+                                <span className="text-xs text-muted-foreground">vs last week</span>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
 
-                      {/* Data freshness summary */}
-                      {freshnessData.length > 0 && (
-                        <FreshnessSummary items={freshnessData} />
-                      )}
-                    </div>
-
-                    <div className="flex flex-col items-center gap-2">
-                      <div className={`rounded-2xl border-2 ${regimeInfo.borderColor} ${regimeInfo.bgColor} p-6`}>
-                        <RegimeIcon className={`h-10 w-10 ${regimeInfo.color}`} />
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Badge variant="outline" className={`${regimeInfo.borderColor} ${regimeInfo.color} text-sm font-semibold`}>
+                      {/* Regime indicator - always visible, compact on mobile */}
+                      <div className="flex flex-col items-center gap-1.5 sm:gap-2 shrink-0">
+                        <div className={`rounded-xl sm:rounded-2xl border-2 ${regimeInfo.borderColor} ${regimeInfo.bgColor} p-3 sm:p-6`}>
+                          <RegimeIcon className={`h-6 w-6 sm:h-10 sm:w-10 ${regimeInfo.color}`} />
+                        </div>
+                        <Badge variant="outline" className={`${regimeInfo.borderColor} ${regimeInfo.color} text-[10px] sm:text-sm font-semibold px-1.5 sm:px-2`}>
                           {regimeInfo.label} Regime
                         </Badge>
-                        <InfoTooltip {...glciDefinitions.regime_classification} size="xs" />
+                        <p className="text-center text-[10px] sm:text-xs text-muted-foreground max-w-[100px] sm:max-w-[150px] hidden sm:block">
+                          {regimeInfo.description}
+                        </p>
                       </div>
-                      <p className="text-center text-xs text-muted-foreground max-w-[150px]">
-                        {regimeInfo.description}
-                      </p>
                     </div>
+
+                    {/* Stats row */}
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
+                          Z-Score:
+                          <InfoTooltip {...glciDefinitions.glci_zscore} size="xs" />
+                        </span>
+                        <span className="font-mono text-xs sm:text-sm font-semibold">
+                          {glciData?.zscore?.toFixed(2) ?? "—"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
+                          Momentum:
+                          <InfoTooltip {...glciDefinitions.glci_momentum} size="xs" />
+                        </span>
+                        <span className={`font-mono text-xs sm:text-sm font-semibold ${(glciData?.momentum ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
+                          {(glciData?.momentum ?? 0) >= 0 ? "+" : ""}{(glciData?.momentum ?? 0).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Data freshness summary */}
+                    {freshnessData.length > 0 && (
+                      <FreshnessSummary items={freshnessData} />
+                    )}
                   </div>
                 </CardContent>
               </Card>

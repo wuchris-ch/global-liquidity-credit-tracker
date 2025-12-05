@@ -168,9 +168,9 @@ export default function DashboardPage() {
         isRefreshing={isLoading}
       />
 
-      <ScrollArea className="flex-1">
-        <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1600px] space-y-4 p-3 sm:space-y-6 sm:p-6">
+      <ScrollArea className="flex-1 w-full">
+        <div className="bg-dots min-h-full w-full overflow-x-hidden">
+          <div className="mx-auto w-full max-w-[1600px] space-y-4 p-3 sm:space-y-6 sm:p-6 overflow-hidden">
             {/* Hero Metrics */}
             <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
               <MetricCard

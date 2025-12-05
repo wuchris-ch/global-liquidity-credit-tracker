@@ -3,6 +3,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
+// Deterministic bar heights to avoid impure Math.random calls during render.
+const BAR_HEIGHTS = Array.from({ length: 30 }, (_, i) => 20 + ((i * 13) % 60));
+
 export function MetricCardSkeleton() {
   return (
     <Card>
@@ -38,12 +41,12 @@ export function ChartSkeleton({ height = 300 }: { height?: number }) {
           style={{ height }}
         >
           <div className="absolute inset-0 flex items-end justify-around gap-1 p-4">
-            {Array.from({ length: 30 }).map((_, i) => (
+            {BAR_HEIGHTS.map((barHeight, i) => (
               <div
                 key={i}
                 className="w-full bg-muted animate-pulse"
                 style={{
-                  height: `${20 + Math.random() * 60}%`,
+                  height: `${barHeight}%`,
                   animationDelay: `${i * 50}ms`,
                 }}
               />

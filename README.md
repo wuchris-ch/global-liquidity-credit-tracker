@@ -233,6 +233,8 @@ If your data doesn't change on every request, don't compute it on every request.
 For a free, low-maintenance setup, the app can publish precomputed JSON to a `gh-pages`
 branch and serve a static frontend (Vercel or GitHub Pages) without any external storage.
 
+> Quick sanity: the scheduled job runs every 12h and publishes to `gh-pages`; the frontend reads from `latest/` on GitHub Pages.
+
 1) Set secrets in GitHub:
    - `FRED_API_KEY` (for fetching data)
    - `GITHUB_TOKEN` is provided automatically by GitHub Actions.

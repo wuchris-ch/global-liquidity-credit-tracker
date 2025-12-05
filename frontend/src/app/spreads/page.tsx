@@ -160,7 +160,7 @@ export default function SpreadsPage() {
 
       <ScrollArea className="flex-1">
         <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6">
+          <div className="mx-auto w-full max-w-[1600px] space-y-4 p-3 sm:space-y-6 sm:p-6">
             {/* Stress Indicator Hero */}
             <Card className="overflow-hidden">
               <div className="grid lg:grid-cols-3">
@@ -223,7 +223,7 @@ export default function SpreadsPage() {
             </Card>
 
             {/* Spread Metrics */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
               <MetricCard
                 title="High Yield OAS"
                 value={isLoading ? "Loading..." : `${Math.round(latestHY)} bps`}
@@ -258,7 +258,7 @@ export default function SpreadsPage() {
             </div>
 
             {/* Main Charts */}
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
               {isLoading ? (
                 <>
                   <Card className="flex h-[350px] items-center justify-center">
@@ -299,7 +299,7 @@ export default function SpreadsPage() {
             </div>
 
             {/* Analysis Section */}
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="inline-flex items-center gap-2 text-sm font-semibold">

@@ -105,44 +105,41 @@ export default function LiquidityPage() {
       <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} />
       <ScrollArea className="flex-1">
         <div className="bg-grid min-h-full">
-          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6">
+          <div className="mx-auto w-full max-w-[1600px] space-y-4 p-3 sm:space-y-6 sm:p-6">
             <Card className="border-primary/20 bg-gradient-to-r from-primary/5 via-card to-card">
-              <CardContent className="p-6">
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex flex-col gap-3 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
                   <div>
-                    <Badge className="mb-3 bg-primary/20 text-primary hover:bg-primary/30">Key Formula</Badge>
-                    <h2 className="inline-flex items-center gap-2 text-xl font-bold tracking-tight">
+                    <Badge className="mb-2 sm:mb-3 bg-primary/20 text-primary hover:bg-primary/30 text-[10px] sm:text-xs">Key Formula</Badge>
+                    <h2 className="inline-flex items-center gap-2 text-base sm:text-xl font-bold tracking-tight">
                       Fed Net Liquidity
                       <InfoTooltip {...metricDefinitions.net_liquidity} size="sm" />
                     </h2>
-                    <p className="mt-1 text-sm text-muted-foreground">A measure of actual liquidity available in the financial system</p>
+                    <p className="mt-1 text-xs sm:text-sm text-muted-foreground">Actual liquidity available in the financial system</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3 font-mono text-sm lg:gap-4 lg:text-base">
-                    <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-2">
-                      <Building2 className="h-4 w-4 text-chart-1" />
-                      <span>Fed Assets</span>
-                      <InfoTooltip {...metricDefinitions.fed_balance_sheet} size="xs" />
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 font-mono text-[10px] sm:text-sm lg:gap-4 lg:text-base">
+                    <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/50 px-2 py-1.5 sm:px-4 sm:py-2">
+                      <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-chart-1" />
+                      <span className="hidden xs:inline">Fed</span><span>Assets</span>
                     </div>
                     <span className="text-muted-foreground">−</span>
-                    <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-2">
-                      <Landmark className="h-4 w-4 text-chart-3" />
+                    <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/50 px-2 py-1.5 sm:px-4 sm:py-2">
+                      <Landmark className="h-3 w-3 sm:h-4 sm:w-4 text-chart-3" />
                       <span>TGA</span>
-                      <InfoTooltip {...metricDefinitions.tga} size="xs" />
                     </div>
                     <span className="text-muted-foreground">−</span>
-                    <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-2">
-                      <Wallet className="h-4 w-4 text-chart-4" />
+                    <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg bg-muted/50 px-2 py-1.5 sm:px-4 sm:py-2">
+                      <Wallet className="h-3 w-3 sm:h-4 sm:w-4 text-chart-4" />
                       <span>RRP</span>
-                      <InfoTooltip {...metricDefinitions.rrp} size="xs" />
                     </div>
                     <span className="text-muted-foreground">=</span>
-                    <div className="flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-primary/10 px-4 py-2"><Activity className="h-4 w-4 text-primary" /><span className="font-semibold text-primary">Net Liquidity</span></div>
+                    <div className="flex items-center gap-1.5 sm:gap-2 rounded-lg border-2 border-primary/30 bg-primary/10 px-2 py-1.5 sm:px-4 sm:py-2"><Activity className="h-3 w-3 sm:h-4 sm:w-4 text-primary" /><span className="font-semibold text-primary">Net Liq</span></div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
               <MetricCard title="Fed Total Assets" value={isLoading ? "Loading..." : formatCurrency(latestFed)} change={calcChange(fedAssets.data)} trend={calcChange(fedAssets.data) >= 0 ? "up" : "down"} icon={<Building2 className="h-5 w-5" />} variant="highlight" info={metricDefinitions.fed_balance_sheet} />
               <MetricCard title="Treasury General Account" value={isLoading ? "Loading..." : formatCurrency(latestTga)} change={calcChange(tga.data)} trend={calcChange(tga.data) >= 0 ? "up" : "down"} icon={<Landmark className="h-5 w-5" />} info={metricDefinitions.tga} />
               <MetricCard title="Reverse Repo Facility" value={isLoading ? "Loading..." : formatCurrency(latestRrp)} change={calcChange(rrp.data)} trend={calcChange(rrp.data) >= 0 ? "up" : "down"} icon={<Wallet className="h-5 w-5" />} info={metricDefinitions.rrp} />
@@ -155,7 +152,7 @@ export default function LiquidityPage() {
               <LiquidityChart title="Fed Net Liquidity" description="Total Assets minus TGA and Reverse Repo" data={netLiquidity.data.map(d => ({ ...d, value: d.value * scaleMillions }))} color="var(--chart-1)" height={400} valueFormatter={(v) => formatCurrency(v)} info={chartDefinitions.net_liquidity_chart} />
             )}
 
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
               {isLoading ? (
                 <><Card className="flex h-[280px] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></Card><Card className="flex h-[280px] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></Card><Card className="flex h-[280px] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></Card></>
               ) : (
@@ -167,7 +164,7 @@ export default function LiquidityPage() {
               )}
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
               <Card>
                 <CardHeader><CardTitle className="text-sm font-semibold">Liquidity Drivers</CardTitle></CardHeader>
                 <CardContent className="space-y-4">

@@ -23,6 +23,9 @@ const nextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
   },
 
+  // Turbopack config (Next.js 16+)
+  turbopack: {},
+
   webpack: (config) => {
     config.resolve.alias = config.resolve.alias || {};
     config.resolve.alias["@"] = aliasPath;

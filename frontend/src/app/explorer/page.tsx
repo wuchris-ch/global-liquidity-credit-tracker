@@ -362,7 +362,7 @@ export default function ExplorerPage() {
 
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="bg-grid min-h-full p-4 sm:p-6">
+                <div className="bg-grid min-h-full p-3 sm:p-6">
                 {selectedSeries.length === 0 ? (
                   <Card className="flex h-[500px] items-center justify-center">
                     <div className="text-center">
@@ -372,16 +372,16 @@ export default function ExplorerPage() {
                     </div>
                   </Card>
                 ) : (
-                  <div className="space-y-6">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Comparing:</span>
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                      <span className="text-xs sm:text-sm text-muted-foreground">Comparing:</span>
                       {selectedSeries.map((id, index) => {
                         const series = availableSeries.find((s) => s.id === id);
                         return (
-                          <Badge key={id} variant="secondary" className="gap-1.5 pr-1">
-                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColors[index] }} />
-                            {series?.name || id}
-                            <button onClick={() => toggleSeries(id)} className="ml-1 rounded-full p-0.5 hover:bg-muted">
+                          <Badge key={id} variant="secondary" className="gap-1 sm:gap-1.5 pr-1 text-[10px] sm:text-xs">
+                            <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full" style={{ backgroundColor: chartColors[index] }} />
+                            <span className="max-w-[80px] sm:max-w-none truncate">{series?.name || id}</span>
+                            <button onClick={() => toggleSeries(id)} className="ml-0.5 sm:ml-1 rounded-full p-0.5 hover:bg-muted">
                               <X className="h-3 w-3" />
                             </button>
                           </Badge>

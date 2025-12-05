@@ -151,9 +151,25 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* Allow pinch-zoom on mobile */
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    /* Improve text rendering on mobile */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Mobile-first responsive text */
+  @media (max-width: 640px) {
+    html {
+      font-size: 14px;
+    }
   }
   
   /* Custom scrollbar */
@@ -349,4 +365,41 @@
 
 .waterfall-total {
   fill: var(--primary);
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Ensure touch-friendly tap targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better scrolling on mobile */
+  .scroll-area, [data-radix-scroll-area-viewport] {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Reduce padding on mobile for more content space */
+  .mobile-compact {
+    padding: 0.75rem;
+  }
+  
+  /* Cards should be full-width on mobile */
+  .card {
+    border-radius: var(--radius-md);
+  }
+}
+
+/* Ensure charts are visible and scrollable on small screens */
+.recharts-wrapper {
+  touch-action: pan-x pan-y;
+}
+
+/* Improve chart tooltip visibility on mobile */
+@media (max-width: 640px) {
+  .recharts-tooltip-wrapper {
+    font-size: 11px !important;
+  }
 }

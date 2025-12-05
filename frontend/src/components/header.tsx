@@ -35,60 +35,64 @@ export function Header({
   isRefreshing = false,
 }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-10 flex min-h-16 shrink-0 items-center gap-3 border-b border-border bg-background/80 px-4 sm:gap-4 sm:px-6 backdrop-blur-xl">
-      <SidebarTrigger className="-ml-2" />
-      <Separator orientation="vertical" className="hidden h-6 sm:flex" />
-      
-      <div className="flex flex-1 min-w-0 flex-wrap items-center gap-3 sm:gap-4">
-        <div className="min-w-0">
-          <h1 className="text-base font-semibold tracking-tight sm:text-lg line-clamp-1">{title}</h1>
-          {description && (
-            <p className="text-[11px] text-muted-foreground sm:text-xs line-clamp-2">{description}</p>
-          )}
+    <header className="sticky top-0 z-10 shrink-0 border-b border-border bg-background/95 backdrop-blur-xl">
+      {/* Main row - always horizontal */}
+      <div className="flex min-h-14 items-center gap-2 px-3 sm:min-h-16 sm:gap-4 sm:px-6">
+        <SidebarTrigger className="-ml-1 sm:-ml-2" />
+        <Separator orientation="vertical" className="hidden h-6 sm:flex" />
+        
+        {/* Title area - flexible */}
+        <div className="flex flex-1 min-w-0 items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-sm font-semibold tracking-tight sm:text-lg truncate">{title}</h1>
+            {description && (
+              <p className="text-[10px] text-muted-foreground sm:text-xs truncate hidden xs:block">{description}</p>
+            )}
+          </div>
+          
+          <Badge
+            variant="outline"
+            className="shrink-0 border-positive/30 bg-positive/5 text-positive text-[10px] sm:text-xs h-5 sm:h-6 px-1.5 sm:px-2"
+          >
+            <span className="mr-1 h-1.5 w-1.5 rounded-full bg-positive pulse-live" />
+            <span className="hidden sm:inline">Live</span>
+            <span className="sm:hidden">●</span>
+          </Badge>
         </div>
-        
-        <Badge
-          variant="outline"
-          className="ml-0 border-positive/30 bg-positive/5 text-positive sm:ml-2"
-        >
-          <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-positive pulse-live" />
-          <span className="hidden sm:inline">Live</span>
-          <span className="sm:hidden">On</span>
-        </Badge>
-      </div>
 
-      <div className="flex flex-1 flex-wrap items-center justify-end gap-2 sm:flex-none sm:gap-3">
-        {showDateSelector && (
-          <Select value={timeRange} onValueChange={(value) => onTimeRangeChange?.(value as TimeRange)}>
-            <SelectTrigger className="h-9 w-full min-w-[0] text-xs sm:w-auto sm:min-w-[140px]">
-              <Calendar className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-              <SelectValue placeholder="Select range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1m">1 Mo</SelectItem>
-              <SelectItem value="3m">3 Mo</SelectItem>
-              <SelectItem value="6m">6 Mo</SelectItem>
-              <SelectItem value="1y">1 Yr</SelectItem>
-              <SelectItem value="2y">2 Yr</SelectItem>
-              <SelectItem value="5y">5 Yr</SelectItem>
-              <SelectItem value="10y">10 Yr</SelectItem>
-              <SelectItem value="15y">15 Yr</SelectItem>
-              <SelectItem value="all">All Time</SelectItem>
-            </SelectContent>
-          </Select>
-        )}
-        
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9 w-full gap-2 sm:w-auto"
-          onClick={onRefresh}
-          disabled={isRefreshing}
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
-          <span className="sm:hidden">{isRefreshing ? "..." : "Refresh"}</span>
-          <span className="hidden sm:inline">{isRefreshing ? "Refreshing..." : "Refresh"}</span>
-        </Button>
+        {/* Controls - compact on mobile */}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+          {showDateSelector && (
+            <Select value={timeRange} onValueChange={(value) => onTimeRangeChange?.(value as TimeRange)}>
+              <SelectTrigger className="h-8 w-[70px] text-[10px] sm:h-9 sm:w-[130px] sm:text-xs">
+                <Calendar className="mr-1 h-3 w-3 sm:mr-2 sm:h-3.5 sm:w-3.5 text-muted-foreground shrink-0" />
+                <SelectValue placeholder="Range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1m">1 Mo</SelectItem>
+                <SelectItem value="3m">3 Mo</SelectItem>
+                <SelectItem value="6m">6 Mo</SelectItem>
+                <SelectItem value="1y">1 Yr</SelectItem>
+                <SelectItem value="2y">2 Yr</SelectItem>
+                <SelectItem value="5y">5 Yr</SelectItem>
+                <SelectItem value="10y">10 Yr</SelectItem>
+                <SelectItem value="15y">15 Yr</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 sm:h-9 sm:w-auto sm:px-3 sm:gap-2"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">{isRefreshing ? "..." : "Refresh"}</span>
+          </Button>
+        </div>
       </div>
     </header>
   );

@@ -66,6 +66,8 @@ interface MultiLineChartProps {
   showYAxis?: boolean;
   showLegend?: boolean;
   height?: number;
+  /** Minimum height on mobile screens */
+  mobileHeight?: number;
   className?: string;
   valueFormatter?: (value: number) => string;
   normalized?: boolean;
@@ -82,11 +84,14 @@ export function MultiLineChart({
   showYAxis = true,
   showLegend = true,
   height = 300,
+  mobileHeight,
   className,
   valueFormatter = (v) => v.toLocaleString(),
   normalized = false,
   info,
 }: MultiLineChartProps) {
+  // Use mobile height on smaller screens
+  const effectiveMobileHeight = mobileHeight ?? Math.max(200, height * 0.7);
   const chartConfig = series.reduce((acc, s) => {
     acc[s.key] = {
       label: s.label,
@@ -107,7 +112,14 @@ export function MultiLineChart({
         )}
       </CardHeader>
       <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="w-full" style={{ height }}>
+        <ChartContainer 
+          config={chartConfig} 
+          className="w-full" 
+          style={{ 
+            height: `clamp(${effectiveMobileHeight}px, 40vw, ${height}px)`,
+            minHeight: effectiveMobileHeight,
+          }}
+        >
           <LineChart
             data={data}
             margin={{ top: 10, right: 10, left: showYAxis ? 0 : -20, bottom: 0 }}

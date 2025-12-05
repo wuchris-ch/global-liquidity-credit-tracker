@@ -29,6 +29,8 @@ interface WaterfallChartProps {
     color?: string;
   }[];
   height?: number;
+  /** Minimum height on mobile screens */
+  mobileHeight?: number;
   className?: string;
   /** Info tooltip content - displays (i) icon when provided */
   info?: InfoTooltipProps;
@@ -47,9 +49,12 @@ export function WaterfallChart({
   currentValue,
   contributions,
   height = 200,
+  mobileHeight,
   className,
   info,
 }: WaterfallChartProps) {
+  // Use mobile height on smaller screens
+  const effectiveMobileHeight = mobileHeight ?? Math.max(180, height * 0.75);
   // Build waterfall data
   const data: WaterfallDataPoint[] = [
     { name: "Previous", value: previousValue, isTotal: true, fill: "var(--muted-foreground)" },
@@ -108,7 +113,14 @@ export function WaterfallChart({
         </div>
       </CardHeader>
       <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="w-full" style={{ height }}>
+        <ChartContainer 
+          config={chartConfig} 
+          className="w-full" 
+          style={{ 
+            height: `clamp(${effectiveMobileHeight}px, 35vw, ${height}px)`,
+            minHeight: effectiveMobileHeight,
+          }}
+        >
           <BarChart
             data={waterfallData}
             layout="vertical"

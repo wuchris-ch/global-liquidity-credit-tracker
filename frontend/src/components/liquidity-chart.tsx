@@ -67,6 +67,8 @@ interface LiquidityChartProps {
   showGrid?: boolean;
   showYAxis?: boolean;
   height?: number;
+  /** Minimum height on mobile screens */
+  mobileHeight?: number;
   className?: string;
   valueFormatter?: (value: number) => string;
   referenceLine?: number;
@@ -85,12 +87,15 @@ export function LiquidityChart({
   showGrid = true,
   showYAxis = true,
   height = 300,
+  mobileHeight,
   className,
   valueFormatter = (v) => v.toLocaleString(),
   referenceLine,
   referenceLabel,
   info,
 }: LiquidityChartProps) {
+  // Use mobile height on smaller screens
+  const effectiveMobileHeight = mobileHeight ?? Math.max(200, height * 0.7);
   const chartConfig = {
     [dataKey]: {
       label: title,
@@ -126,7 +131,14 @@ export function LiquidityChart({
         </div>
       </CardHeader>
       <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="w-full" style={{ height }}>
+        <ChartContainer 
+          config={chartConfig} 
+          className="w-full" 
+          style={{ 
+            height: `clamp(${effectiveMobileHeight}px, 40vw, ${height}px)`,
+            minHeight: effectiveMobileHeight,
+          }}
+        >
           <ChartComponent
             data={data}
             margin={{ top: 10, right: 10, left: showYAxis ? 0 : -20, bottom: 0 }}

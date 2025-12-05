@@ -170,9 +170,9 @@ export default function DashboardPage() {
 
       <ScrollArea className="flex-1">
         <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1600px] space-y-6 p-4 sm:p-6">
+          <div className="mx-auto w-full max-w-[1600px] space-y-4 p-3 sm:space-y-6 sm:p-6">
             {/* Hero Metrics */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
               <MetricCard
                 title="Fed Balance Sheet"
                 value={isLoading ? "Loading..." : formatCurrency(latestFed)}
@@ -211,7 +211,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Main Charts */}
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
               {isLoading ? (
                 <>
                   <Card className="flex h-[320px] items-center justify-center">
@@ -246,8 +246,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Tabbed Section */}
-            <Tabs defaultValue="rates" className="space-y-4">
-              <TabsList className="grid w-full max-w-full grid-cols-3 gap-1 sm:max-w-md">
+            <Tabs defaultValue="rates" className="space-y-3 sm:space-y-4">
+              <TabsList className="grid w-full max-w-full grid-cols-3 gap-1 h-auto p-1 sm:max-w-md">
                 <TabsTrigger value="rates" className="text-xs">
                   Funding Rates
                 </TabsTrigger>
@@ -259,8 +259,8 @@ export default function DashboardPage() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="rates" className="space-y-4">
-                <div className="grid gap-6 lg:grid-cols-3">
+              <TabsContent value="rates" className="space-y-3 sm:space-y-4">
+                <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
                   <div className="lg:col-span-2">
                     {isLoading ? (
                       <Card className="flex h-[350px] items-center justify-center">
@@ -320,8 +320,8 @@ export default function DashboardPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="spreads" className="space-y-4">
-                <div className="grid gap-6 lg:grid-cols-3">
+              <TabsContent value="spreads" className="space-y-3 sm:space-y-4">
+                <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
                   <div className="lg:col-span-2">
                     {isLoading ? (
                       <Card className="flex h-[350px] items-center justify-center">
@@ -378,8 +378,8 @@ export default function DashboardPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="central-banks" className="space-y-4">
-                <div className="grid gap-6 lg:grid-cols-3">
+              <TabsContent value="central-banks" className="space-y-3 sm:space-y-4">
+                <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
                   <div className="lg:col-span-2">
                     {isLoading ? (
                       <Card className="flex h-[350px] items-center justify-center">
@@ -457,7 +457,7 @@ export default function DashboardPage() {
             </Tabs>
 
             {/* Bottom Charts */}
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
               {isLoading ? (
                 <>
                   <Card className="flex h-[250px] items-center justify-center">

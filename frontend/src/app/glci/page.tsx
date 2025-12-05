@@ -199,13 +199,13 @@ export default function GLCIPage() {
 
       <ScrollArea className="flex-1">
         <div className="bg-dots min-h-full">
-          <div className="mx-auto w-full max-w-[1800px] space-y-6 p-4 sm:p-6">
+          <div className="mx-auto w-full max-w-[1800px] space-y-4 p-3 sm:space-y-6 sm:p-6">
             {/* Hero Section */}
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
               {/* Main GLCI Value */}
               <Card className="lg:col-span-2 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between">
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-foreground shadow-lg">
@@ -220,12 +220,12 @@ export default function GLCIPage() {
                         </div>
                       </div>
                       
-                      <div className="flex items-baseline gap-4">
+                      <div className="flex items-baseline gap-2 sm:gap-4 flex-wrap">
                         {isLoading ? (
                           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                         ) : (
                           <>
-                            <span className="font-mono text-5xl font-bold tracking-tight">
+                            <span className="font-mono text-3xl sm:text-5xl font-bold tracking-tight">
                               {glciData?.value.toFixed(1) ?? "—"}
                             </span>
                             <div className="flex items-center gap-1">
@@ -307,8 +307,8 @@ export default function GLCIPage() {
             </div>
 
             {/* Tabs for different views */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 gap-2 md:max-w-lg md:grid-cols-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4">
+              <TabsList className="grid w-full grid-cols-2 gap-1 sm:gap-2 h-auto p-1 md:max-w-lg md:grid-cols-4">
                 <TabsTrigger value="overview" className="gap-2 text-xs sm:text-sm">
                   <BarChart3 className="h-3.5 w-3.5" />
                   Overview
@@ -328,7 +328,7 @@ export default function GLCIPage() {
               </TabsList>
 
               {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6">
+              <TabsContent value="overview" className="space-y-3 sm:space-y-6">
                 {/* Main GLCI Chart */}
                 {isLoading ? (
                   <Card className="flex h-[400px] items-center justify-center">
@@ -349,7 +349,7 @@ export default function GLCIPage() {
                 )}
 
                 {/* Statistics Row */}
-                <div className="grid gap-4 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
                   <MetricCard
                     title="Current Value"
                     value={isLoading ? "Loading..." : glciData?.value.toFixed(1) ?? "—"}
@@ -384,7 +384,7 @@ export default function GLCIPage() {
                     <CardTitle className="text-sm font-semibold">Index Interpretation</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-3 md:grid-cols-3">
+                    <div className="grid gap-2 sm:gap-3 md:grid-cols-3">
                       <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <TrendingUp className="h-4 w-4 text-emerald-500" />
@@ -420,8 +420,8 @@ export default function GLCIPage() {
               </TabsContent>
 
               {/* Pillars Tab */}
-              <TabsContent value="pillars" className="space-y-6">
-                <div className="grid gap-6 lg:grid-cols-2">
+              <TabsContent value="pillars" className="space-y-3 sm:space-y-6">
+                <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
                   {isLoading ? (
                     <>
                       <Card className="flex h-[350px] items-center justify-center">
@@ -472,7 +472,7 @@ export default function GLCIPage() {
                 </div>
 
                 {/* Individual pillar cards */}
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-2 sm:gap-4 md:grid-cols-3">
                   {glciData?.pillars?.map((pillar) => {
                     const config = pillarConfig[pillar.name as keyof typeof pillarConfig];
                     const Icon = config?.icon || Activity;
@@ -517,8 +517,8 @@ export default function GLCIPage() {
               </TabsContent>
 
               {/* Analytics Tab */}
-              <TabsContent value="analytics" className="space-y-6">
-                <div className="grid gap-6 lg:grid-cols-2">
+              <TabsContent value="analytics" className="space-y-3 sm:space-y-6">
+                <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
                   {/* Predictive Panel */}
                   {!isLoading && glciData && (
                     <PredictivePanel
@@ -542,8 +542,8 @@ export default function GLCIPage() {
               </TabsContent>
 
               {/* Data Tab */}
-              <TabsContent value="data" className="space-y-6">
-                <div className="grid gap-6 lg:grid-cols-2">
+              <TabsContent value="data" className="space-y-3 sm:space-y-6">
+                <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
                   {/* Data Freshness */}
                   {freshnessData.length > 0 && (
                     <DataFreshness items={freshnessData} />

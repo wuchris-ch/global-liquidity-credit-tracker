@@ -8,6 +8,7 @@ const aliasCandidates = [
   path.join(cwd, "frontend", "src"), // when build runs from repo root
 ];
 const aliasPath = aliasCandidates.find(fs.existsSync) ?? aliasCandidates[0];
+console.log("[next.config] cwd:", cwd, "alias:", aliasPath);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -23,6 +24,7 @@ const nextConfig = {
   },
 
   webpack: (config) => {
+    config.resolve.alias = config.resolve.alias || {};
     config.resolve.alias["@"] = aliasPath;
     return config;
   },

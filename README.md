@@ -14,20 +14,20 @@ Track global liquidity and credit metrics from central banks, BIS, World Bank, a
 
 ## 🏗️ Architecture
 
-Static-first architecture with scheduled data pipeline:
+Static-first architecture with a scheduled data pipeline:
 
 | Layer | Stack | Hosting |
 |-------|-------|---------|
-| **Frontend** | Next.js, React, Tailwind, shadcn/ui, Recharts | [Vercel](https://vercel.com) |
-| **Data Pipeline** | Python, pandas, statsmodels, scipy | [GitHub Actions](https://github.com/features/actions) (scheduled) |
-| **Data Storage** | Pre-computed JSON | [GitHub Pages](https://pages.github.com) |
+| **Frontend** | Next.js, React, Tailwind, shadcn/ui, Recharts | Vercel |
+| **Data Pipeline** | Python, pandas, statsmodels, scipy | GitHub Actions (scheduled) |
+| **Data Storage** | Pre-computed JSON | GitHub Pages |
 | **Data Sources** | FRED, BIS, World Bank, NY Fed APIs | External APIs |
 
 **How it works:**
-1. GitHub Actions runs every 12 hours
-2. Python scripts fetch data from all sources and compute indices (GLCI, Fed Net Liquidity, etc.)
-3. Results are exported as static JSON and published to GitHub Pages
-4. Frontend fetches pre-built JSON instantly—no backend computation at request time
+1. GitHub Actions runs every 12 hours.
+2. Python scripts fetch data from all sources and compute indices (GLCI, Fed Net Liquidity, etc.).
+3. Results are exported as static JSON and published to GitHub Pages.
+4. Frontend fetches pre-built JSON instantly—no backend computation at request time.
 
 ## Quick Start
 

@@ -132,9 +132,9 @@ export default function ExplorerPage() {
 
   const toggleSeries = (id: string) => {
     if (selectedSeries.includes(id)) {
-      setSelectedSeries(selectedSeries.filter((s) => s !== id));
+      setUserSelectedSeries(selectedSeries.filter((s) => s !== id));
     } else if (selectedSeries.length < 5) {
-      setSelectedSeries([...selectedSeries, id]);
+      setUserSelectedSeries([...selectedSeries, id]);
     }
   };
 
@@ -273,7 +273,7 @@ export default function ExplorerPage() {
                 size="sm"
                 className="h-6 px-2 text-xs"
                 onClick={() => {
-                  setSelectedSeries([]);
+                  setUserSelectedSeries([]);
                   onClose?.();
                 }}
               >

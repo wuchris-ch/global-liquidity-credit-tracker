@@ -29,6 +29,8 @@ Static-first architecture with a scheduled data pipeline:
 3. Results are exported as static JSON and published to GitHub Pages.
 4. Frontend fetches pre-built JSON instantly—no backend computation at request time.
 
+> ⚠️ **Important:** Do not delete the `gh-pages` branch! It stores the pre-computed JSON data served by GitHub Pages. Deleting it will break the production frontend. The branch is protected, but if you must modify branch settings, ensure `gh-pages` remains intact.
+
 ## Quick Start
 
 ```bash

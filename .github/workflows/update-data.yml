@@ -52,6 +52,7 @@ jobs:
           mkdir -p /tmp/export
           rm -rf /tmp/export/*
           cp -r data/export/* /tmp/export/
+          cp vercel.json /tmp/export/
 
       - name: Publish to gh-pages
         env:
@@ -83,6 +84,9 @@ jobs:
               echo "$SNAP_DIRS" | head -n $(($COUNT-3)) | xargs -r rm -rf
             fi
           fi
+          
+          # Restore vercel.json to disable Vercel builds for this branch
+          cp /tmp/export/vercel.json .
 
           touch .nojekyll
 

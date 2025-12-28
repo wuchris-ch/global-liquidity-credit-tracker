@@ -1,0 +1,20 @@
+{
+  "date": "2025-12-26",
+  "pillars": {
+    "liquidity": {
+      "value": -4.438360249914187,
+      "weight": 0.4,
+      "contribution": -1.775344099965675
+    },
+    "credit": {
+      "value": 0.0913523464240833,
+      "weight": 0.35,
+      "contribution": 0.03197332124842915
+    },
+    "stress": {
+      "value": -2.6498055307389796,
+      "weight": 0.25,
+      "contribution": -0.6624513826847449
+    }
+  }
+}

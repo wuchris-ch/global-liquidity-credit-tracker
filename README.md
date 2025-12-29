@@ -2,17 +2,18 @@
 
 Track global liquidity and credit metrics from central banks, BIS, World Bank, and market data sources.
 
-## 🌐 Live Demo
+## Live Demo
 
 **[global-liquidity-credit-tracker.vercel.app](https://global-liquidity-credit-tracker.vercel.app)**
 
-- [Dashboard](https://global-liquidity-credit-tracker.vercel.app/) — Overview of key liquidity metrics
-- [GLCI Index](https://global-liquidity-credit-tracker.vercel.app/glci) — Global Liquidity & Credit Index (tri-pillar composite)
-- [Liquidity Monitor](https://global-liquidity-credit-tracker.vercel.app/liquidity) — Fed balance sheet & net liquidity
-- [Credit Spreads](https://global-liquidity-credit-tracker.vercel.app/spreads) — HY/IG spread analysis
-- [Data Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer) — Compare multiple series
+- [Dashboard](https://global-liquidity-credit-tracker.vercel.app/), overview of key liquidity metrics
+- [GLCI Index](https://global-liquidity-credit-tracker.vercel.app/glci), Global Liquidity & Credit Index (tri-pillar composite)
+- [Risk by Regime](https://global-liquidity-credit-tracker.vercel.app/risk), Sharpe ratios and returns by GLCI regime
+- [Liquidity Monitor](https://global-liquidity-credit-tracker.vercel.app/liquidity), Fed balance sheet & net liquidity
+- [Credit Spreads](https://global-liquidity-credit-tracker.vercel.app/spreads), HY/IG spread analysis
+- [Data Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), compare multiple series
 
-## 🏗️ Architecture
+## Architecture
 
 Static-first architecture with a scheduled data pipeline:
 
@@ -21,15 +22,15 @@ Static-first architecture with a scheduled data pipeline:
 | **Frontend** | Next.js, React, Tailwind, shadcn/ui, Recharts | Vercel |
 | **Data Pipeline** | Python, pandas, statsmodels, scipy | GitHub Actions (scheduled) |
 | **Data Storage** | Pre-computed JSON | GitHub Pages |
-| **Data Sources** | FRED, BIS, World Bank, NY Fed APIs | External APIs |
+| **Data Sources** | FRED, BIS, World Bank, NY Fed, Yahoo Finance | External APIs |
 
 **How it works:**
 1. GitHub Actions runs every 12 hours.
-2. Python scripts fetch data from all sources and compute indices (GLCI, Fed Net Liquidity, etc.).
+2. Python scripts fetch data from all sources and compute indices (GLCI, Fed Net Liquidity, risk metrics, etc.).
 3. Results are exported as static JSON and published to GitHub Pages.
-4. Frontend fetches pre-built JSON instantly—no backend computation at request time.
+4. Frontend fetches pre-built JSON instantly, no backend computation at request time.
 
-> ⚠️ **Important:** Do not delete the `gh-pages` branch! It stores the pre-computed JSON data served by GitHub Pages. Deleting it will break the production frontend. The branch is protected, but if you must modify branch settings, ensure `gh-pages` remains intact.
+> **Important:** Do not delete the `gh-pages` branch! It stores the pre-computed JSON data served by GitHub Pages. Deleting it will break the production frontend. The branch is protected, but if you must modify branch settings, ensure `gh-pages` remains intact.
 
 ## Quick Start
 
@@ -66,6 +67,7 @@ python cli.py compute --index fed_net_liquidity
 | BIS | Credit to non-financial sector | SDMX (no key) |
 | World Bank | Credit-to-GDP ratios | REST (no key) |
 | NY Fed | SOFR, repo operations | REST (no key) |
+| Yahoo Finance | Asset prices (ETFs, crypto) | yfinance (no key) |
 
 ## Configured Series
 
@@ -77,7 +79,7 @@ python cli.py compute --index fed_net_liquidity
 ### Funding Rates
 - `sofr` - Secured Overnight Financing Rate (daily)
 - `fed_funds_rate` - Effective Fed Funds Rate (daily)
-- `euro_short_term_rate` - €STR (daily)
+- `euro_short_term_rate` - Euro Short-Term Rate (daily)
 
 ### Monetary Aggregates
 - `us_m2`, `eu_m3`, `china_m2`, `japan_m2`
@@ -89,6 +91,15 @@ python cli.py compute --index fed_net_liquidity
 
 ### BIS Credit Data
 - `bis_credit_us`, `bis_credit_eu`, `bis_credit_cn`, `bis_credit_jp`
+
+### Asset Prices (for Risk Dashboard)
+- `sp500_price` - S&P 500 Index (FRED)
+- `russell2000_price` - Russell 2000 ETF (IWM)
+- `gold_price` - Gold ETF (GLD)
+- `silver_price` - Silver ETF (SLV)
+- `bitcoin_price` - Bitcoin (BTC-USD)
+- `ethereum_price` - Ethereum (ETH-USD)
+- `long_bond_price` - 20+ Year Treasury Bond ETF (TLT)
 
 ## Composite Indices
 
@@ -104,6 +115,32 @@ Z-score average of TED spread, HY spread, and IG spread.
 ### Global CB Assets
 Sum of major central bank balance sheets (USD-normalized).
 
+### Global Liquidity & Credit Index (GLCI)
+Tri-pillar composite index combining:
+- **Liquidity** (40%): Central bank balance sheets, reserve balances, M2
+- **Credit** (35%): Bank credit, consumer credit, BIS credit data
+- **Stress** (25%, inverted): Credit spreads, VIX, funding rates
+
+Regime classification: Tight (z-score < -1), Neutral (-1 to +1), Loose (> +1)
+
+## Risk by Regime Dashboard
+
+The Risk by Regime dashboard shows how different asset classes perform under various GLCI liquidity regimes.
+
+**Metrics computed:**
+- Sharpe ratios (overall and by regime)
+- Annualized returns and volatility
+- Maximum drawdown
+- Correlation with GLCI
+- Rolling 252-day Sharpe ratio time series
+
+**Assets tracked:**
+- Large Cap Equities: S&P 500
+- Small Cap Equities: Russell 2000
+- Commodities: Gold, Silver
+- Crypto: Bitcoin, Ethereum
+- Fixed Income: Long Bonds (TLT)
+
 ## Project Structure
 
 ```
@@ -111,9 +148,9 @@ global_liquidity_tracker/
 ├── config/
 │   └── series.yml          # Series and index definitions
 ├── src/
-│   ├── data_sources/       # API clients (FRED, BIS, World Bank, NY Fed)
+│   ├── data_sources/       # API clients (FRED, BIS, World Bank, NY Fed, yfinance)
 │   ├── etl/                # Data fetching and storage
-│   └── indicators/         # Aggregation and transforms
+│   └── indicators/         # Aggregation, transforms, risk metrics
 ├── data/
 │   ├── raw/                # Raw fetched data (parquet)
 │   └── curated/            # Computed indices (parquet)
@@ -142,6 +179,9 @@ python cli.py compute --index fed_net_liquidity --save
 
 # Show series data
 python cli.py show fed_total_assets --tail 30
+
+# Compute risk metrics
+python -c "from src.indicators.risk_metrics import compute_risk_metrics; compute_risk_metrics(save=True)"
 ```
 
 ## Adding New Series
@@ -151,11 +191,11 @@ Edit `config/series.yml`:
 ```yaml
 series:
   my_new_series:
-    source: fred           # fred, bis, worldbank, nyfed
+    source: fred           # fred, bis, worldbank, nyfed, yfinance
     source_id: SERIES_ID   # Source-specific ID
     country: US
     frequency: weekly      # daily, weekly, monthly, quarterly, annual
-    type: stock            # stock, rate, ratio, spread
+    type: stock            # stock, rate, ratio, spread, price
     unit: millions_usd
     description: "My new series description"
 ```
@@ -244,6 +284,7 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
 2) GitHub Actions (`.github/workflows/update-data.yml`) runs every 12h:
    - `python scripts/update_data.py` (fetch + indices)
    - `python - <<'PY' ... compute_glci(save=True)` (GLCI)
+   - `python - <<'PY' ... compute_risk_metrics(save=True)` (Risk metrics)
    - `python scripts/export_to_json.py --output data/export/latest --snapshot` (API-shaped JSON)
    - Force-publishes `latest/` and a few `snapshots/` to the `gh-pages` branch.
 
@@ -255,6 +296,7 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
    - `latest/api/series/index.json`, `latest/api/series/{id}/index.json`, `latest/api/series/{id}/latest/index.json`
    - `latest/api/indices/index.json`, `latest/api/indices/{id}/index.json`
    - `latest/api/glci/index.json`, `latest/api/glci/latest/index.json`, `latest/api/glci/pillars/index.json`, `latest/api/glci/freshness/index.json`, `latest/api/glci/regime-history/index.json`
+   - `latest/api/risk/index.json`, `latest/api/risk/{asset_id}/index.json`
    - Snapshots mirror the same layout under `snapshots/YYYY-MM-DD/`.
 
 ### Local development (optional live backend)

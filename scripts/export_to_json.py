@@ -368,6 +368,96 @@ def export_glci_freshness(
     write_json(output_dir / "api" / "glci" / "freshness" / "index.json", freshness)
 
 
+def export_risk_metrics(storage: DataStorage, output_dir: Path) -> bool:
+    """Export risk metrics to JSON for Risk by Regime dashboard.
+
+    Outputs:
+      <base>/api/risk/index.json - Full dashboard payload
+      <base>/api/risk/{asset_id}/index.json - Per-asset details
+    """
+    risk_df = storage.load_curated("risk", "risk_metrics")
+    if risk_df is None or risk_df.empty:
+        return False
+
+    # Get current regime from GLCI
+    glci_df = storage.load_curated("indices", "glci")
+    current_regime = "neutral"
+    if glci_df is not None and not glci_df.empty:
+        glci_df = glci_df.sort_values("date")
+        regime_code = int(glci_df.iloc[-1].get("regime", 0))
+        current_regime = REGIME_LABELS.get(regime_code, "neutral")
+
+    # Build assets list
+    assets = []
+    for _, row in risk_df.iterrows():
+        asset = {
+            "id": row["asset_id"],
+            "name": row["name"],
+            "category": row.get("category", "Other"),
+            "current_sharpe": round(float(row["current_sharpe"]), 2) if pd.notna(row["current_sharpe"]) else 0,
+            "annualized_return": round(float(row["annualized_return"]), 2) if pd.notna(row["annualized_return"]) else 0,
+            "annualized_volatility": round(float(row["annualized_volatility"]), 2) if pd.notna(row["annualized_volatility"]) else 0,
+            "max_drawdown": round(float(row["max_drawdown"]), 2) if pd.notna(row["max_drawdown"]) else 0,
+            "sharpe_by_regime": {
+                "tight": round(float(row["sharpe_tight"]), 2) if pd.notna(row.get("sharpe_tight")) else None,
+                "neutral": round(float(row["sharpe_neutral"]), 2) if pd.notna(row.get("sharpe_neutral")) else None,
+                "loose": round(float(row["sharpe_loose"]), 2) if pd.notna(row.get("sharpe_loose")) else None,
+            },
+            "return_by_regime": {
+                "tight": round(float(row["return_tight"]), 2) if pd.notna(row.get("return_tight")) else None,
+                "neutral": round(float(row["return_neutral"]), 2) if pd.notna(row.get("return_neutral")) else None,
+                "loose": round(float(row["return_loose"]), 2) if pd.notna(row.get("return_loose")) else None,
+            },
+            "correlation_with_glci": round(float(row["correlation_with_glci"]), 3) if pd.notna(row.get("correlation_with_glci")) else 0,
+        }
+
+        # Try to load rolling sharpe data
+        rolling_df = storage.load_curated("risk", f"rolling_sharpe_{row['asset_id']}")
+        if rolling_df is not None and not rolling_df.empty:
+            rolling_df = rolling_df.sort_values("date")
+            asset["rolling_sharpe"] = [
+                {"date": fmt_date(r["date"]), "value": round(float(r["value"]), 3)}
+                for _, r in rolling_df.iterrows()
+                if pd.notna(r["value"])
+            ]
+        else:
+            asset["rolling_sharpe"] = []
+
+        assets.append(asset)
+
+    # Build regime performance matrix for heatmap
+    regime_matrix = {
+        "assets": [a["name"] for a in assets],
+        "regimes": ["tight", "neutral", "loose"],
+        "sharpe_data": [
+            [a["sharpe_by_regime"][r] for r in ["tight", "neutral", "loose"]]
+            for a in assets
+        ],
+        "return_data": [
+            [a["return_by_regime"][r] for r in ["tight", "neutral", "loose"]]
+            for a in assets
+        ],
+    }
+
+    payload = {
+        "computed_at": datetime.utcnow().isoformat(),
+        "current_regime": current_regime,
+        "assets": assets,
+        "regime_matrix": regime_matrix,
+    }
+
+    write_json(output_dir / "api" / "risk" / "index.json", payload)
+
+    # Per-asset endpoints
+    for asset in assets:
+        write_json(
+            output_dir / "api" / "risk" / asset["id"] / "index.json",
+            asset
+        )
+
+    return True
+
+
 def export_all(output_dir: Path, add_snapshot: bool) -> None:
     storage = DataStorage(raw_path=RAW_DATA_PATH, curated_path=CURATED_DATA_PATH)
     series_cfg = get_all_series()
@@ -395,6 +485,13 @@ def export_all(output_dir: Path, add_snapshot: bool) -> None:
         print("[export] Skipped GLCI (missing curated data)")
     else:
         export_glci_freshness(storage, series_cfg, output_dir)
+
+    # Risk metrics endpoints
+    risk_ok = export_risk_metrics(storage, output_dir)
+    if not risk_ok:
+        print("[export] Skipped risk metrics (no data - run risk computation first)")
+    else:
+        print("[export] Exported risk metrics")
 
     if add_snapshot:
         date_stamp = datetime.utcnow().strftime("%Y-%m-%d")

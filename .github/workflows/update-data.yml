@@ -43,6 +43,13 @@ jobs:
           compute_glci(save=True)
           PY
 
+      - name: Compute risk metrics and save
+        run: |
+          python - <<'PY'
+          from src.indicators.risk_metrics import compute_risk_metrics
+          compute_risk_metrics(save=True)
+          PY
+
       - name: Export JSON artifacts
         run: |
           python scripts/export_to_json.py --output data/export/latest --snapshot

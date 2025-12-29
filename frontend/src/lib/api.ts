@@ -125,6 +125,43 @@ export interface RegimeHistory {
   current: string;
 }
 
+// Risk by Regime types
+export interface AssetRiskMetrics {
+  id: string;
+  name: string;
+  category: string;
+  current_sharpe: number;
+  annualized_return: number;
+  annualized_volatility: number;
+  max_drawdown: number;
+  sharpe_by_regime: {
+    tight: number | null;
+    neutral: number | null;
+    loose: number | null;
+  };
+  return_by_regime: {
+    tight: number | null;
+    neutral: number | null;
+    loose: number | null;
+  };
+  correlation_with_glci: number;
+  rolling_sharpe?: DataPoint[];
+}
+
+export interface RegimeMatrix {
+  assets: string[];
+  regimes: string[];
+  sharpe_data: (number | null)[][];
+  return_data: (number | null)[][];
+}
+
+export interface RiskDashboardResponse {
+  computed_at: string;
+  current_regime: "tight" | "neutral" | "loose";
+  assets: AssetRiskMetrics[];
+  regime_matrix: RegimeMatrix;
+}
+
 class ApiClient {
   private baseUrl: string;
   private isStatic: boolean;
@@ -251,6 +288,15 @@ class ApiClient {
     if (end) params.set("end", end);
     const query = params.toString() ? `?${params.toString()}` : "";
     return this.fetch<RegimeHistory>(`/api/glci/regime-history${query}`);
+  }
+
+  // Risk by Regime endpoints
+  async getRiskMetrics(): Promise<RiskDashboardResponse> {
+    return this.fetch<RiskDashboardResponse>("/api/risk");
+  }
+
+  async getAssetRisk(assetId: string): Promise<AssetRiskMetrics> {
+    return this.fetch<AssetRiskMetrics>(`/api/risk/${assetId}`);
   }
 }
 

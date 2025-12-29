@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Literal
 
 from ..config import get_series_config, get_all_series, RAW_DATA_PATH
-from ..data_sources import FredClient, BISClient, WorldBankClient, NYFedClient
+from ..data_sources import FredClient, BISClient, WorldBankClient, NYFedClient, YFinanceClient
 
 
 class DataFetcher:
@@ -30,6 +30,8 @@ class DataFetcher:
                 self._clients[source] = WorldBankClient(cache_path=cache_path)
             elif source == "nyfed":
                 self._clients[source] = NYFedClient(cache_path=cache_path)
+            elif source == "yfinance":
+                self._clients[source] = YFinanceClient(cache_path=cache_path)
             else:
                 raise ValueError(f"Unknown data source: {source}")
         

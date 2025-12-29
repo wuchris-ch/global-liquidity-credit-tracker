@@ -22,6 +22,7 @@ import {
   Globe2,
   LayoutDashboard,
   LineChart,
+  PieChart,
   TrendingUp,
   Wallet,
 } from "lucide-react";
@@ -39,6 +40,11 @@ const mainNavItems = [
     title: "GLCI",
     url: "/glci",
     icon: Gauge,
+  },
+  {
+    title: "Risk by Regime",
+    url: "/risk",
+    icon: PieChart,
     badge: "NEW",
   },
   {
@@ -63,6 +69,7 @@ const dataSourceItems = [
   { title: "NY Fed", icon: CircleDollarSign, status: "live" },
   { title: "BIS", icon: Globe2, status: "live" },
   { title: "World Bank", icon: Wallet, status: "live" },
+  { title: "Yahoo Finance", icon: LineChart, status: "live" },
 ];
 
 export function AppSidebar() {

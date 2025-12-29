@@ -406,6 +406,72 @@ series:
     unit: percent_gdp
     description: "Domestic Credit to Private Sector (% of GDP) - Japan"
 
+  # ===================
+  # Asset Prices (for Risk Dashboard)
+  # ===================
+  sp500_price:
+    source: fred
+    source_id: SP500
+    country: US
+    frequency: daily
+    type: price
+    unit: index
+    description: "S&P 500 Index"
+
+  gold_price:
+    source: yfinance
+    source_id: GLD
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "Gold ETF (GLD)"
+
+  russell2000_price:
+    source: yfinance
+    source_id: IWM
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "Russell 2000 ETF (IWM)"
+
+  silver_price:
+    source: yfinance
+    source_id: SLV
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "Silver ETF (SLV)"
+
+  bitcoin_price:
+    source: yfinance
+    source_id: BTC-USD
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "Bitcoin Price (USD)"
+
+  ethereum_price:
+    source: yfinance
+    source_id: ETH-USD
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "Ethereum Price (USD)"
+
+  long_bond_price:
+    source: yfinance
+    source_id: TLT
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "20+ Year Treasury Bond ETF (TLT)"
+
 # ===================
 # Composite Index Definitions
 # ===================

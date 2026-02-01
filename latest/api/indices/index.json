@@ -1,0 +1,30 @@
+[
+  {
+    "id": "fed_net_liquidity",
+    "name": "Fed Net Liquidity",
+    "description": "Fed Net Liquidity = Total Assets - TGA - Reverse Repo",
+    "frequency": "weekly",
+    "components": 3
+  },
+  {
+    "id": "usd_funding_stress",
+    "name": "Usd Funding Stress",
+    "description": "USD Funding Stress Index (z-score average of spreads)",
+    "frequency": "daily",
+    "components": 3
+  },
+  {
+    "id": "global_cb_assets",
+    "name": "Global Cb Assets",
+    "description": "Major Central Bank Total Assets (USD-normalized)",
+    "frequency": "monthly",
+    "components": 3
+  },
+  {
+    "id": "global_liquidity_credit_index",
+    "name": "Global Liquidity Credit Index",
+    "description": "Tri-pillar Global Liquidity & Credit Index (GLCI)",
+    "frequency": "weekly",
+    "components": 3
+  }
+]

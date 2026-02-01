@@ -1,0 +1,177 @@
+[
+  {
+    "series_id": "fed_total_assets",
+    "pillar": "liquidity",
+    "last_date": "2026-01-28",
+    "days_old": 4,
+    "is_stale": false
+  },
+  {
+    "series_id": "fed_reserve_balances",
+    "pillar": "liquidity",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "fed_reverse_repo",
+    "pillar": "liquidity",
+    "last_date": "2026-01-30",
+    "days_old": 2,
+    "is_stale": false
+  },
+  {
+    "series_id": "fed_treasury_general_account",
+    "pillar": "liquidity",
+    "last_date": "2026-01-28",
+    "days_old": 4,
+    "is_stale": false
+  },
+  {
+    "series_id": "ecb_total_assets",
+    "pillar": "liquidity",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "boj_total_assets",
+    "pillar": "liquidity",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "boe_total_assets",
+    "pillar": "liquidity",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "us_m2",
+    "pillar": "liquidity",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "us_bank_credit_total",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "us_bank_loans_leases",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "us_consumer_credit",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "us_commercial_paper",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "bis_credit_us",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "bis_credit_eu",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "bis_credit_cn",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "bis_credit_jp",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "wb_credit_gdp_us",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "wb_credit_gdp_cn",
+    "pillar": "credit",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "ice_bofa_us_high_yield_spread",
+    "pillar": "stress",
+    "last_date": "2026-01-29",
+    "days_old": 3,
+    "is_stale": false
+  },
+  {
+    "series_id": "ice_bofa_us_ig_spread",
+    "pillar": "stress",
+    "last_date": "2026-01-29",
+    "days_old": 3,
+    "is_stale": false
+  },
+  {
+    "series_id": "ted_spread",
+    "pillar": "stress",
+    "last_date": "2022-01-21",
+    "days_old": 1472,
+    "is_stale": true
+  },
+  {
+    "series_id": "sofr",
+    "pillar": "stress",
+    "last_date": "2026-01-29",
+    "days_old": 3,
+    "is_stale": false
+  },
+  {
+    "series_id": "fed_funds_rate",
+    "pillar": "stress",
+    "last_date": "2026-01-29",
+    "days_old": 3,
+    "is_stale": false
+  },
+  {
+    "series_id": "vix",
+    "pillar": "stress",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  },
+  {
+    "series_id": "nfci",
+    "pillar": "stress",
+    "last_date": "unknown",
+    "days_old": -1,
+    "is_stale": true
+  }
+]

@@ -1,0 +1,386 @@
+[
+  {
+    "id": "fed_total_assets",
+    "name": "Federal Reserve Total Assets",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "weekly",
+    "unit": "millions_usd"
+  },
+  {
+    "id": "fed_treasury_general_account",
+    "name": "Treasury General Account at Fed",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "weekly",
+    "unit": "millions_usd"
+  },
+  {
+    "id": "fed_reverse_repo",
+    "name": "Overnight Reverse Repurchase Agreements",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "daily",
+    "unit": "billions_usd"
+  },
+  {
+    "id": "fed_reserve_balances",
+    "name": "Reserve Balances with Federal Reserve Banks",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "weekly",
+    "unit": "millions_usd"
+  },
+  {
+    "id": "ecb_total_assets",
+    "name": "ECB Total Assets",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "weekly",
+    "unit": "millions_eur"
+  },
+  {
+    "id": "boj_total_assets",
+    "name": "Bank of Japan Total Assets",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "monthly",
+    "unit": "millions_jpy"
+  },
+  {
+    "id": "boe_total_assets",
+    "name": "Bank of England Total Assets",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "quarterly",
+    "unit": "millions_gbp"
+  },
+  {
+    "id": "fx_eurusd",
+    "name": "EUR/USD Exchange Rate",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd_per_eur"
+  },
+  {
+    "id": "fx_usdjpy",
+    "name": "USD/JPY Exchange Rate",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "jpy_per_usd"
+  },
+  {
+    "id": "fx_gbpusd",
+    "name": "GBP/USD Exchange Rate",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd_per_gbp"
+  },
+  {
+    "id": "fx_usdcny",
+    "name": "USD/CNY Exchange Rate",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "cny_per_usd"
+  },
+  {
+    "id": "us_cpi",
+    "name": "US Consumer Price Index for All Urban Consumers",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "monthly",
+    "unit": "index_1982_84"
+  },
+  {
+    "id": "eu_hicp",
+    "name": "Euro Area Harmonized Index of Consumer Prices",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "monthly",
+    "unit": "index_2015"
+  },
+  {
+    "id": "jp_cpi",
+    "name": "Japan Consumer Price Index",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "monthly",
+    "unit": "index_2020"
+  },
+  {
+    "id": "sofr",
+    "name": "Secured Overnight Financing Rate",
+    "source": "FRED",
+    "category": "Funding Rates",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "fed_funds_rate",
+    "name": "Effective Federal Funds Rate",
+    "source": "FRED",
+    "category": "Funding Rates",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "euro_short_term_rate",
+    "name": "Euro Short-Term Rate (\u20acSTR)",
+    "source": "FRED",
+    "category": "Funding Rates",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "us_m2",
+    "name": "US M2 Money Stock",
+    "source": "FRED",
+    "category": "Money Supply",
+    "frequency": "monthly",
+    "unit": "billions_usd"
+  },
+  {
+    "id": "eu_m3",
+    "name": "Euro Area M3 Money Supply",
+    "source": "FRED",
+    "category": "Money Supply",
+    "frequency": "monthly",
+    "unit": "index"
+  },
+  {
+    "id": "china_m2",
+    "name": "China M2 Money Supply",
+    "source": "FRED",
+    "category": "Money Supply",
+    "frequency": "monthly",
+    "unit": "index"
+  },
+  {
+    "id": "japan_m2",
+    "name": "Japan M2 Money Supply",
+    "source": "FRED",
+    "category": "Money Supply",
+    "frequency": "monthly",
+    "unit": "index"
+  },
+  {
+    "id": "ted_spread",
+    "name": "TED Spread (3M LIBOR - 3M T-Bill)",
+    "source": "FRED",
+    "category": "Credit Spreads",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "ice_bofa_us_high_yield_spread",
+    "name": "ICE BofA US High Yield Index Option-Adjusted Spread",
+    "source": "FRED",
+    "category": "Credit Spreads",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "ice_bofa_us_ig_spread",
+    "name": "ICE BofA US Corporate Index Option-Adjusted Spread",
+    "source": "FRED",
+    "category": "Credit Spreads",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "treasury_3m",
+    "name": "3-Month Treasury Constant Maturity Rate",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "treasury_10y",
+    "name": "10-Year Treasury Constant Maturity Rate",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "treasury_2y",
+    "name": "2-Year Treasury Constant Maturity Rate",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "vix",
+    "name": "CBOE Volatility Index (VIX)",
+    "source": "FRED",
+    "category": "Volatility",
+    "frequency": "daily",
+    "unit": "index"
+  },
+  {
+    "id": "nfci",
+    "name": "Chicago Fed National Financial Conditions Index",
+    "source": "FRED",
+    "category": "Financial Conditions",
+    "frequency": "weekly",
+    "unit": "index"
+  },
+  {
+    "id": "us_bank_credit_total",
+    "name": "Total Bank Credit at US Commercial Banks",
+    "source": "FRED",
+    "category": "Bank Credit",
+    "frequency": "weekly",
+    "unit": "billions_usd"
+  },
+  {
+    "id": "us_bank_loans_leases",
+    "name": "Total Loans and Leases at US Commercial Banks",
+    "source": "FRED",
+    "category": "Bank Credit",
+    "frequency": "weekly",
+    "unit": "billions_usd"
+  },
+  {
+    "id": "us_consumer_credit",
+    "name": "Total Consumer Credit Owned and Securitized",
+    "source": "FRED",
+    "category": "Consumer Credit",
+    "frequency": "monthly",
+    "unit": "billions_usd"
+  },
+  {
+    "id": "us_commercial_paper",
+    "name": "Commercial Paper Outstanding",
+    "source": "FRED",
+    "category": "Commercial Paper",
+    "frequency": "weekly",
+    "unit": "billions_usd"
+  },
+  {
+    "id": "bis_credit_us",
+    "name": "BIS Credit to Private Non-Financial Sector - US",
+    "source": "BIS",
+    "category": "BIS Credit",
+    "frequency": "quarterly",
+    "unit": "local_currency"
+  },
+  {
+    "id": "bis_credit_eu",
+    "name": "BIS Credit to Private Non-Financial Sector - Euro Area",
+    "source": "BIS",
+    "category": "BIS Credit",
+    "frequency": "quarterly",
+    "unit": "local_currency"
+  },
+  {
+    "id": "bis_credit_cn",
+    "name": "BIS Credit to Private Non-Financial Sector - China",
+    "source": "BIS",
+    "category": "BIS Credit",
+    "frequency": "quarterly",
+    "unit": "local_currency"
+  },
+  {
+    "id": "bis_credit_jp",
+    "name": "BIS Credit to Private Non-Financial Sector - Japan",
+    "source": "BIS",
+    "category": "BIS Credit",
+    "frequency": "quarterly",
+    "unit": "local_currency"
+  },
+  {
+    "id": "wb_credit_gdp_us",
+    "name": "Domestic Credit to Private Sector (% of GDP) - US",
+    "source": "WORLDBANK",
+    "category": "Other",
+    "frequency": "annual",
+    "unit": "percent_gdp"
+  },
+  {
+    "id": "wb_credit_gdp_cn",
+    "name": "Domestic Credit to Private Sector (% of GDP) - China",
+    "source": "WORLDBANK",
+    "category": "Other",
+    "frequency": "annual",
+    "unit": "percent_gdp"
+  },
+  {
+    "id": "wb_credit_gdp_eu",
+    "name": "Domestic Credit to Private Sector (% of GDP) - Euro Area",
+    "source": "WORLDBANK",
+    "category": "Other",
+    "frequency": "annual",
+    "unit": "percent_gdp"
+  },
+  {
+    "id": "wb_credit_gdp_jp",
+    "name": "Domestic Credit to Private Sector (% of GDP) - Japan",
+    "source": "WORLDBANK",
+    "category": "Other",
+    "frequency": "annual",
+    "unit": "percent_gdp"
+  },
+  {
+    "id": "sp500_price",
+    "name": "S&P 500 Index",
+    "source": "FRED",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "index"
+  },
+  {
+    "id": "gold_price",
+    "name": "Gold ETF (GLD)",
+    "source": "YFINANCE",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "russell2000_price",
+    "name": "Russell 2000 ETF (IWM)",
+    "source": "YFINANCE",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "silver_price",
+    "name": "Silver ETF (SLV)",
+    "source": "YFINANCE",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "bitcoin_price",
+    "name": "Bitcoin Price (USD)",
+    "source": "YFINANCE",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "ethereum_price",
+    "name": "Ethereum Price (USD)",
+    "source": "YFINANCE",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "long_bond_price",
+    "name": "20+ Year Treasury Bond ETF (TLT)",
+    "source": "YFINANCE",
+    "category": "Other",
+    "frequency": "daily",
+    "unit": "usd"
+  }
+]

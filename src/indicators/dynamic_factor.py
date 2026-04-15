@@ -1,11 +1,4 @@
-"""Dynamic Factor Model implementation for latent factor extraction.
-
-This module provides robust factor extraction with:
-- Mixed-frequency support via Kalman filtering
-- Proper sign constraint enforcement
-- Data quality validation
-- Shrinkage/regularization for stability
-"""
+"""Dynamic Factor Model implementation for latent factor extraction."""
 import pandas as pd
 import numpy as np
 from typing import Literal

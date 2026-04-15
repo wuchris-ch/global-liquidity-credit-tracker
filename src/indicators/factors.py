@@ -126,11 +126,9 @@ class FeatureMatrixBuilder:
                 # Resample to target frequency
                 df = resample_to_frequency(df, target_freq, agg_method="last")
                 
-                # *** KEY FIX: Apply sign flip BEFORE computing transforms ***
-                # This ensures the factor loadings will have the correct sign
+                # Pre-flip negative-sign series so downstream factor loadings are positive.
                 if series_sign < 0:
                     df = apply_sign_flip(df, "value", series_sign)
-                    # After flipping, the effective sign is now positive
                     effective_sign = 1
                 else:
                     effective_sign = series_sign
@@ -216,14 +214,13 @@ class FeatureMatrixBuilder:
                     })
                     all_features[feature_name] = feature_df
                     
-                    # Store metadata - note: sign is now always positive after pre-flipping
                     all_metadata.append(FeatureMetadata(
                         series_id=series_id,
                         pillar=pillar_name,
                         country=country or series_config.get("country", ""),
                         transform=transform,
                         unit=unit,
-                        sign=effective_sign,  # Always positive after pre-flip
+                        sign=effective_sign,  # positive after pre-flip
                         source_frequency=source_freq,
                         data_quality=coverage,
                         last_updated=str(last_date)[:10] if pd.notna(last_date) else "unknown"

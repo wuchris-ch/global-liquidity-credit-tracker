@@ -4,13 +4,6 @@ The GLCI is a tri-pillar composite index that measures:
 1. Liquidity: Central bank balance sheets, monetary aggregates
 2. Credit: Private sector credit growth, credit-to-GDP gaps
 3. Stress: Credit spreads, funding rates, volatility (inverted)
-
-Key improvements in this version:
-- Pre-flip negative-sign series for correct factor loadings
-- Credit impulse (second derivative) instead of just levels
-- Data quality validation and reporting
-- Proper handling of mixed-frequency data
-- Time-varying weight optimization option
 """
 import pandas as pd
 import numpy as np

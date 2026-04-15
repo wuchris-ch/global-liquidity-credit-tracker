@@ -18,10 +18,6 @@ class DataStorage:
         self.raw_path.mkdir(parents=True, exist_ok=True)
         self.curated_path.mkdir(parents=True, exist_ok=True)
     
-    # ==================
-    # Raw Data Operations
-    # ==================
-    
     def save_raw(self, df: pd.DataFrame, source: str, series_id: str) -> Path:
         """Save raw data to parquet file.
         
@@ -83,10 +79,6 @@ class DataStorage:
                     })
         
         return series_list
-    
-    # ==================
-    # Curated Data Operations
-    # ==================
     
     def save_curated(self, df: pd.DataFrame, category: str, name: str,
                      metadata: dict | None = None) -> Path:
@@ -151,10 +143,6 @@ class DataStorage:
                     })
         
         return datasets
-    
-    # ==================
-    # Utility Methods
-    # ==================
     
     def get_latest_date(self, source: str, series_id: str) -> pd.Timestamp | None:
         """Get the latest date in a raw series."""

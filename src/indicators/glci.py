@@ -507,23 +507,37 @@ class GLCIComputer:
                 series_id = comp["series"]
                 try:
                     df = self.fetcher.fetch_series(series_id)
-                    if not df.empty:
-                        last_date = df["date"].max()
-                        days_old = (pd.Timestamp.now() - pd.Timestamp(last_date)).days
-                        freshness[series_id] = {
-                            "pillar": pillar_name,
-                            "last_date": str(last_date)[:10],
-                            "days_old": days_old,
-                            "is_stale": days_old > 14
-                        }
-                except:
+                except Exception as e:
+                    # Network/upstream fetch failures are expected here (stale data
+                    # is meaningful info); record as unknown rather than crashing
+                    # the whole freshness report.
+                    print(f"Warning: freshness fetch failed for {series_id}: {e}")
                     freshness[series_id] = {
                         "pillar": pillar_name,
                         "last_date": "unknown",
                         "days_old": -1,
                         "is_stale": True
                     }
-        
+                    continue
+
+                if df.empty:
+                    freshness[series_id] = {
+                        "pillar": pillar_name,
+                        "last_date": "unknown",
+                        "days_old": -1,
+                        "is_stale": True
+                    }
+                    continue
+
+                last_date = df["date"].max()
+                days_old = (pd.Timestamp.now() - pd.Timestamp(last_date)).days
+                freshness[series_id] = {
+                    "pillar": pillar_name,
+                    "last_date": str(last_date)[:10],
+                    "days_old": days_old,
+                    "is_stale": days_old > 14
+                }
+
         return freshness
 
 

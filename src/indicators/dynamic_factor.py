@@ -557,10 +557,14 @@ class DynamicFactorModel:
             raise ValueError("Model must be fitted first")
         
         if self._method_used == "dfm":
-            try:
-                return 1 - self._results.sse / self._results.centered_tss
-            except:
-                return 0.5  # Default if calculation fails
+            # statsmodels occasionally omits sse/centered_tss depending on model
+            # convergence state; return NaN so callers can detect the missing
+            # value rather than a silently-made-up number.
+            sse = getattr(self._results, "sse", None)
+            centered_tss = getattr(self._results, "centered_tss", None)
+            if sse is None or centered_tss in (None, 0):
+                return float("nan")
+            return 1 - sse / centered_tss
         else:
             if HAS_SKLEARN and hasattr(self._model, "explained_variance_ratio_"):
                 return sum(self._model.explained_variance_ratio_)

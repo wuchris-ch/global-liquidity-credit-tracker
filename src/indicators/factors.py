@@ -290,13 +290,14 @@ class FeatureMatrixBuilder:
         for meta in metadata:
             if meta.data_quality < 0.5:
                 low_coverage.append((meta.series_id, meta.data_quality))
-            
-            try:
-                days_old = (pd.Timestamp.now() - pd.Timestamp(meta.last_updated)).days
-                if days_old > 30:
-                    stale_series.append((meta.series_id, days_old))
-            except:
-                pass
+
+            # last_updated is "unknown" when source data had no valid dates; skip
+            # the staleness check in that case instead of crashing.
+            if meta.last_updated == "unknown":
+                continue
+            days_old = (pd.Timestamp.now() - pd.Timestamp(meta.last_updated)).days
+            if days_old > 30:
+                stale_series.append((meta.series_id, days_old))
         
         report = DataQualityReport(
             pillar=pillar_name,

@@ -29,6 +29,9 @@ const filterSeries = <T extends WithDate>(
   return data.filter((d) => isInRange(d.date, start, end));
 };
 
+/** Liquidity regime classification used across GLCI and risk endpoints. */
+export type Regime = "tight" | "neutral" | "loose";
+
 export interface DataPoint {
   date: string;
   value: number;
@@ -79,7 +82,7 @@ export interface GLCIPillar {
 export interface GLCIResponse {
   value: number;
   zscore: number;
-  regime: "tight" | "neutral" | "loose";
+  regime: Regime;
   regime_code: number;
   date: string;
   momentum: number;
@@ -159,7 +162,7 @@ export interface RegimeMatrix {
 
 export interface RiskDashboardResponse {
   computed_at: string;
-  current_regime: "tight" | "neutral" | "loose";
+  current_regime: Regime;
   assets: AssetRiskMetrics[];
   regime_matrix: RegimeMatrix;
 }

@@ -207,7 +207,7 @@ export default function RiskPage() {
   // Find best/worst performers in current regime
   const regimeInsights = useMemo(() => {
     if (!data) return null;
-    const regime = data.current_regime as "tight" | "neutral" | "loose";
+    const regime = data.current_regime;
     const sorted = [...data.assets]
       .filter((a) => a.sharpe_by_regime[regime] !== null)
       .sort(

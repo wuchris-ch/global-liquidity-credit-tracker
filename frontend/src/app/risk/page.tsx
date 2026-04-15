@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { useRiskData } from "@/hooks/use-risk-data";
 import { AssetRiskMetrics } from "@/lib/api";
+import { getFreshnessStatus, getLatestDate } from "@/lib/data-status";
 
 const regimeColors = {
   tight: "text-regime-tight bg-regime-tight/10 border-regime-tight/30",
@@ -201,6 +202,7 @@ function AssetCards({ assets }: { assets: AssetRiskMetrics[] }) {
 export default function RiskPage() {
   const [activeTab, setActiveTab] = useState<string>("overview");
   const { data, isLoading, error, refetch } = useRiskData();
+  const pageStatus = getFreshnessStatus(getLatestDate(data?.computed_at ?? null));
 
   // Find best/worst performers in current regime
   const regimeInsights = useMemo(() => {
@@ -258,7 +260,8 @@ export default function RiskPage() {
       <div className="flex h-screen flex-col bg-background">
         <Header
           title="Risk by Regime"
-          description="Risk-adjusted returns by GLCI regime"
+          description="Sharpe ratios and risk metrics conditioned on GLCI regime"
+          status={pageStatus}
         />
         <div className="flex flex-1 items-center justify-center">
           <Card className="max-w-md">
@@ -287,6 +290,7 @@ export default function RiskPage() {
         description="Sharpe ratios and risk metrics conditioned on GLCI regime"
         onRefresh={refetch}
         isRefreshing={isLoading}
+        status={pageStatus}
       />
 
       <ScrollArea className="flex-1 w-full">
@@ -349,7 +353,7 @@ export default function RiskPage() {
                     Asset Overview
                     <InfoTooltip
                       title="Current Sharpe Ratios"
-                      description="Real-time risk-adjusted performance for each tracked asset class."
+                      description="Latest computed risk-adjusted performance for each tracked asset class."
                       interpretation="Sharpe ratio measures excess return per unit of risk. Higher is better."
                       size="sm"
                     />

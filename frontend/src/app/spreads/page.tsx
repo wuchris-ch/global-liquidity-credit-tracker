@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
 import { metricDefinitions, chartDefinitions, spreadDefinitions } from "@/lib/indicator-definitions";
+import { getFreshnessStatus, getLatestDate } from "@/lib/data-status";
 
 function getDateRange(range: TimeRange): { start: string; end: string } {
   const end = new Date();
@@ -109,6 +110,16 @@ export default function SpreadsPage() {
     ? hyBps.reduce((a, b) => a + b.value, 0) / hyBps.length 
     : 0;
 
+  const pageStatus = getFreshnessStatus(
+    getLatestDate(
+      hySpread.latestDate,
+      igSpread.latestDate,
+      sofr.latestDate,
+      fedFunds.latestDate,
+      stressIndex.latestDate
+    )
+  );
+
   const getStressLevel = (value: number) => {
     if (value < -0.5) return { label: "Low Stress", color: "positive", icon: CheckCircle2 };
     if (value < 0.5) return { label: "Normal", color: "muted-foreground", icon: Activity };
@@ -128,6 +139,7 @@ export default function SpreadsPage() {
           onTimeRangeChange={handleTimeRangeChange}
           onRefresh={handleRefresh}
           isRefreshing={isLoading}
+          status={pageStatus}
         />
         <div className="flex flex-1 items-center justify-center">
           <Card className="max-w-md">
@@ -156,6 +168,7 @@ export default function SpreadsPage() {
         onTimeRangeChange={handleTimeRangeChange}
         onRefresh={handleRefresh}
         isRefreshing={isLoading}
+        status={pageStatus}
       />
 
       <ScrollArea className="flex-1 w-full">
@@ -408,4 +421,3 @@ export default function SpreadsPage() {
     </div>
   );
 }
-

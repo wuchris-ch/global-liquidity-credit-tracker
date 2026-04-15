@@ -21,6 +21,11 @@ import {
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
 import { formatCurrency, UNIT_SCALES } from "@/lib/utils";
 import { metricDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
+import {
+  formatShortDate,
+  getFreshnessStatus,
+  getLatestDate,
+} from "@/lib/data-status";
 
 function getDateRange(range: TimeRange): { start: string; end: string } {
   const end = new Date();
@@ -80,19 +85,42 @@ export default function DashboardPage() {
   // Scale factors for different unit types
   const scaleMillions = UNIT_SCALES.millions_usd;
 
+  const getLatestValue = (data: { date: string; value: number }[]) =>
+    data.length > 0 ? data[data.length - 1]?.value ?? null : null;
+
   // Get latest values (scaled to base currency)
-  const latestFed = (fedAssets.data[fedAssets.data.length - 1]?.value ?? 0) * scaleMillions;
-  const latestNet = (netLiquidity.data[netLiquidity.data.length - 1]?.value ?? 0) * scaleMillions;
-  const latestSofr = sofr.data[sofr.data.length - 1]?.value ?? 0;
-  const latestHY = (hySpread.data[hySpread.data.length - 1]?.value ?? 0) * 100; // Convert to bps
+  const latestFedRaw = getLatestValue(fedAssets.data);
+  const latestNetRaw = getLatestValue(netLiquidity.data);
+  const latestSofr = getLatestValue(sofr.data);
+  const latestEffr = getLatestValue(fedFunds.data);
+  const latestHYRaw = getLatestValue(hySpread.data);
+  const latestIGRaw = getLatestValue(igSpread.data);
+
+  const latestFed = latestFedRaw !== null ? latestFedRaw * scaleMillions : null;
+  const latestNet = latestNetRaw !== null ? latestNetRaw * scaleMillions : null;
+  const latestHY = latestHYRaw !== null ? latestHYRaw * 100 : null;
+  const latestIG = latestIGRaw !== null ? latestIGRaw * 100 : null;
 
   // Calculate changes
   const calcChange = (data: { date: string; value: number }[], periods = 7) => {
-    if (data.length < periods + 1) return 0;
+    if (data.length < periods + 1) return undefined;
     const latest = data[data.length - 1]?.value ?? 0;
     const prev = data[data.length - periods - 1]?.value ?? latest;
-    return prev !== 0 ? ((latest - prev) / prev) * 100 : 0;
+    return prev !== 0 ? ((latest - prev) / prev) * 100 : undefined;
   };
+
+  const pageStatus = getFreshnessStatus(
+    getLatestDate(
+      fedAssets.latestDate,
+      netLiquidity.latestDate,
+      sofr.latestDate,
+      fedFunds.latestDate,
+      hySpread.latestDate,
+      igSpread.latestDate,
+      ecbAssets.latestDate,
+      bojAssets.latestDate
+    )
+  );
 
   // Prepare multi-line chart data
   const fundingRatesData = useMemo(() => {
@@ -133,11 +161,12 @@ export default function DashboardPage() {
       <div className="flex h-screen flex-col bg-background">
         <Header
           title="Dashboard"
-          description="Real-time global liquidity and credit metrics"
+          description="Scheduled global liquidity and credit metrics"
           timeRange={timeRange}
           onTimeRangeChange={handleTimeRangeChange}
           onRefresh={handleRefresh}
           isRefreshing={isLoading}
+          status={pageStatus}
         />
         <div className="flex flex-1 items-center justify-center">
           <Card className="max-w-md">
@@ -161,11 +190,12 @@ export default function DashboardPage() {
     <div className="flex h-screen flex-col bg-background">
       <Header
         title="Dashboard"
-        description="Real-time global liquidity and credit metrics"
+        description="Scheduled global liquidity and credit metrics"
         timeRange={timeRange}
         onTimeRangeChange={handleTimeRangeChange}
         onRefresh={handleRefresh}
         isRefreshing={isLoading}
+        status={pageStatus}
       />
 
       <ScrollArea className="flex-1 w-full">
@@ -175,17 +205,22 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
               <MetricCard
                 title="Fed Balance Sheet"
-                value={isLoading ? "Loading..." : formatCurrency(latestFed)}
+                value={isLoading ? "Loading..." : latestFed !== null ? formatCurrency(latestFed) : "No data"}
                 change={calcChange(fedAssets.data)}
-                trend={calcChange(fedAssets.data) >= 0 ? "up" : "down"}
+                trend={(calcChange(fedAssets.data) ?? 0) >= 0 ? "up" : "down"}
                 icon={<Building2 className="h-5 w-5" />}
                 variant="highlight"
                 info={metricDefinitions.fed_balance_sheet}
               />
               <MetricCard
                 title="SOFR Rate"
-                value={isLoading ? "Loading..." : `${latestSofr.toFixed(2)}%`}
-                change={sofr.data.length > 7 ? (sofr.data[sofr.data.length - 1]?.value ?? 0) - (sofr.data[sofr.data.length - 8]?.value ?? 0) : 0}
+                value={isLoading ? "Loading..." : latestSofr !== null ? `${latestSofr.toFixed(2)}%` : "No data"}
+                change={
+                  sofr.data.length > 7
+                    ? (sofr.data[sofr.data.length - 1]?.value ?? 0) -
+                      (sofr.data[sofr.data.length - 8]?.value ?? 0)
+                    : undefined
+                }
                 changeLabel="vs last week"
                 trend="neutral"
                 icon={<CircleDollarSign className="h-5 w-5" />}
@@ -193,18 +228,18 @@ export default function DashboardPage() {
               />
               <MetricCard
                 title="HY Spread"
-                value={isLoading ? "Loading..." : `${Math.round(latestHY)} bps`}
+                value={isLoading ? "Loading..." : latestHY !== null ? `${Math.round(latestHY)} bps` : "No data"}
                 change={calcChange(hySpread.data)}
                 changeLabel="bps"
-                trend={calcChange(hySpread.data) <= 0 ? "up" : "down"}
+                trend={(calcChange(hySpread.data) ?? 0) <= 0 ? "up" : "down"}
                 icon={<TrendingUp className="h-5 w-5" />}
                 info={metricDefinitions.hy_spread}
               />
               <MetricCard
                 title="Net Liquidity"
-                value={isLoading ? "Loading..." : formatCurrency(latestNet)}
+                value={isLoading ? "Loading..." : latestNet !== null ? formatCurrency(latestNet) : "No data"}
                 change={calcChange(netLiquidity.data)}
-                trend={calcChange(netLiquidity.data) >= 0 ? "up" : "down"}
+                trend={(calcChange(netLiquidity.data) ?? 0) >= 0 ? "up" : "down"}
                 icon={<Activity className="h-5 w-5" />}
                 info={metricDefinitions.net_liquidity}
               />
@@ -293,11 +328,13 @@ export default function DashboardPage() {
                               <InfoTooltip {...metricDefinitions.sofr_rate} size="xs" />
                             </p>
                             <p className="font-mono text-lg font-bold">
-                              {isLoading ? "..." : `${latestSofr.toFixed(2)}%`}
+                              {isLoading ? "..." : latestSofr !== null ? `${latestSofr.toFixed(2)}%` : "No data"}
                             </p>
                           </div>
                           <div className="flex items-center gap-1 text-muted-foreground">
-                            <span className="font-mono text-xs">Live</span>
+                            <span className="font-mono text-xs">
+                              {sofr.latestDate ? formatShortDate(sofr.latestDate) : "No data"}
+                            </span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
@@ -307,11 +344,13 @@ export default function DashboardPage() {
                               <InfoTooltip {...metricDefinitions.effr} size="xs" />
                             </p>
                             <p className="font-mono text-lg font-bold">
-                              {isLoading ? "..." : `${(fedFunds.data[fedFunds.data.length - 1]?.value ?? 0).toFixed(2)}%`}
+                              {isLoading ? "..." : latestEffr !== null ? `${latestEffr.toFixed(2)}%` : "No data"}
                             </p>
                           </div>
                           <div className="flex items-center gap-1 text-muted-foreground">
-                            <span className="font-mono text-xs">Live</span>
+                            <span className="font-mono text-xs">
+                              {fedFunds.latestDate ? formatShortDate(fedFunds.latestDate) : "No data"}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -355,7 +394,7 @@ export default function DashboardPage() {
                           </p>
                           <div className="flex items-baseline gap-2">
                             <p className="font-mono text-2xl font-bold text-negative">
-                              {isLoading ? "..." : Math.round(latestHY)}
+                              {isLoading ? "..." : latestHY !== null ? Math.round(latestHY) : "No data"}
                             </p>
                             <span className="text-xs text-muted-foreground">bps</span>
                           </div>
@@ -367,7 +406,7 @@ export default function DashboardPage() {
                           </p>
                           <div className="flex items-baseline gap-2">
                             <p className="font-mono text-2xl font-bold text-positive">
-                              {isLoading ? "..." : Math.round((igSpread.data[igSpread.data.length - 1]?.value ?? 0) * 100)}
+                              {isLoading ? "..." : latestIG !== null ? Math.round(latestIG) : "No data"}
                             </p>
                             <span className="text-xs text-muted-foreground">bps</span>
                           </div>
@@ -413,13 +452,18 @@ export default function DashboardPage() {
                             <div>
                               <p className="text-xs font-medium">Federal Reserve</p>
                               <p className="font-mono text-sm font-bold">
-                                {isLoading ? "..." : formatCurrency(latestFed)}
+                                {isLoading ? "..." : latestFed !== null ? formatCurrency(latestFed) : "No data"}
                               </p>
                             </div>
                           </div>
-                          <span className={`font-mono text-xs ${calcChange(fedAssets.data) >= 0 ? "text-positive" : "text-negative"}`}>
-                            {calcChange(fedAssets.data) >= 0 ? "+" : ""}{calcChange(fedAssets.data).toFixed(1)}%
-                          </span>
+                          {calcChange(fedAssets.data) !== undefined ? (
+                            <span className={`font-mono text-xs ${(calcChange(fedAssets.data) ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
+                              {(calcChange(fedAssets.data) ?? 0) >= 0 ? "+" : ""}
+                              {(calcChange(fedAssets.data) ?? 0).toFixed(1)}%
+                            </span>
+                          ) : (
+                            <span className="font-mono text-xs text-muted-foreground">No range change</span>
+                          )}
                         </div>
                         <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
                           <div className="flex items-center gap-3">
@@ -431,9 +475,16 @@ export default function DashboardPage() {
                               </p>
                             </div>
                           </div>
-                          <span className={`font-mono text-xs ${calcChange(ecbAssets.data) >= 0 ? "text-positive" : "text-negative"}`}>
-                            {calcChange(ecbAssets.data) >= 0 ? "+" : ""}{calcChange(ecbAssets.data).toFixed(1)}%
-                          </span>
+                          {calcChange(ecbAssets.data) !== undefined ? (
+                            <span className={`font-mono text-xs ${(calcChange(ecbAssets.data) ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
+                              {(calcChange(ecbAssets.data) ?? 0) >= 0 ? "+" : ""}
+                              {(calcChange(ecbAssets.data) ?? 0).toFixed(1)}%
+                            </span>
+                          ) : (
+                            <span className="font-mono text-xs text-muted-foreground">
+                              {ecbAssets.latestDate ? `Last ${formatShortDate(ecbAssets.latestDate)}` : "Unavailable"}
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
                           <div className="flex items-center gap-3">
@@ -445,9 +496,16 @@ export default function DashboardPage() {
                               </p>
                             </div>
                           </div>
-                          <span className={`font-mono text-xs ${calcChange(bojAssets.data) >= 0 ? "text-positive" : "text-negative"}`}>
-                            {calcChange(bojAssets.data) >= 0 ? "+" : ""}{calcChange(bojAssets.data).toFixed(1)}%
-                          </span>
+                          {calcChange(bojAssets.data) !== undefined ? (
+                            <span className={`font-mono text-xs ${(calcChange(bojAssets.data) ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
+                              {(calcChange(bojAssets.data) ?? 0) >= 0 ? "+" : ""}
+                              {(calcChange(bojAssets.data) ?? 0).toFixed(1)}%
+                            </span>
+                          ) : (
+                            <span className="font-mono text-xs text-muted-foreground">
+                              {bojAssets.latestDate ? `Last ${formatShortDate(bojAssets.latestDate)}` : "Unavailable"}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </CardContent>

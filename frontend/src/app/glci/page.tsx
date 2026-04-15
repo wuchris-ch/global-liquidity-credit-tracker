@@ -33,6 +33,7 @@ import {
 import { useGLCIData } from "@/hooks/use-series-data";
 import api, { DataFreshnessItem, RegimeHistory } from "@/lib/api";
 import { glciDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
+import { getFreshnessStatus } from "@/lib/data-status";
 
 function getDateRange(range: TimeRange): { start: string; end: string } {
   const end = new Date();
@@ -135,6 +136,7 @@ export default function GLCIPage() {
   const regime = glciData?.regime || "neutral";
   const regimeInfo = regimeConfig[regime as keyof typeof regimeConfig] || regimeConfig.neutral;
   const RegimeIcon = regimeInfo.icon;
+  const pageStatus = getFreshnessStatus(glciData?.date ?? null);
 
   // Prepare pillar chart data
   const pillarChartData = useMemo(() => {
@@ -167,6 +169,7 @@ export default function GLCIPage() {
           onTimeRangeChange={handleTimeRangeChange}
           onRefresh={handleRefresh}
           isRefreshing={isLoading}
+          status={pageStatus}
         />
         <div className="flex flex-1 items-center justify-center">
           <Card className="max-w-md">
@@ -195,6 +198,7 @@ export default function GLCIPage() {
         onTimeRangeChange={handleTimeRangeChange}
         onRefresh={handleRefresh}
         isRefreshing={isLoading}
+        status={pageStatus}
       />
 
       <ScrollArea className="flex-1 w-full">

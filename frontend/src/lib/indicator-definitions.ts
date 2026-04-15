@@ -193,7 +193,7 @@ export const chartDefinitions: Record<string, InfoTooltipProps> = {
       { label: "-0.5 to 0.5", content: "Normal conditions" },
       { label: "> 1.0", content: "Elevated stress - risk-off positioning warranted" },
     ],
-    interpretation: "Real-time gauge of funding market health. Extreme readings are mean-reverting.",
+    interpretation: "Scheduled gauge of funding market health. Extreme readings are mean-reverting.",
   },
 };
 
@@ -454,6 +454,5 @@ export function getInfoDefinition(key: string): InfoTooltipProps | undefined {
     predictiveDefinitions[key]
   );
 }
-
 
 

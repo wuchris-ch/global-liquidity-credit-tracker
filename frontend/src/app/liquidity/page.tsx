@@ -21,15 +21,11 @@ import {
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
 import { formatCurrency, UNIT_SCALES } from "@/lib/utils";
 import { metricDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
-
-// Define unit types for the series we're displaying
-// Values from FRED come in these units, we need to scale to base dollars for display
-const SERIES_UNITS = {
-  fed_total_assets: "millions_usd",
-  fed_treasury_general_account: "millions_usd",
-  fed_reverse_repo: "billions_usd",
-  fed_net_liquidity: "millions_usd", // Computed index is in millions
-} as const;
+import {
+  formatShortDate,
+  getFreshnessStatus,
+  getLatestDate,
+} from "@/lib/data-status";
 
 function getDateRange(range: TimeRange): { start: string; end: string } {
   const end = new Date();
@@ -70,22 +66,39 @@ export default function LiquidityPage() {
   const scaleMillions = UNIT_SCALES.millions_usd;
   const scaleBillions = UNIT_SCALES.billions_usd;
 
-  const latestFed = (fedAssets.data[fedAssets.data.length - 1]?.value ?? 0) * scaleMillions;
-  const latestTga = (tga.data[tga.data.length - 1]?.value ?? 0) * scaleMillions;
-  const latestRrp = (rrp.data[rrp.data.length - 1]?.value ?? 0) * scaleBillions;
-  const latestNet = (netLiquidity.data[netLiquidity.data.length - 1]?.value ?? 0) * scaleMillions;
+  const getLatestValue = (data: { date: string; value: number }[]) =>
+    data.length > 0 ? data[data.length - 1]?.value ?? null : null;
+
+  const latestFedRaw = getLatestValue(fedAssets.data);
+  const latestTgaRaw = getLatestValue(tga.data);
+  const latestRrpRaw = getLatestValue(rrp.data);
+  const latestNetRaw = getLatestValue(netLiquidity.data);
+
+  const latestFed = latestFedRaw !== null ? latestFedRaw * scaleMillions : null;
+  const latestTga = latestTgaRaw !== null ? latestTgaRaw * scaleMillions : null;
+  const latestRrp = latestRrpRaw !== null ? latestRrpRaw * scaleBillions : null;
+  const latestNet = latestNetRaw !== null ? latestNetRaw * scaleMillions : null;
 
   const calcChange = (data: { date: string; value: number }[]) => {
-    if (data.length < 8) return 0;
+    if (data.length < 8) return undefined;
     const latest = data[data.length - 1]?.value ?? 0;
     const prev = data[data.length - 8]?.value ?? latest;
-    return prev !== 0 ? ((latest - prev) / prev) * 100 : 0;
+    return prev !== 0 ? ((latest - prev) / prev) * 100 : undefined;
   };
+
+  const pageStatus = getFreshnessStatus(
+    getLatestDate(
+      fedAssets.latestDate,
+      tga.latestDate,
+      rrp.latestDate,
+      netLiquidity.latestDate
+    )
+  );
 
   if (hasError) {
     return (
       <div className="flex h-screen flex-col bg-background">
-        <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} />
+        <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} status={pageStatus} />
         <div className="flex flex-1 items-center justify-center">
           <Card className="max-w-md">
             <CardContent className="flex flex-col items-center gap-4 p-6">
@@ -102,7 +115,7 @@ export default function LiquidityPage() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} />
+      <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} status={pageStatus} />
       <ScrollArea className="flex-1 w-full">
         <div className="bg-grid min-h-full w-full overflow-x-hidden">
           <div className="mx-auto w-full max-w-[1600px] space-y-3 p-2 min-[360px]:p-3 sm:space-y-6 sm:p-6 overflow-hidden">
@@ -140,10 +153,10 @@ export default function LiquidityPage() {
             </Card>
 
             <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-              <MetricCard title="Fed Total Assets" value={isLoading ? "Loading..." : formatCurrency(latestFed)} change={calcChange(fedAssets.data)} trend={calcChange(fedAssets.data) >= 0 ? "up" : "down"} icon={<Building2 className="h-5 w-5" />} variant="highlight" info={metricDefinitions.fed_balance_sheet} />
-              <MetricCard title="Treasury General Account" value={isLoading ? "Loading..." : formatCurrency(latestTga)} change={calcChange(tga.data)} trend={calcChange(tga.data) >= 0 ? "up" : "down"} icon={<Landmark className="h-5 w-5" />} info={metricDefinitions.tga} />
-              <MetricCard title="Reverse Repo Facility" value={isLoading ? "Loading..." : formatCurrency(latestRrp)} change={calcChange(rrp.data)} trend={calcChange(rrp.data) >= 0 ? "up" : "down"} icon={<Wallet className="h-5 w-5" />} info={metricDefinitions.rrp} />
-              <MetricCard title="Net Liquidity" value={isLoading ? "Loading..." : formatCurrency(latestNet)} change={calcChange(netLiquidity.data)} trend={calcChange(netLiquidity.data) >= 0 ? "up" : "down"} icon={<Activity className="h-5 w-5" />} variant="highlight" info={metricDefinitions.net_liquidity} />
+              <MetricCard title="Fed Total Assets" value={isLoading ? "Loading..." : latestFed !== null ? formatCurrency(latestFed) : "No data"} change={calcChange(fedAssets.data)} trend={(calcChange(fedAssets.data) ?? 0) >= 0 ? "up" : "down"} icon={<Building2 className="h-5 w-5" />} variant="highlight" info={metricDefinitions.fed_balance_sheet} />
+              <MetricCard title="Treasury General Account" value={isLoading ? "Loading..." : latestTga !== null ? formatCurrency(latestTga) : "No data"} change={calcChange(tga.data)} trend={(calcChange(tga.data) ?? 0) >= 0 ? "up" : "down"} icon={<Landmark className="h-5 w-5" />} info={metricDefinitions.tga} />
+              <MetricCard title="Reverse Repo Facility" value={isLoading ? "Loading..." : latestRrp !== null ? formatCurrency(latestRrp) : "No data"} change={calcChange(rrp.data)} trend={(calcChange(rrp.data) ?? 0) >= 0 ? "up" : "down"} icon={<Wallet className="h-5 w-5" />} info={metricDefinitions.rrp} />
+              <MetricCard title="Net Liquidity" value={isLoading ? "Loading..." : latestNet !== null ? formatCurrency(latestNet) : "No data"} change={calcChange(netLiquidity.data)} trend={(calcChange(netLiquidity.data) ?? 0) >= 0 ? "up" : "down"} icon={<Activity className="h-5 w-5" />} variant="highlight" info={metricDefinitions.net_liquidity} />
             </div>
 
             {isLoading ? (
@@ -189,14 +202,16 @@ export default function LiquidityPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between border-b border-border pb-3">
-                      <div><p className="text-xs text-muted-foreground">Current Net Liquidity</p><p className="font-mono text-xl font-bold">{isLoading ? "..." : formatCurrency(latestNet)}</p></div>
-                      <Badge variant="outline" className="border-positive/30 text-positive">Live Data</Badge>
+                      <div><p className="text-xs text-muted-foreground">Current Net Liquidity</p><p className="font-mono text-xl font-bold">{isLoading ? "..." : latestNet !== null ? formatCurrency(latestNet) : "No data"}</p></div>
+                      <Badge variant="outline" className="border-border text-muted-foreground">
+                        {pageStatus.latestDate ? `As of ${formatShortDate(pageStatus.latestDate)}` : "No data"}
+                      </Badge>
                     </div>
                       <div className="grid grid-cols-2 gap-4">
                       <div className="rounded-lg bg-muted/30 p-3"><p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Period High</p><p className="mt-1 font-mono text-lg font-semibold">{isLoading || netLiquidity.data.length === 0 ? "..." : formatCurrency(Math.max(...netLiquidity.data.map((d) => d.value)) * scaleMillions)}</p></div>
                       <div className="rounded-lg bg-muted/30 p-3"><p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Period Low</p><p className="mt-1 font-mono text-lg font-semibold">{isLoading || netLiquidity.data.length === 0 ? "..." : formatCurrency(Math.min(...netLiquidity.data.map((d) => d.value)) * scaleMillions)}</p></div>
                     </div>
-                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-3"><p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Critical Support Level</p><p className="mt-1 font-mono text-lg font-semibold text-primary">$5.5T</p><p className="mt-1 text-xs text-muted-foreground">Historically correlates with market stress</p></div>
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-3"><p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Latest Observation</p><p className="mt-1 font-mono text-lg font-semibold text-primary">{pageStatus.latestDate ? formatShortDate(pageStatus.latestDate) : "Unavailable"}</p><p className="mt-1 text-xs text-muted-foreground">Use the page header freshness badge to judge whether the selected window is current.</p></div>
                   </div>
                 </CardContent>
               </Card>
@@ -207,4 +222,3 @@ export default function LiquidityPage() {
     </div>
   );
 }
-

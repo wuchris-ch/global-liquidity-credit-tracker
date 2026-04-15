@@ -17,7 +17,6 @@ import {
   Activity,
   BarChart3,
   Building2,
-  CircleDollarSign,
   Gauge,
   Globe2,
   LayoutDashboard,
@@ -25,6 +24,7 @@ import {
   PieChart,
   TrendingUp,
   Wallet,
+  Clock3,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -65,11 +65,11 @@ const mainNavItems = [
 ];
 
 const dataSourceItems = [
-  { title: "FRED", icon: Building2, status: "live" },
-  { title: "NY Fed", icon: CircleDollarSign, status: "live" },
-  { title: "BIS", icon: Globe2, status: "live" },
-  { title: "World Bank", icon: Wallet, status: "live" },
-  { title: "Yahoo Finance", icon: LineChart, status: "live" },
+  { title: "FRED", icon: Building2 },
+  { title: "NY Fed", icon: Activity },
+  { title: "BIS", icon: Globe2 },
+  { title: "World Bank", icon: Wallet },
+  { title: "Yahoo Finance", icon: LineChart },
 ];
 
 export function AppSidebar() {
@@ -138,13 +138,6 @@ export function AppSidebar() {
                   <SidebarMenuButton tooltip={item.title} className="cursor-default">
                     <item.icon className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">{item.title}</span>
-                    <Badge
-                      variant="outline"
-                      className="ml-auto h-5 border-positive/30 bg-positive/10 px-1.5 text-[9px] font-semibold uppercase tracking-wider text-positive group-data-[collapsible=icon]:hidden"
-                    >
-                      <span className="mr-1 h-1.5 w-1.5 rounded-full bg-positive pulse-live" />
-                      {item.status}
-                    </Badge>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -156,21 +149,18 @@ export function AppSidebar() {
 
         <SidebarGroup>
           <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
-            Quick Stats
+            Data Notes
           </SidebarGroupLabel>
           <SidebarGroupContent className="px-2 group-data-[collapsible=icon]:hidden">
             <div className="space-y-3 rounded-lg bg-muted/30 p-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Fed Assets</span>
-                <span className="font-mono text-xs font-semibold text-positive">$6.89T</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">SOFR Rate</span>
-                <span className="font-mono text-xs font-semibold">5.31%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">HY Spread</span>
-                <span className="font-mono text-xs font-semibold text-negative">+287 bps</span>
+              <div className="flex items-start gap-2">
+                <Clock3 className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Scheduled publication</p>
+                  <p className="text-xs text-muted-foreground">
+                    Data updates on the export schedule. Each page shows the latest observation date for the data it is using.
+                  </p>
+                </div>
               </div>
             </div>
           </SidebarGroupContent>
@@ -184,23 +174,15 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              Last Update
+              Data Status
             </span>
-            <span className="font-mono text-xs">
-              {new Date().toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
+            <span className="text-xs text-muted-foreground">See page header</span>
           </div>
         </div>
       </SidebarFooter>
     </Sidebar>
   );
 }
-
 
 
 

@@ -50,6 +50,7 @@ export interface SeriesResponse {
   source: string;
   unit: string;
   data: DataPoint[];
+  latest_date?: string | null;
 }
 
 export interface IndexResponse {
@@ -57,6 +58,7 @@ export interface IndexResponse {
   name: string;
   description: string;
   data: DataPoint[];
+  latest_date?: string | null;
 }
 
 export interface LatestValue {
@@ -205,6 +207,7 @@ class ApiClient {
     if (end) params.set("end", end);
     const query = params.toString() ? `?${params.toString()}` : "";
     const result = await this.fetch<SeriesResponse>(`/api/series/${seriesId}${query}`);
+    result.latest_date = result.latest_date ?? result.data[result.data.length - 1]?.date ?? null;
     if (this.isStatic) {
       result.data = filterSeries(result.data, start, end);
     }
@@ -229,6 +232,7 @@ class ApiClient {
     if (end) params.set("end", end);
     const query = params.toString() ? `?${params.toString()}` : "";
     const result = await this.fetch<IndexResponse>(`/api/indices/${indexId}${query}`);
+    result.latest_date = result.latest_date ?? result.data[result.data.length - 1]?.date ?? null;
     if (this.isStatic) {
       result.data = filterSeries(result.data, start, end);
     }

@@ -2,7 +2,7 @@
  * React hooks for fetching series and index data.
  */
 import { useState, useEffect, useCallback } from "react";
-import api, { DataPoint, SeriesInfo, SeriesResponse, IndexResponse, GLCIResponse } from "@/lib/api";
+import api, { DataPoint, SeriesInfo, GLCIResponse } from "@/lib/api";
 
 export interface UseSeriesDataOptions {
   start?: string;
@@ -12,6 +12,7 @@ export interface UseSeriesDataOptions {
 
 export interface UseSeriesDataResult {
   data: DataPoint[];
+  latestDate: string | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
@@ -23,6 +24,7 @@ export function useSeriesData(
 ): UseSeriesDataResult {
   const { start, end, enabled = true } = options;
   const [data, setData] = useState<DataPoint[]>([]);
+  const [latestDate, setLatestDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -35,9 +37,11 @@ export function useSeriesData(
     try {
       const response = await api.getSeries(seriesId, start, end);
       setData(response.data);
+      setLatestDate(response.latest_date ?? response.data[response.data.length - 1]?.date ?? null);
     } catch (e) {
       setError(e instanceof Error ? e : new Error(String(e)));
       setData([]);
+      setLatestDate(null);
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +51,7 @@ export function useSeriesData(
     fetchData();
   }, [fetchData]);
 
-  return { data, isLoading, error, refetch: fetchData };
+  return { data, latestDate, isLoading, error, refetch: fetchData };
 }
 
 export function useIndexData(
@@ -56,6 +60,7 @@ export function useIndexData(
 ): UseSeriesDataResult {
   const { start, end, enabled = true } = options;
   const [data, setData] = useState<DataPoint[]>([]);
+  const [latestDate, setLatestDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -68,9 +73,11 @@ export function useIndexData(
     try {
       const response = await api.getIndex(indexId, start, end);
       setData(response.data);
+      setLatestDate(response.latest_date ?? response.data[response.data.length - 1]?.date ?? null);
     } catch (e) {
       setError(e instanceof Error ? e : new Error(String(e)));
       setData([]);
+      setLatestDate(null);
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +87,7 @@ export function useIndexData(
     fetchData();
   }, [fetchData]);
 
-  return { data, isLoading, error, refetch: fetchData };
+  return { data, latestDate, isLoading, error, refetch: fetchData };
 }
 
 export interface UseMultipleSeriesResult {
@@ -117,7 +124,7 @@ export function useMultipleSeries(
     } finally {
       setIsLoading(false);
     }
-  }, [seriesIds.join(","), start, end, enabled]);
+  }, [seriesIds, start, end, enabled]);
 
   useEffect(() => {
     fetchData();

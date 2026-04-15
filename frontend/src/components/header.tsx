@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Calendar } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { FreshnessStatus } from "@/lib/data-status";
 
 export type TimeRange = "1m" | "3m" | "6m" | "1y" | "2y" | "5y" | "10y" | "15y" | "all";
 
@@ -24,7 +25,16 @@ interface HeaderProps {
   timeRange?: TimeRange;
   onTimeRangeChange?: (range: TimeRange) => void;
   isRefreshing?: boolean;
+  status?: FreshnessStatus;
 }
+
+const statusToneClasses: Record<FreshnessStatus["tone"], string> = {
+  current: "border-positive/30 bg-positive/5 text-positive",
+  recent: "border-positive/30 bg-positive/5 text-positive",
+  stale: "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  old: "border-negative/30 bg-negative/10 text-negative",
+  missing: "border-negative/30 bg-negative/10 text-negative",
+};
 
 export function Header({
   title,
@@ -34,7 +44,14 @@ export function Header({
   timeRange = "3m",
   onTimeRangeChange,
   isRefreshing = false,
+  status,
 }: HeaderProps) {
+  const currentStatus = status ?? {
+    label: "Scheduled data",
+    tone: "recent" as const,
+    latestDate: null,
+  };
+
   return (
     <header className="sticky top-0 z-10 shrink-0 border-b border-border bg-background/95 backdrop-blur-xl">
       {/* Main row - always horizontal */}
@@ -53,11 +70,25 @@ export function Header({
           
           <Badge
             variant="outline"
-            className="shrink-0 border-positive/30 bg-positive/5 text-positive text-[10px] sm:text-xs h-5 sm:h-6 px-1.5 sm:px-2"
+            className={`shrink-0 text-[10px] sm:text-xs h-5 sm:h-6 px-1.5 sm:px-2 ${statusToneClasses[currentStatus.tone]}`}
           >
-            <span className="mr-1 h-1.5 w-1.5 rounded-full bg-positive pulse-live" />
-            <span className="hidden sm:inline">Live</span>
-            <span className="sm:hidden">●</span>
+            <span
+              className={`mr-1 h-1.5 w-1.5 rounded-full ${
+                currentStatus.tone === "stale"
+                  ? "bg-amber-500"
+                  : currentStatus.tone === "old" || currentStatus.tone === "missing"
+                    ? "bg-negative"
+                    : "bg-positive"
+              }`}
+            />
+            <span className="hidden sm:inline">{currentStatus.label}</span>
+            <span className="sm:hidden">
+              {currentStatus.tone === "current" || currentStatus.tone === "recent"
+                ? "Upd"
+                : currentStatus.tone === "stale"
+                  ? "Stale"
+                  : "Old"}
+            </span>
           </Badge>
         </div>
 
@@ -100,5 +131,4 @@ export function Header({
     </header>
   );
 }
-
 

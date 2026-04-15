@@ -1,7 +1,7 @@
 """Risk metrics computation for asset classes conditioned on GLCI regimes."""
 import pandas as pd
 import numpy as np
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 from pathlib import Path

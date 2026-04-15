@@ -50,6 +50,13 @@ jobs:
           compute_risk_metrics(save=True)
           PY
 
+      - name: Compute backtest track record and save
+        run: |
+          python - <<'PY'
+          from src.indicators.backtest import compute_backtest
+          compute_backtest(save=True)
+          PY
+
       - name: Export JSON artifacts
         run: |
           python scripts/export_to_json.py --output data/export/latest --snapshot

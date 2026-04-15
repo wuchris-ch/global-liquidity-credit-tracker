@@ -458,6 +458,23 @@ def export_risk_metrics(storage: DataStorage, output_dir: Path) -> bool:
     return True
 
 
+def export_backtest(output_dir: Path) -> bool:
+    """Export backtest track-record payload to /api/backtest/track_record/index.json.
+
+    Reads the structured JSON written by BacktestComputer._save (which is a
+    faithful dump of the dataclass via to_dict).
+    """
+    source_path = CURATED_DATA_PATH / "backtest" / "track_record.json"
+    if not source_path.exists():
+        return False
+
+    with open(source_path, "r") as f:
+        payload = json.load(f)
+
+    write_json(output_dir / "api" / "backtest" / "track_record" / "index.json", payload)
+    return True
+
+
 def export_all(output_dir: Path, add_snapshot: bool) -> None:
     storage = DataStorage(raw_path=RAW_DATA_PATH, curated_path=CURATED_DATA_PATH)
     series_cfg = get_all_series()
@@ -492,6 +509,13 @@ def export_all(output_dir: Path, add_snapshot: bool) -> None:
         print("[export] Skipped risk metrics (no data - run risk computation first)")
     else:
         print("[export] Exported risk metrics")
+
+    # Backtest / track record endpoint
+    backtest_ok = export_backtest(output_dir)
+    if not backtest_ok:
+        print("[export] Skipped backtest (no data - run backtest computation first)")
+    else:
+        print("[export] Exported backtest track record")
 
     if add_snapshot:
         date_stamp = datetime.utcnow().strftime("%Y-%m-%d")

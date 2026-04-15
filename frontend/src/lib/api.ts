@@ -167,6 +167,64 @@ export interface RiskDashboardResponse {
   regime_matrix: RegimeMatrix;
 }
 
+// Backtest / Track Record types
+export interface BacktestStats {
+  median: number | null;
+  p25: number | null;
+  p75: number | null;
+  hit_rate: number | null;
+  n: number;
+  ci_median_low: number | null;
+  ci_median_high: number | null;
+  ci_hit_rate_low: number | null;
+  ci_hit_rate_high: number | null;
+  edge: number | null;
+}
+
+export interface BacktestBaseRate {
+  median: number | null;
+  hit_rate: number | null;
+  n: number;
+}
+
+export type BacktestHorizon = "4" | "13" | "26";
+
+export interface BacktestAssetResult {
+  id: string;
+  name: string;
+  category: string;
+  base_rates: Record<BacktestHorizon, BacktestBaseRate>;
+  results: Record<
+    string, // classifier: 'glci' | 'nfci'
+    Record<
+      Regime, // 'tight' | 'neutral' | 'loose'
+      Record<BacktestHorizon, BacktestStats>
+    >
+  >;
+}
+
+export interface BacktestTimelineEntry {
+  date: string;
+  regime: Regime;
+  zscore: number | null;
+  value: number | null;
+}
+
+export interface BacktestClassifierMeta {
+  name: string;
+  n_per_regime: Partial<Record<Regime, number>>;
+  current_regime: Regime | null;
+  timeline: BacktestTimelineEntry[];
+}
+
+export interface BacktestResponse {
+  computed_at: string;
+  date_range: { start: string; end: string };
+  horizons: number[];
+  classifiers: Record<string, BacktestClassifierMeta>;
+  assets: BacktestAssetResult[];
+}
+
 class ApiClient {
   private baseUrl: string;
   private isStatic: boolean;
@@ -300,6 +358,10 @@ class ApiClient {
   // Risk by Regime endpoints
   async getRiskMetrics(): Promise<RiskDashboardResponse> {
     return this.fetch<RiskDashboardResponse>("/api/risk");
+  }
+
+  async getBacktest(): Promise<BacktestResponse> {
+    return this.fetch<BacktestResponse>("/api/backtest/track_record");
   }
 
 }

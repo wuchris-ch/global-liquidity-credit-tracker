@@ -19,6 +19,7 @@ import {
   Building2,
   Gauge,
   Globe2,
+  History,
   LayoutDashboard,
   LineChart,
   PieChart,
@@ -45,6 +46,11 @@ const mainNavItems = [
     title: "Risk by Regime",
     url: "/risk",
     icon: PieChart,
+  },
+  {
+    title: "Track Record",
+    url: "/track-record",
+    icon: History,
     badge: "NEW",
   },
   {

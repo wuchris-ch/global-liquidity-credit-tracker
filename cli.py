@@ -48,7 +48,15 @@ def main():
     show_parser.add_argument("--start", help="Start date (YYYY-MM-DD)")
     show_parser.add_argument("--end", help="End date (YYYY-MM-DD)")
     show_parser.add_argument("--tail", type=int, default=20, help="Number of rows to show")
-    
+
+    # Backtest command
+    backtest_parser = subparsers.add_parser(
+        "backtest",
+        help="Compute expanding-window backtest / track record of GLCI regime",
+    )
+    backtest_parser.add_argument("--save", action="store_true", help="Save to storage")
+    backtest_parser.add_argument("--quiet", action="store_true", help="Suppress progress output")
+
     args = parser.parse_args()
     
     if not args.command:
@@ -56,7 +64,7 @@ def main():
         return
     
     # Check API key for commands that need it
-    if args.command in ["fetch", "compute", "show"] and not FRED_API_KEY:
+    if args.command in ["fetch", "compute", "show", "backtest"] and not FRED_API_KEY:
         print("Error: FRED_API_KEY not set. Add it to your .env file.")
         print("Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html")
         sys.exit(1)
@@ -69,6 +77,8 @@ def main():
         cmd_list(args)
     elif args.command == "show":
         cmd_show(args)
+    elif args.command == "backtest":
+        cmd_backtest(args)
 
 
 def cmd_fetch(args):
@@ -254,6 +264,35 @@ def cmd_show(args):
         
     except Exception as e:
         print(f"Error: {e}")
+
+
+def cmd_backtest(args):
+    """Compute expanding-window backtest / track record."""
+    from src.indicators.backtest import compute_backtest
+
+    result = compute_backtest(save=args.save, verbose=not args.quiet)
+
+    print(f"\nBacktest window: {result.date_range[0]} to {result.date_range[1]}")
+    print(f"Assets computed: {len(result.assets)}")
+    for clf_name, meta in result.classifiers.items():
+        counts = ", ".join(f"{k}={v}" for k, v in meta["n_per_regime"].items())
+        print(f"  {clf_name}: current={meta['current_regime']} ({counts})")
+
+    for asset in result.assets:
+        glci_loose_13w = (
+            asset.results.get("glci", {})
+            .get("loose", {})
+            .get(13, {})
+        )
+        base_13w = asset.base_rates.get(13, {})
+        loose_hr = glci_loose_13w.get("hit_rate")
+        base_hr = base_13w.get("hit_rate")
+        edge = glci_loose_13w.get("edge")
+        if loose_hr is not None and base_hr is not None:
+            print(
+                f"  {asset.name}: loose-13w hit={loose_hr:.0%} "
+                f"(base={base_hr:.0%}, edge={edge:+.1%})"
+            )
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ import { Header } from "@/components/header";
 import { MetricCard } from "@/components/metric-card";
 import { MultiLineChart } from "@/components/multi-line-chart";
 import { InfoTooltip } from "@/components/info-tooltip";
+import { HeatmapChart, sharpeHeatmapColor } from "@/components/heatmap-chart";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Card,
@@ -31,7 +32,6 @@ import {
   TrendingDown,
   TrendingUp,
   Gauge,
-  LineChart,
   Percent,
 } from "lucide-react";
 import { useRiskData } from "@/hooks/use-risk-data";
@@ -72,86 +72,38 @@ function RegimeHeatmap({
     sharpe_data: (number | null)[][];
   };
 }) {
-  const getColor = (value: number | null) => {
-    if (value === null) return "bg-muted";
-    if (value > 1.5) return "bg-emerald-500/70 text-white";
-    if (value > 1.0) return "bg-emerald-500/50";
-    if (value > 0.5) return "bg-emerald-500/30";
-    if (value > 0) return "bg-yellow-500/30";
-    if (value > -0.5) return "bg-orange-500/30";
-    return "bg-red-500/50";
-  };
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          Sharpe Ratio by Regime
-          <InfoTooltip
-            title="Regime-Conditional Sharpe"
-            description="Shows risk-adjusted returns for each asset during different GLCI regimes."
-            sections={[
-              {
-                label: "Loose Regime",
-                content: "GLCI z-score > +1. Abundant liquidity, risk-on.",
-              },
-              {
-                label: "Neutral Regime",
-                content: "GLCI z-score between -1 and +1. Balanced conditions.",
-              },
-              {
-                label: "Tight Regime",
-                content:
-                  "GLCI z-score < -1. Restrictive liquidity, risk-off.",
-              },
-            ]}
-            interpretation="Higher Sharpe ratios indicate better risk-adjusted performance. Values above 1.0 are generally considered good."
-            size="sm"
-          />
-        </CardTitle>
-        <CardDescription className="text-xs">
-          Which assets perform best in each liquidity regime?
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="text-left text-xs font-medium text-muted-foreground p-2">
-                  Asset
-                </th>
-                {data.regimes.map((regime) => (
-                  <th
-                    key={regime}
-                    className="text-center text-xs font-medium text-muted-foreground p-2 capitalize"
-                  >
-                    {regimeLabels[regime as keyof typeof regimeLabels] || regime}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.assets.map((asset, i) => (
-                <tr key={asset} className="border-t border-border/50">
-                  <td className="text-sm font-medium p-2">{asset}</td>
-                  {data.sharpe_data[i].map((value, j) => (
-                    <td
-                      key={j}
-                      className={`text-center p-2 ${getColor(value)}`}
-                    >
-                      <span className="font-mono text-sm">
-                        {value !== null ? value.toFixed(2) : "N/A"}
-                      </span>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+    <HeatmapChart
+      title="Sharpe Ratio by Regime"
+      description="Which assets perform best in each liquidity regime?"
+      rowLabels={data.assets}
+      columnLabels={data.regimes.map(
+        (r) => regimeLabels[r as keyof typeof regimeLabels] || r,
+      )}
+      data={data.sharpe_data}
+      getColor={sharpeHeatmapColor}
+      info={{
+        title: "Regime-Conditional Sharpe",
+        description:
+          "Shows risk-adjusted returns for each asset during different GLCI regimes.",
+        sections: [
+          {
+            label: "Loose Regime",
+            content: "GLCI z-score > +1. Abundant liquidity, risk-on.",
+          },
+          {
+            label: "Neutral Regime",
+            content: "GLCI z-score between -1 and +1. Balanced conditions.",
+          },
+          {
+            label: "Tight Regime",
+            content: "GLCI z-score < -1. Restrictive liquidity, risk-off.",
+          },
+        ],
+        interpretation:
+          "Higher Sharpe ratios indicate better risk-adjusted performance. Values above 1.0 are generally considered good.",
+      }}
+    />
   );
 }
 

@@ -14,7 +14,9 @@ function normalizeDate(value: string | null | undefined): string | null {
   if (!value) return null;
   const [datePart] = value.split("T");
   if (!datePart) return null;
-  return /^\d{4}-\d{2}-\d{2}$/.test(datePart) ? datePart : null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return null;
+  const todayISO = new Date().toISOString().slice(0, 10);
+  return datePart > todayISO ? todayISO : datePart;
 }
 
 function dayDiff(latestDate: string): number {

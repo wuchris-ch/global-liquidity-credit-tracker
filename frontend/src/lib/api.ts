@@ -302,10 +302,7 @@ class ApiClient {
     return this.fetch<RiskDashboardResponse>("/api/risk");
   }
 
-  async getAssetRisk(assetId: string): Promise<AssetRiskMetrics> {
-    return this.fetch<AssetRiskMetrics>(`/api/risk/${assetId}`);
-  }
 }
 
-export const api = new ApiClient();
+const api = new ApiClient();
 export default api;

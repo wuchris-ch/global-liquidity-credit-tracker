@@ -4,6 +4,28 @@ import numpy as np
 from typing import Literal
 
 
+def _as_series(obj) -> pd.Series:
+    """Coerce a DataFrame's first column to a Series; pass Series through.
+
+    Several pandas operations can return either a Series or a single-column
+    DataFrame depending on how the input was indexed. This helper normalizes
+    the result so downstream arithmetic/assignment works uniformly.
+    """
+    if isinstance(obj, pd.DataFrame):
+        return obj.iloc[:, 0]
+    return obj
+
+
+def _assign_col(df: pd.DataFrame, col: str, values) -> None:
+    """Assign a computed series to a DataFrame column, unwrapping DataFrames.
+
+    Mirrors the common pattern ``df[col] = values.values if hasattr(values, 'values') else values``
+    that previously appeared after many transform computations.
+    """
+    values = _as_series(values)
+    df[col] = values.values if hasattr(values, "values") else values
+
+
 def resample_to_frequency(
     df: pd.DataFrame,
     target_freq: Literal["D", "W", "M", "Q", "A"],
@@ -110,27 +132,17 @@ def compute_zscore(
         DataFrame with zscore column added
     """
     df = df.copy()
-    
-    # Ensure we're working with a Series
-    values = df[value_col]
-    if isinstance(values, pd.DataFrame):
-        values = values.iloc[:, 0]
-    
+
+    values = _as_series(df[value_col])
+
     if window:
         rolling_mean = values.rolling(window=window, min_periods=min_periods).mean()
         rolling_std = values.rolling(window=window, min_periods=min_periods).std()
     else:
         rolling_mean = values.expanding(min_periods=min_periods).mean()
         rolling_std = values.expanding(min_periods=min_periods).std()
-    
-    zscore = (values - rolling_mean) / rolling_std
-    
-    # Ensure result is a Series
-    if isinstance(zscore, pd.DataFrame):
-        zscore = zscore.iloc[:, 0]
-    
-    df["zscore"] = zscore.values if hasattr(zscore, 'values') else zscore
-    
+
+    _assign_col(df, "zscore", (values - rolling_mean) / rolling_std)
     return df
 
 
@@ -257,24 +269,18 @@ def compute_growth_rate(
         DataFrame with growth_rate column added
     """
     df = df.copy()
-    
-    # Ensure we're working with a Series
-    values = df[value_col]
-    if isinstance(values, pd.DataFrame):
-        values = values.iloc[:, 0]
-    
+
+    values = _as_series(df[value_col])
+
     if method == "log":
         # Log returns for more stable estimation
         growth = np.log(values / values.shift(periods))
     else:
         growth = values.pct_change(periods=periods)
-    
-    # Ensure result is a Series
-    if isinstance(growth, pd.DataFrame):
-        growth = growth.iloc[:, 0]
-    
-    df["growth_rate"] = growth.values * 100 if hasattr(growth, 'values') else growth * 100
-    
+
+    growth = _as_series(growth) * 100
+    df["growth_rate"] = growth.values if hasattr(growth, "values") else growth
+
     return df
 
 
@@ -296,24 +302,13 @@ def compute_rolling_gap(
         DataFrame with gap column (deviation from trend)
     """
     df = df.copy()
-    
-    # Ensure we're working with a Series
-    values = df[value_col]
-    if isinstance(values, pd.DataFrame):
-        values = values.iloc[:, 0]
-    
-    rolling_mean = values.rolling(window=window, min_periods=min_periods).mean()
-    
-    # Ensure result is a Series
-    if isinstance(rolling_mean, pd.DataFrame):
-        rolling_mean = rolling_mean.iloc[:, 0]
-    
-    gap = values - rolling_mean
-    gap_pct = (values / rolling_mean - 1) * 100
-    
-    df["gap"] = gap.values if hasattr(gap, 'values') else gap
-    df["gap_pct"] = gap_pct.values if hasattr(gap_pct, 'values') else gap_pct
-    
+
+    values = _as_series(df[value_col])
+    rolling_mean = _as_series(values.rolling(window=window, min_periods=min_periods).mean())
+
+    _assign_col(df, "gap", values - rolling_mean)
+    _assign_col(df, "gap_pct", (values / rolling_mean - 1) * 100)
+
     return df
 
 
@@ -382,29 +377,19 @@ def compute_credit_impulse(
         DataFrame with credit_impulse and credit_flow columns
     """
     df = df.copy()
-    
-    # Ensure we're working with a Series
-    values = df[value_col]
-    if isinstance(values, pd.DataFrame):
-        values = values.iloc[:, 0]
-    
+
+    values = _as_series(df[value_col])
+
     # First derivative: credit flow (change in credit)
-    credit_flow = values.diff(periods=periods)
-    
-    if isinstance(credit_flow, pd.DataFrame):
-        credit_flow = credit_flow.iloc[:, 0]
-    
-    df["credit_flow"] = credit_flow.values if hasattr(credit_flow, 'values') else credit_flow
-    
+    credit_flow = _as_series(values.diff(periods=periods))
+    _assign_col(df, "credit_flow", credit_flow)
+
     if as_change_of_flow:
         # Second derivative: credit impulse (change in credit flow)
-        credit_impulse = credit_flow.diff(periods=periods)
-        if isinstance(credit_impulse, pd.DataFrame):
-            credit_impulse = credit_impulse.iloc[:, 0]
-        df["credit_impulse"] = credit_impulse.values if hasattr(credit_impulse, 'values') else credit_impulse
+        _assign_col(df, "credit_impulse", credit_flow.diff(periods=periods))
     else:
         df["credit_impulse"] = df["credit_flow"]
-    
+
     return df
 
 
@@ -467,17 +452,12 @@ def standardize_series(
         DataFrame with standardized column
     """
     df = df.copy()
-    
-    # Ensure we're working with a Series, not DataFrame
+
     if value_col not in df.columns:
         raise ValueError(f"Column '{value_col}' not found in DataFrame")
-    
-    values = df[value_col].copy()
-    
-    # Ensure values is a Series
-    if isinstance(values, pd.DataFrame):
-        values = values.iloc[:, 0]
-    
+
+    values = _as_series(df[value_col].copy())
+
     if method == "zscore":
         if window:
             mean = values.rolling(window=window, min_periods=20).mean()
@@ -486,7 +466,7 @@ def standardize_series(
             mean = values.expanding(min_periods=20).mean()
             std = values.expanding(min_periods=20).std()
         standardized = (values - mean) / std
-        
+
     elif method == "minmax":
         if window:
             min_val = values.rolling(window=window, min_periods=20).min()
@@ -495,7 +475,7 @@ def standardize_series(
             min_val = values.expanding(min_periods=20).min()
             max_val = values.expanding(min_periods=20).max()
         standardized = (values - min_val) / (max_val - min_val)
-        
+
     elif method == "robust":
         # Use median and IQR for robustness to outliers
         if window:
@@ -510,13 +490,9 @@ def standardize_series(
         standardized = (values - median) / iqr
     else:
         raise ValueError(f"Unknown standardization method: {method}")
-    
-    # Ensure result is a Series and assign
-    if isinstance(standardized, pd.DataFrame):
-        standardized = standardized.iloc[:, 0]
-    
-    df["standardized"] = standardized.values
-    
+
+    df["standardized"] = _as_series(standardized).values
+
     return df
 
 
@@ -538,32 +514,20 @@ def compute_momentum(
         DataFrame with momentum columns
     """
     df = df.copy()
-    
-    # Ensure we're working with a Series
-    values = df[value_col]
-    if isinstance(values, pd.DataFrame):
-        values = values.iloc[:, 0]
-    
+
+    values = _as_series(df[value_col])
+
     # Simple momentum (rate of change)
-    momentum = values.diff(short_window)
-    if isinstance(momentum, pd.DataFrame):
-        momentum = momentum.iloc[:, 0]
-    df["momentum"] = momentum.values if hasattr(momentum, 'values') else momentum
-    
+    _assign_col(df, "momentum", values.diff(short_window))
+
     # MACD-style momentum
     short_ma = values.rolling(window=short_window).mean()
     long_ma = values.rolling(window=long_window).mean()
-    momentum_macd = short_ma - long_ma
-    if isinstance(momentum_macd, pd.DataFrame):
-        momentum_macd = momentum_macd.iloc[:, 0]
-    df["momentum_macd"] = momentum_macd.values if hasattr(momentum_macd, 'values') else momentum_macd
-    
+    _assign_col(df, "momentum_macd", short_ma - long_ma)
+
     # Rate of change
-    roc = values.pct_change(periods=short_window) * 100
-    if isinstance(roc, pd.DataFrame):
-        roc = roc.iloc[:, 0]
-    df["roc"] = roc.values if hasattr(roc, 'values') else roc
-    
+    _assign_col(df, "roc", values.pct_change(periods=short_window) * 100)
+
     return df
 
 

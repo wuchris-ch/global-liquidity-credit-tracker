@@ -1,8 +1,35 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import type { TimeRange } from "@/components/header"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+/**
+ * Compute ISO date strings for a preset time range.
+ * Shared by every page header so behavior stays consistent.
+ */
+export function getDateRange(range: TimeRange): { start: string; end: string } {
+  const end = new Date();
+  const start = new Date();
+
+  switch (range) {
+    case "1m": start.setMonth(end.getMonth() - 1); break;
+    case "3m": start.setMonth(end.getMonth() - 3); break;
+    case "6m": start.setMonth(end.getMonth() - 6); break;
+    case "1y": start.setFullYear(end.getFullYear() - 1); break;
+    case "2y": start.setFullYear(end.getFullYear() - 2); break;
+    case "5y": start.setFullYear(end.getFullYear() - 5); break;
+    case "10y": start.setFullYear(end.getFullYear() - 10); break;
+    case "15y": start.setFullYear(end.getFullYear() - 15); break;
+    case "all": start.setFullYear(2000); break;
+  }
+
+  return {
+    start: start.toISOString().split("T")[0],
+    end: end.toISOString().split("T")[0],
+  };
 }
 
 /**

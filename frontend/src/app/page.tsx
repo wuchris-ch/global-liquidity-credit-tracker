@@ -19,35 +19,13 @@ import {
   Loader2,
 } from "lucide-react";
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
-import { formatCurrency, UNIT_SCALES } from "@/lib/utils";
+import { formatCurrency, getDateRange, UNIT_SCALES } from "@/lib/utils";
 import { metricDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
 import {
   formatShortDate,
   getFreshnessStatus,
   getLatestDate,
 } from "@/lib/data-status";
-
-function getDateRange(range: TimeRange): { start: string; end: string } {
-  const end = new Date();
-  const start = new Date();
-  
-  switch (range) {
-    case "1m": start.setMonth(end.getMonth() - 1); break;
-    case "3m": start.setMonth(end.getMonth() - 3); break;
-    case "6m": start.setMonth(end.getMonth() - 6); break;
-    case "1y": start.setFullYear(end.getFullYear() - 1); break;
-    case "2y": start.setFullYear(end.getFullYear() - 2); break;
-    case "5y": start.setFullYear(end.getFullYear() - 5); break;
-    case "10y": start.setFullYear(end.getFullYear() - 10); break;
-    case "15y": start.setFullYear(end.getFullYear() - 15); break;
-    case "all": start.setFullYear(2000); break;
-  }
-  
-  return {
-    start: start.toISOString().split("T")[0],
-    end: end.toISOString().split("T")[0],
-  };
-}
 
 export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>("3m");

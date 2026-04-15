@@ -5,16 +5,17 @@ from typing import Literal
 
 from ..config import get_series_config, get_all_series, RAW_DATA_PATH
 from ..data_sources import FredClient, BISClient, WorldBankClient, NYFedClient, YFinanceClient
+from ..data_sources.base import BaseClient
 
 
 class DataFetcher:
     """Orchestrates data fetching from all configured sources."""
-    
-    def __init__(self, fred_api_key: str | None = None):
-        self._clients = {}
+
+    def __init__(self, fred_api_key: str | None = None) -> None:
+        self._clients: dict[str, BaseClient] = {}
         self._fred_api_key = fred_api_key
-    
-    def _get_client(self, source: str):
+
+    def _get_client(self, source: str) -> BaseClient:
         """Get or create a client for the given source."""
         if source not in self._clients:
             cache_path = RAW_DATA_PATH / source
@@ -57,9 +58,9 @@ class DataFetcher:
         source_id = config["source_id"]
         
         client = self._get_client(source)
-        
+
         # Handle source-specific fetching
-        if source == "worldbank":
+        if source == "worldbank" and isinstance(client, WorldBankClient):
             country = config.get("country", "all")
             df = client.get_series(source_id, start_date, end_date, country=country)
         else:

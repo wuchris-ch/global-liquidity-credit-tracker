@@ -16,9 +16,9 @@ from .glci import GLCIComputer
 class Aggregator:
     """Computes composite liquidity and credit indices."""
     
-    def __init__(self, fetcher: DataFetcher | None = None):
+    def __init__(self, fetcher: DataFetcher | None = None) -> None:
         self.fetcher = fetcher or DataFetcher()
-        self._cache = {}
+        self._cache: dict[str, pd.DataFrame] = {}
     
     def compute_index(
         self,
@@ -71,7 +71,7 @@ class Aggregator:
             component_data[series_id] = df
         
         # Compute based on method
-        if method == "arithmetic" or index_id == "fed_net_liquidity":
+        if method == "arithmetic":
             return self._compute_arithmetic(index_id, component_data, components, frequency)
         elif method == "zscore_average":
             return self._compute_zscore_average(index_id, component_data, components, frequency)

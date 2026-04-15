@@ -10,15 +10,10 @@ import {
 import { InfoTooltip, InfoTooltipProps } from "@/components/info-tooltip";
 import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis, YAxis, ReferenceLine } from "recharts";
 import { cn } from "@/lib/utils";
-
-interface ChartDataPoint {
-  date: string;
-  value: number;
-  [key: string]: string | number;
-}
+import type { DataPoint } from "@/lib/api";
 
 // Smart date formatter based on data range
-function getDateFormatter(data: ChartDataPoint[]) {
+function getDateFormatter(data: DataPoint[]) {
   if (data.length < 2) {
     return (value: string) => {
       const date = new Date(value);
@@ -60,7 +55,7 @@ function getDateFormatter(data: ChartDataPoint[]) {
 interface LiquidityChartProps {
   title: string;
   description?: string;
-  data: ChartDataPoint[];
+  data: DataPoint[];
   dataKey?: string;
   chartType?: "line" | "area";
   color?: string;

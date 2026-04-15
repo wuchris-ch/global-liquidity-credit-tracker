@@ -1,11 +1,4 @@
-"""Dynamic Factor Model implementation for latent factor extraction.
-
-This module provides robust factor extraction with:
-- Mixed-frequency support via Kalman filtering
-- Proper sign constraint enforcement
-- Data quality validation
-- Shrinkage/regularization for stability
-"""
+"""Dynamic Factor Model implementation for latent factor extraction."""
 import pandas as pd
 import numpy as np
 from typing import Literal
@@ -94,7 +87,7 @@ class DynamicFactorModel:
         shrinkage_alpha: float = 0.1,
         min_observations: int = 30,
         min_variables: int = 2
-    ):
+    ) -> None:
         """Initialize the Dynamic Factor Model.
         
         Args:
@@ -255,7 +248,7 @@ class DynamicFactorModel:
         else:
             return "pca"
     
-    def _fit_dfm(self, X: pd.DataFrame, mask: pd.DataFrame | None = None):
+    def _fit_dfm(self, X: pd.DataFrame, mask: pd.DataFrame | None = None) -> None:
         """Fit using statsmodels Dynamic Factor Model."""
         data = X.select_dtypes(include=[np.number]).copy()
         
@@ -299,13 +292,13 @@ class DynamicFactorModel:
             warnings.warn(f"DFM fitting failed: {e}. Falling back to PCA.")
             self._fit_pca(X)
     
-    def _fit_dfm_mq(self, X: pd.DataFrame):
+    def _fit_dfm_mq(self, X: pd.DataFrame) -> None:
         """Fit using statsmodels Mixed-Frequency DFM."""
         # This would require frequency information for each column
         # Falling back to regular DFM for now
         self._fit_dfm(X)
     
-    def _fit_pca_shrunk(self, X: pd.DataFrame):
+    def _fit_pca_shrunk(self, X: pd.DataFrame) -> None:
         """Fit using PCA with shrinkage on loadings."""
         data = X.select_dtypes(include=[np.number]).copy()
         
@@ -357,7 +350,7 @@ class DynamicFactorModel:
         self._full_data = data
         self._method_used = "pca_shrunk"
     
-    def _fit_pca(self, X: pd.DataFrame):
+    def _fit_pca(self, X: pd.DataFrame) -> None:
         """Fit using standard PCA (fallback method)."""
         data = X.select_dtypes(include=[np.number]).copy()
         
@@ -557,10 +550,14 @@ class DynamicFactorModel:
             raise ValueError("Model must be fitted first")
         
         if self._method_used == "dfm":
-            try:
-                return 1 - self._results.sse / self._results.centered_tss
-            except:
-                return 0.5  # Default if calculation fails
+            # statsmodels occasionally omits sse/centered_tss depending on model
+            # convergence state; return NaN so callers can detect the missing
+            # value rather than a silently-made-up number.
+            sse = getattr(self._results, "sse", None)
+            centered_tss = getattr(self._results, "centered_tss", None)
+            if sse is None or centered_tss in (None, 0):
+                return float("nan")
+            return 1 - sse / centered_tss
         else:
             if HAS_SKLEARN and hasattr(self._model, "explained_variance_ratio_"):
                 return sum(self._model.explained_variance_ratio_)

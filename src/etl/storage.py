@@ -10,17 +10,13 @@ from ..config import RAW_DATA_PATH, CURATED_DATA_PATH
 class DataStorage:
     """Handles storage and retrieval of time series data."""
     
-    def __init__(self, raw_path: Path | None = None, curated_path: Path | None = None):
+    def __init__(self, raw_path: Path | None = None, curated_path: Path | None = None) -> None:
         self.raw_path = raw_path or RAW_DATA_PATH
         self.curated_path = curated_path or CURATED_DATA_PATH
         
         # Ensure directories exist
         self.raw_path.mkdir(parents=True, exist_ok=True)
         self.curated_path.mkdir(parents=True, exist_ok=True)
-    
-    # ==================
-    # Raw Data Operations
-    # ==================
     
     def save_raw(self, df: pd.DataFrame, source: str, series_id: str) -> Path:
         """Save raw data to parquet file.
@@ -83,10 +79,6 @@ class DataStorage:
                     })
         
         return series_list
-    
-    # ==================
-    # Curated Data Operations
-    # ==================
     
     def save_curated(self, df: pd.DataFrame, category: str, name: str,
                      metadata: dict | None = None) -> Path:
@@ -151,10 +143,6 @@ class DataStorage:
                     })
         
         return datasets
-    
-    # ==================
-    # Utility Methods
-    # ==================
     
     def get_latest_date(self, source: str, series_id: str) -> pd.Timestamp | None:
         """Get the latest date in a raw series."""

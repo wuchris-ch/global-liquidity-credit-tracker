@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, type CSSProperties } from "react";
 import { Header, TimeRange } from "@/components/header";
 import { MetricCard } from "@/components/metric-card";
 import { LiquidityChart } from "@/components/liquidity-chart";
@@ -20,30 +20,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
+import { getDateRange } from "@/lib/utils";
 import { metricDefinitions, chartDefinitions, spreadDefinitions } from "@/lib/indicator-definitions";
 import { getFreshnessStatus, getLatestDate } from "@/lib/data-status";
-
-function getDateRange(range: TimeRange): { start: string; end: string } {
-  const end = new Date();
-  const start = new Date();
-  
-  switch (range) {
-    case "1m": start.setMonth(end.getMonth() - 1); break;
-    case "3m": start.setMonth(end.getMonth() - 3); break;
-    case "6m": start.setMonth(end.getMonth() - 6); break;
-    case "1y": start.setFullYear(end.getFullYear() - 1); break;
-    case "2y": start.setFullYear(end.getFullYear() - 2); break;
-    case "5y": start.setFullYear(end.getFullYear() - 5); break;
-    case "10y": start.setFullYear(end.getFullYear() - 10); break;
-    case "15y": start.setFullYear(end.getFullYear() - 15); break;
-    case "all": start.setFullYear(2000); break;
-  }
-  
-  return {
-    start: start.toISOString().split("T")[0],
-    end: end.toISOString().split("T")[0],
-  };
-}
 
 export default function SpreadsPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>("1y");
@@ -345,10 +324,11 @@ export default function SpreadsPage() {
                         <Progress
                           value={item.total > 0 ? (item.value / item.total) * 100 : 0}
                           className="h-2"
-                          style={{
-                            // @ts-expect-error CSS custom property
-                            "--progress-background": item.color,
-                          }}
+                          style={
+                            {
+                              "--progress-background": item.color,
+                            } as CSSProperties
+                          }
                         />
                       </div>
                     ))}

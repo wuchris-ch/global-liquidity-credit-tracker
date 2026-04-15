@@ -16,10 +16,7 @@ from .transforms import (
     compute_hp_filter_gap,
     standardize_series,
     align_series,
-    forward_fill_with_limit,
     apply_sign_flip,
-    detect_frequency,
-    get_frequency_periods,
 )
 
 
@@ -52,10 +49,10 @@ class DataQualityReport:
 class FeatureMatrixBuilder:
     """Builds feature matrices for factor models from configured series."""
     
-    def __init__(self, fetcher: DataFetcher | None = None):
+    def __init__(self, fetcher: DataFetcher | None = None) -> None:
         self.fetcher = fetcher or DataFetcher()
-        self._cache = {}
-        self._quality_reports = {}
+        self._cache: dict[str, pd.DataFrame] = {}
+        self._quality_reports: dict[str, DataQualityReport] = {}
     
     def build_feature_matrix(
         self,
@@ -129,11 +126,9 @@ class FeatureMatrixBuilder:
                 # Resample to target frequency
                 df = resample_to_frequency(df, target_freq, agg_method="last")
                 
-                # *** KEY FIX: Apply sign flip BEFORE computing transforms ***
-                # This ensures the factor loadings will have the correct sign
+                # Pre-flip negative-sign series so downstream factor loadings are positive.
                 if series_sign < 0:
                     df = apply_sign_flip(df, "value", series_sign)
-                    # After flipping, the effective sign is now positive
                     effective_sign = 1
                 else:
                     effective_sign = series_sign
@@ -219,14 +214,13 @@ class FeatureMatrixBuilder:
                     })
                     all_features[feature_name] = feature_df
                     
-                    # Store metadata - note: sign is now always positive after pre-flipping
                     all_metadata.append(FeatureMetadata(
                         series_id=series_id,
                         pillar=pillar_name,
                         country=country or series_config.get("country", ""),
                         transform=transform,
                         unit=unit,
-                        sign=effective_sign,  # Always positive after pre-flip
+                        sign=effective_sign,  # positive after pre-flip
                         source_frequency=source_freq,
                         data_quality=coverage,
                         last_updated=str(last_date)[:10] if pd.notna(last_date) else "unknown"
@@ -291,13 +285,14 @@ class FeatureMatrixBuilder:
         for meta in metadata:
             if meta.data_quality < 0.5:
                 low_coverage.append((meta.series_id, meta.data_quality))
-            
-            try:
-                days_old = (pd.Timestamp.now() - pd.Timestamp(meta.last_updated)).days
-                if days_old > 30:
-                    stale_series.append((meta.series_id, days_old))
-            except:
-                pass
+
+            # last_updated is "unknown" when source data had no valid dates; skip
+            # the staleness check in that case instead of crashing.
+            if meta.last_updated == "unknown":
+                continue
+            days_old = (pd.Timestamp.now() - pd.Timestamp(meta.last_updated)).days
+            if days_old > 30:
+                stale_series.append((meta.series_id, days_old))
         
         report = DataQualityReport(
             pillar=pillar_name,

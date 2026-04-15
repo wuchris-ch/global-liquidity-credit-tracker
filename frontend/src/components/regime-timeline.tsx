@@ -6,12 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { InfoTooltip } from "@/components/info-tooltip";
 import { regimeDefinitions } from "@/lib/indicator-definitions";
 import { cn } from "@/lib/utils";
-
-interface RegimePeriod {
-  regime: string;
-  start: string;
-  end: string;
-}
+import type { RegimePeriod } from "@/lib/api";
 
 interface RegimeTimelineProps {
   periods: RegimePeriod[];

@@ -1,9 +1,8 @@
 """Risk metrics computation for asset classes conditioned on GLCI regimes."""
 import pandas as pd
 import numpy as np
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 from pathlib import Path
 
 from ..etl.fetcher import DataFetcher
@@ -88,7 +87,7 @@ class RiskMetricsComputer:
         fetcher: DataFetcher | None = None,
         storage: DataStorage | None = None,
         rolling_window: int = 252,
-    ):
+    ) -> None:
         self.fetcher = fetcher or DataFetcher()
         self.storage = storage or DataStorage()
         self.rolling_window = rolling_window
@@ -215,7 +214,7 @@ class RiskMetricsComputer:
     def _compute_asset_metrics(
         self,
         asset_id: str,
-        config: dict,
+        config: dict[str, str],
         glci_df: pd.DataFrame,
         rf_df: pd.DataFrame | None,
         start_date: str | None,
@@ -377,7 +376,7 @@ class RiskMetricsComputer:
 
         return matrix
 
-    def _save_results(self, result: RiskDashboardResult):
+    def _save_results(self, result: RiskDashboardResult) -> None:
         """Save risk metrics to storage."""
         # Convert to DataFrame for storage
         assets_data = []

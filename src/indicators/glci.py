@@ -4,38 +4,27 @@ The GLCI is a tri-pillar composite index that measures:
 1. Liquidity: Central bank balance sheets, monetary aggregates
 2. Credit: Private sector credit growth, credit-to-GDP gaps
 3. Stress: Credit spreads, funding rates, volatility (inverted)
-
-Key improvements in this version:
-- Pre-flip negative-sign series for correct factor loadings
-- Credit impulse (second derivative) instead of just levels
-- Data quality validation and reporting
-- Proper handling of mixed-frequency data
-- Time-varying weight optimization option
 """
 import pandas as pd
 import numpy as np
 from datetime import datetime
 from typing import Literal
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, field
 import json
 import warnings
 
-from ..config import get_index_config, get_country_weights, CURATED_DATA_PATH
+from ..config import get_index_config, CURATED_DATA_PATH
 from ..etl.fetcher import DataFetcher
 from ..etl.storage import DataStorage
 from .factors import (
     FeatureMatrixBuilder,
-    FeatureMetadata,
     DataQualityReport,
     get_pillar_weights,
     get_pillar_signs,
-    get_component_signs,
 )
 from .dynamic_factor import (
     DynamicFactorModel,
     combine_factors,
-    FactorModelResult,
-    optimize_pillar_weights,
 )
 from .transforms import (
     detect_regime,
@@ -78,7 +67,7 @@ class GLCIComputer:
         self,
         fetcher: DataFetcher | None = None,
         storage: DataStorage | None = None
-    ):
+    ) -> None:
         self.fetcher = fetcher or DataFetcher()
         self.storage = storage or DataStorage()
         self.feature_builder = FeatureMatrixBuilder(self.fetcher)
@@ -413,7 +402,7 @@ class GLCIComputer:
         
         return pillars_df
     
-    def _save_results(self, result: GLCIResult):
+    def _save_results(self, result: GLCIResult) -> None:
         """Save GLCI results to storage."""
         print("\nSaving results...")
         
@@ -507,23 +496,37 @@ class GLCIComputer:
                 series_id = comp["series"]
                 try:
                     df = self.fetcher.fetch_series(series_id)
-                    if not df.empty:
-                        last_date = df["date"].max()
-                        days_old = (pd.Timestamp.now() - pd.Timestamp(last_date)).days
-                        freshness[series_id] = {
-                            "pillar": pillar_name,
-                            "last_date": str(last_date)[:10],
-                            "days_old": days_old,
-                            "is_stale": days_old > 14
-                        }
-                except:
+                except Exception as e:
+                    # Network/upstream fetch failures are expected here (stale data
+                    # is meaningful info); record as unknown rather than crashing
+                    # the whole freshness report.
+                    print(f"Warning: freshness fetch failed for {series_id}: {e}")
                     freshness[series_id] = {
                         "pillar": pillar_name,
                         "last_date": "unknown",
                         "days_old": -1,
                         "is_stale": True
                     }
-        
+                    continue
+
+                if df.empty:
+                    freshness[series_id] = {
+                        "pillar": pillar_name,
+                        "last_date": "unknown",
+                        "days_old": -1,
+                        "is_stale": True
+                    }
+                    continue
+
+                last_date = df["date"].max()
+                days_old = (pd.Timestamp.now() - pd.Timestamp(last_date)).days
+                freshness[series_id] = {
+                    "pillar": pillar_name,
+                    "last_date": str(last_date)[:10],
+                    "days_old": days_old,
+                    "is_stale": days_old > 14
+                }
+
         return freshness
 
 

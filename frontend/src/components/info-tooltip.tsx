@@ -142,26 +142,4 @@ function InfoRow({ label, content }: { label: string; content: string }) {
   );
 }
 
-// Convenience component for inline info with text
-interface InfoWithLabelProps extends InfoTooltipProps {
-  label: string;
-  labelClassName?: string;
-}
-
-export function InfoWithLabel({ 
-  label, 
-  labelClassName,
-  ...infoProps 
-}: InfoWithLabelProps) {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className={labelClassName}>{label}</span>
-      <InfoTooltip {...infoProps} />
-    </span>
-  );
-}
-
-
-
-
 

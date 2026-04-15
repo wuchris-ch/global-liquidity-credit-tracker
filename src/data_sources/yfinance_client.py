@@ -14,7 +14,7 @@ class YFinanceClient(BaseClient):
 
     source_name = "yfinance"
 
-    def __init__(self, cache_path: Path | None = None):
+    def __init__(self, cache_path: Path | None = None) -> None:
         super().__init__(cache_path)
         try:
             import yfinance as yf

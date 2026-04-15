@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, type CSSProperties } from "react";
 import { Header, TimeRange } from "@/components/header";
 import { MetricCard } from "@/components/metric-card";
 import { LiquidityChart } from "@/components/liquidity-chart";
@@ -345,10 +345,11 @@ export default function SpreadsPage() {
                         <Progress
                           value={item.total > 0 ? (item.value / item.total) * 100 : 0}
                           className="h-2"
-                          style={{
-                            // @ts-expect-error CSS custom property
-                            "--progress-background": item.color,
-                          }}
+                          style={
+                            {
+                              "--progress-background": item.color,
+                            } as CSSProperties
+                          }
                         />
                       </div>
                     ))}

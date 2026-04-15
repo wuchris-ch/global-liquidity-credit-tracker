@@ -94,7 +94,7 @@ class DynamicFactorModel:
         shrinkage_alpha: float = 0.1,
         min_observations: int = 30,
         min_variables: int = 2
-    ):
+    ) -> None:
         """Initialize the Dynamic Factor Model.
         
         Args:
@@ -255,7 +255,7 @@ class DynamicFactorModel:
         else:
             return "pca"
     
-    def _fit_dfm(self, X: pd.DataFrame, mask: pd.DataFrame | None = None):
+    def _fit_dfm(self, X: pd.DataFrame, mask: pd.DataFrame | None = None) -> None:
         """Fit using statsmodels Dynamic Factor Model."""
         data = X.select_dtypes(include=[np.number]).copy()
         
@@ -299,13 +299,13 @@ class DynamicFactorModel:
             warnings.warn(f"DFM fitting failed: {e}. Falling back to PCA.")
             self._fit_pca(X)
     
-    def _fit_dfm_mq(self, X: pd.DataFrame):
+    def _fit_dfm_mq(self, X: pd.DataFrame) -> None:
         """Fit using statsmodels Mixed-Frequency DFM."""
         # This would require frequency information for each column
         # Falling back to regular DFM for now
         self._fit_dfm(X)
     
-    def _fit_pca_shrunk(self, X: pd.DataFrame):
+    def _fit_pca_shrunk(self, X: pd.DataFrame) -> None:
         """Fit using PCA with shrinkage on loadings."""
         data = X.select_dtypes(include=[np.number]).copy()
         
@@ -357,7 +357,7 @@ class DynamicFactorModel:
         self._full_data = data
         self._method_used = "pca_shrunk"
     
-    def _fit_pca(self, X: pd.DataFrame):
+    def _fit_pca(self, X: pd.DataFrame) -> None:
         """Fit using standard PCA (fallback method)."""
         data = X.select_dtypes(include=[np.number]).copy()
         

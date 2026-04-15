@@ -10,7 +10,7 @@ class BaseClient(ABC):
     
     source_name: str = "base"
     
-    def __init__(self, cache_path: Path | None = None):
+    def __init__(self, cache_path: Path | None = None) -> None:
         self.cache_path = cache_path
         if cache_path:
             cache_path.mkdir(parents=True, exist_ok=True)

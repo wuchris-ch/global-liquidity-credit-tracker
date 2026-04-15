@@ -11,7 +11,7 @@ class FredClient(BaseClient):
     
     source_name = "fred"
     
-    def __init__(self, api_key: str | None = None, cache_path: Path | None = None):
+    def __init__(self, api_key: str | None = None, cache_path: Path | None = None) -> None:
         super().__init__(cache_path)
         self.api_key = api_key or FRED_API_KEY
         if not self.api_key:

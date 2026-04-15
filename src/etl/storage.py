@@ -10,7 +10,7 @@ from ..config import RAW_DATA_PATH, CURATED_DATA_PATH
 class DataStorage:
     """Handles storage and retrieval of time series data."""
     
-    def __init__(self, raw_path: Path | None = None, curated_path: Path | None = None):
+    def __init__(self, raw_path: Path | None = None, curated_path: Path | None = None) -> None:
         self.raw_path = raw_path or RAW_DATA_PATH
         self.curated_path = curated_path or CURATED_DATA_PATH
         

@@ -16,9 +16,9 @@ from .glci import GLCIComputer
 class Aggregator:
     """Computes composite liquidity and credit indices."""
     
-    def __init__(self, fetcher: DataFetcher | None = None):
+    def __init__(self, fetcher: DataFetcher | None = None) -> None:
         self.fetcher = fetcher or DataFetcher()
-        self._cache = {}
+        self._cache: dict[str, pd.DataFrame] = {}
     
     def compute_index(
         self,

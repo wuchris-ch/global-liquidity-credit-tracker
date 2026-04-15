@@ -24,7 +24,7 @@ class BISClient(BaseClient):
         "property": "WS_SPP",         # Property prices
     }
     
-    def __init__(self, cache_path: Path | None = None):
+    def __init__(self, cache_path: Path | None = None) -> None:
         super().__init__(cache_path)
         self.session = requests.Session()
         self.session.headers.update({

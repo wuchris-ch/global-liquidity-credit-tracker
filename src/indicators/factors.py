@@ -51,10 +51,10 @@ class DataQualityReport:
 class FeatureMatrixBuilder:
     """Builds feature matrices for factor models from configured series."""
     
-    def __init__(self, fetcher: DataFetcher | None = None):
+    def __init__(self, fetcher: DataFetcher | None = None) -> None:
         self.fetcher = fetcher or DataFetcher()
-        self._cache = {}
-        self._quality_reports = {}
+        self._cache: dict[str, pd.DataFrame] = {}
+        self._quality_reports: dict[str, DataQualityReport] = {}
     
     def build_feature_matrix(
         self,

@@ -78,7 +78,7 @@ class GLCIComputer:
         self,
         fetcher: DataFetcher | None = None,
         storage: DataStorage | None = None
-    ):
+    ) -> None:
         self.fetcher = fetcher or DataFetcher()
         self.storage = storage or DataStorage()
         self.feature_builder = FeatureMatrixBuilder(self.fetcher)
@@ -413,7 +413,7 @@ class GLCIComputer:
         
         return pillars_df
     
-    def _save_results(self, result: GLCIResult):
+    def _save_results(self, result: GLCIResult) -> None:
         """Save GLCI results to storage."""
         print("\nSaving results...")
         

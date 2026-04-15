@@ -16,7 +16,7 @@ class NYFedClient(BaseClient):
     source_name = "nyfed"
     BASE_URL = "https://markets.newyorkfed.org/api"
     
-    def __init__(self, cache_path: Path | None = None):
+    def __init__(self, cache_path: Path | None = None) -> None:
         super().__init__(cache_path)
         self.session = requests.Session()
     

@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from ..config import get_all_series, get_all_indices, get_series_config, get_index_config
 from ..etl import DataFetcher, DataStorage
-from ..indicators import Aggregator, GLCIComputer
+from ..indicators import Aggregator, GLCIComputer, GLCIResult
 
 
 # Suppress noisy sklearn/statsmodels warnings
@@ -35,34 +35,34 @@ def get_allowed_origins() -> list[str]:
 # Simple in-memory cache for GLCI results
 class GLCICache:
     """Cache GLCI computation results with TTL."""
-    def __init__(self, ttl_seconds: int = 300):  # 5 minute default TTL
+    def __init__(self, ttl_seconds: int = 300) -> None:  # 5 minute default TTL
         self.ttl = ttl_seconds
-        self._cache: dict = {}
-        self._timestamps: dict = {}
-    
+        self._cache: dict[str, GLCIResult] = {}
+        self._timestamps: dict[str, datetime] = {}
+
     def _make_key(self, start: str, end: str) -> str:
         return f"{start}:{end}"
-    
-    def get(self, start: str, end: str):
+
+    def get(self, start: str, end: str) -> GLCIResult | None:
         key = self._make_key(start, end)
         if key not in self._cache:
             return None
-        
+
         # Check TTL
         cached_time = self._timestamps.get(key, datetime.min)
         if datetime.now() - cached_time > timedelta(seconds=self.ttl):
             del self._cache[key]
             del self._timestamps[key]
             return None
-        
+
         return self._cache[key]
-    
-    def set(self, start: str, end: str, result):
+
+    def set(self, start: str, end: str, result: GLCIResult) -> None:
         key = self._make_key(start, end)
         self._cache[key] = result
         self._timestamps[key] = datetime.now()
-    
-    def clear(self):
+
+    def clear(self) -> None:
         self._cache.clear()
         self._timestamps.clear()
 

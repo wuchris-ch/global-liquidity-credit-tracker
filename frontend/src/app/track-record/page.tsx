@@ -262,6 +262,161 @@ export default function TrackRecordPage() {
               )}
             </div>
 
+            <details
+              open
+              className="group rounded-lg border border-primary/20 bg-primary/5 p-4 text-xs"
+            >
+              <summary className="cursor-pointer select-none text-sm font-semibold text-foreground">
+                How to read this page
+              </summary>
+              <div className="mt-4 space-y-4 text-muted-foreground">
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">
+                    What this page answers
+                  </p>
+                  <p>
+                    If GLCI says &quot;loose&quot; or &quot;tight&quot; right
+                    now, does history show that certain assets usually move a
+                    certain way over the next few months? And is that pattern
+                    strong enough to actually bet on? That is the whole point
+                    of this page.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">
+                    1. The three cards below
+                  </p>
+                  <ul className="ml-4 list-disc space-y-1.5">
+                    <li>
+                      <strong className="text-foreground">
+                        Strongest positive edge:
+                      </strong>{" "}
+                      the one asset + regime + horizon combo where the GLCI
+                      signal helped the most historically. &quot;+5pp&quot;
+                      means: when GLCI was in that regime, buying that asset
+                      for that many weeks had a hit rate 5 percentage points
+                      higher than the base rate (just buying on any random
+                      week). Bigger edge = stronger signal.
+                    </li>
+                    <li>
+                      <strong className="text-foreground">
+                        Largest negative edge:
+                      </strong>{" "}
+                      the mirror image. Being in that regime hurt returns.
+                      Useful as a &quot;when GLCI says X, don&apos;t touch
+                      Y&quot; marker.
+                    </li>
+                    <li>
+                      <strong className="text-foreground">
+                        Current GLCI regime:
+                      </strong>{" "}
+                      what the signal is flashing today, with the NFCI
+                      baseline alongside for comparison.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">
+                    2. The Regime History bar
+                  </p>
+                  <p>
+                    Each thin vertical stripe is one historical week, colored
+                    by the regime GLCI was in that week.
+                  </p>
+                  <ul className="ml-4 list-disc space-y-1">
+                    <li>
+                      <span className="text-positive">Green</span> = loose
+                      (liquidity easing, historically risk-on friendly)
+                    </li>
+                    <li>Yellow = neutral (nothing extreme either way)</li>
+                    <li>
+                      <span className="text-negative">Red</span> = tight
+                      (liquidity contracting, historically risk-off)
+                    </li>
+                  </ul>
+                  <p>
+                    The three big boxes under the bar show what share of
+                    history sat in each regime.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">
+                    3. The Forward Returns table (the main tool)
+                  </p>
+                  <p>
+                    One row per asset (S&amp;P 500, Gold, Bitcoin, etc.). Each
+                    row has 9 cells grouped by regime (Tight / Neutral /
+                    Loose) and horizon (4, 13, 26 weeks forward).
+                  </p>
+                  <p className="mt-2">Inside each cell:</p>
+                  <ul className="ml-4 list-disc space-y-1">
+                    <li>
+                      <strong className="text-foreground">Big number:</strong>{" "}
+                      median return over that horizon, starting from a week
+                      that was in that regime. Green = positive, red =
+                      negative.
+                    </li>
+                    <li>
+                      <strong className="text-foreground">Small line:</strong>{" "}
+                      hit rate (fraction of windows that ended positive) and
+                      the edge in percentage points versus that asset&apos;s
+                      unconditional base rate. Positive edge = the regime
+                      label genuinely helped.
+                    </li>
+                    <li>
+                      <strong className="text-foreground">Hover a cell:</strong>{" "}
+                      reveals the IQR (middle 50% of returns) and the 95%
+                      bootstrap confidence intervals on the median and hit
+                      rate.
+                    </li>
+                    <li>
+                      <strong className="text-foreground">
+                        Empty cell with just &quot;n=X&quot;:
+                      </strong>{" "}
+                      fewer than 20 observations in that bucket. Too thin to
+                      trust, so nothing is shown.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="font-semibold text-foreground">
+                    4. How to actually use this for positioning
+                  </p>
+                  <ul className="ml-4 list-disc space-y-1.5">
+                    <li>
+                      Scan the <strong className="text-foreground">Loose</strong>{" "}
+                      columns for strong green numbers. Those are the assets
+                      and horizons that historically tended to work when
+                      liquidity was easing.
+                    </li>
+                    <li>
+                      Scan the <strong className="text-foreground">Tight</strong>{" "}
+                      columns for deep red. Those are your &quot;when GLCI is
+                      tight, this asset has suffered&quot; warnings.
+                    </li>
+                    <li>
+                      Switch to the{" "}
+                      <strong className="text-foreground">NFCI tab</strong>{" "}
+                      and compare. NFCI is a simpler, well-known stress index.
+                      If GLCI&apos;s edges don&apos;t beat NFCI&apos;s, the
+                      composite isn&apos;t adding information, and you could
+                      just use NFCI alone.
+                    </li>
+                    <li>
+                      This is a{" "}
+                      <strong className="text-foreground">backtest</strong>.
+                      Past regimes may not repeat. The point is to calibrate
+                      your expectations, not to guarantee outcomes.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </details>
+
             {isLoading && !data && (
               <div className="flex items-center justify-center py-24">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

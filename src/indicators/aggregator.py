@@ -71,7 +71,7 @@ class Aggregator:
             component_data[series_id] = df
         
         # Compute based on method
-        if method == "arithmetic" or index_id == "fed_net_liquidity":
+        if method == "arithmetic":
             return self._compute_arithmetic(index_id, component_data, components, frequency)
         elif method == "zscore_average":
             return self._compute_zscore_average(index_id, component_data, components, frequency)

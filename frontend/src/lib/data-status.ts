@@ -10,21 +10,30 @@ export interface FreshnessStatus {
 
 type LatestDateInput = DataPoint[] | string | null | undefined;
 
+function localDateISO(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function parseLocalDate(date: string): Date {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
 function normalizeDate(value: string | null | undefined): string | null {
   if (!value) return null;
   const [datePart] = value.split("T");
   if (!datePart) return null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return null;
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayISO = localDateISO();
   return datePart > todayISO ? todayISO : datePart;
 }
 
 function dayDiff(latestDate: string): number {
-  const latest = new Date(`${latestDate}T00:00:00Z`);
-  const now = new Date();
-  const today = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-  );
+  const latest = parseLocalDate(latestDate);
+  const today = parseLocalDate(localDateISO());
   return Math.max(
     0,
     Math.floor((today.getTime() - latest.getTime()) / (1000 * 60 * 60 * 24))
@@ -35,15 +44,14 @@ export function formatShortDate(date: string | null | undefined): string {
   const normalized = normalizeDate(date);
   if (!normalized) return "unknown";
 
-  const parsed = new Date(`${normalized}T00:00:00Z`);
+  const parsed = parseLocalDate(normalized);
   const now = new Date();
-  const sameYear = parsed.getUTCFullYear() === now.getUTCFullYear();
+  const sameYear = parsed.getFullYear() === now.getFullYear();
 
   return parsed.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     ...(sameYear ? {} : { year: "numeric" }),
-    timeZone: "UTC",
   });
 }
 

@@ -9,6 +9,7 @@ Track global liquidity and credit metrics from central banks, BIS, World Bank, a
 - [Dashboard](https://global-liquidity-credit-tracker.vercel.app/), overview of key liquidity metrics
 - [GLCI Index](https://global-liquidity-credit-tracker.vercel.app/glci), Global Liquidity & Credit Index (tri-pillar composite)
 - [Risk by Regime](https://global-liquidity-credit-tracker.vercel.app/risk), Sharpe ratios and returns by GLCI regime
+- [Track Record](https://global-liquidity-credit-tracker.vercel.app/track-record), GLCI regime backtest vs forward returns
 - [Liquidity Monitor](https://global-liquidity-credit-tracker.vercel.app/liquidity), Fed balance sheet & net liquidity
 - [Credit Spreads](https://global-liquidity-credit-tracker.vercel.app/spreads), HY/IG spread analysis
 - [Data Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), compare multiple series
@@ -26,9 +27,11 @@ Static-first architecture with a scheduled data pipeline:
 
 **How it works:**
 1. GitHub Actions runs every 12 hours.
-2. Python scripts fetch data from all sources and compute indices (GLCI, Fed Net Liquidity, risk metrics, etc.).
+2. Python scripts fetch data from all sources and compute indices (GLCI, Fed Net Liquidity, risk metrics, backtest track record, etc.).
 3. Results are exported as static JSON and published to GitHub Pages.
 4. Frontend fetches pre-built JSON instantly, no backend computation at request time.
+
+All dashboard pages display data freshness indicators showing when the data was last updated. If the pipeline hasn't run recently or an upstream source is lagging, the freshness status will reflect that.
 
 > **Important:** Do not delete the `gh-pages` branch! It stores the pre-computed JSON data served by GitHub Pages. Deleting it will break the production frontend. The branch is protected, but if you must modify branch settings, ensure `gh-pages` remains intact.
 
@@ -57,6 +60,7 @@ The frontend will be available at http://localhost:3000 and will fetch live data
 python cli.py list series
 python cli.py fetch --series fed_total_assets sofr --save
 python cli.py compute --index fed_net_liquidity
+python cli.py backtest --save
 ```
 
 ## Data Sources
@@ -92,7 +96,11 @@ python cli.py compute --index fed_net_liquidity
 ### BIS Credit Data
 - `bis_credit_us`, `bis_credit_eu`, `bis_credit_cn`, `bis_credit_jp`
 
-### Asset Prices (for Risk Dashboard)
+### Exchange Rates & Inflation (for normalization)
+- `fx_eurusd`, `fx_usdjpy`, `fx_gbpusd`, `fx_usdcny` - Major FX pairs
+- `us_cpi`, `eu_hicp`, `jp_cpi` - Inflation indices
+
+### Asset Prices (for Risk & Track Record dashboards)
 - `sp500_price` - S&P 500 Index (FRED)
 - `russell2000_price` - Russell 2000 ETF (IWM)
 - `gold_price` - Gold ETF (GLD)
@@ -141,21 +149,44 @@ The Risk by Regime dashboard shows how different asset classes perform under var
 - Crypto: Bitcoin, Ethereum
 - Fixed Income: Long Bonds (TLT)
 
+## Track Record Dashboard
+
+The Track Record dashboard backtests the GLCI regime classifier against forward asset returns to measure its predictive value.
+
+**Methodology:**
+- Expanding-window backtest with a 52-week burn-in period (no look-ahead bias)
+- Tests 4, 13, and 26-week forward return horizons
+- Compares GLCI regime classifier against an NFCI baseline
+- Bootstrap 95% confidence intervals for statistical rigor
+
+**Metrics shown:**
+- Hit rate: how often the regime correctly predicts the sign of forward returns
+- Mean return by regime: average forward return conditioned on Tight, Neutral, or Loose
+- Sharpe delta: difference in risk-adjusted returns between Loose and Tight regimes
+- Confidence intervals via bootstrap resampling
+
 ## Project Structure
 
 ```
 global_liquidity_tracker/
 ├── config/
-│   └── series.yml          # Series and index definitions
+│   └── series.yml              # Series and index definitions
 ├── src/
-│   ├── data_sources/       # API clients (FRED, BIS, World Bank, NY Fed, yfinance)
-│   ├── etl/                # Data fetching and storage
-│   └── indicators/         # Aggregation, transforms, risk metrics
+│   ├── data_sources/           # API clients (FRED, BIS, World Bank, NY Fed, yfinance)
+│   ├── etl/                    # Data fetching and storage
+│   └── indicators/
+│       ├── glci.py             # GLCI index computation
+│       ├── risk_metrics.py     # Risk by Regime metrics
+│       ├── backtest.py         # Track Record expanding-window backtest
+│       ├── dynamic_factor.py   # DFM latent factor extraction
+│       ├── factors.py          # Feature engineering (FX, real, GDP scaling)
+│       ├── transforms.py       # Data transforms (zscore, growth, impulse, gap)
+│       └── aggregator.py       # Index aggregation dispatcher
 ├── data/
-│   ├── raw/                # Raw fetched data (parquet)
-│   └── curated/            # Computed indices (parquet)
-├── frontend/               # Next.js dashboard
-├── cli.py                  # Command-line interface
+│   ├── raw/                    # Raw fetched data (parquet)
+│   └── curated/                # Computed indices (parquet + JSON)
+├── frontend/                   # Next.js dashboard
+├── cli.py                      # Command-line interface
 └── pyproject.toml
 ```
 
@@ -182,6 +213,9 @@ python cli.py show fed_total_assets --tail 30
 
 # Compute risk metrics
 python -c "from src.indicators.risk_metrics import compute_risk_metrics; compute_risk_metrics(save=True)"
+
+# Compute backtest track record (expanding-window, 52-week burn-in)
+python cli.py backtest --save
 ```
 
 ## Adding New Series
@@ -285,6 +319,7 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
    - `python scripts/update_data.py` (fetch + indices)
    - `python - <<'PY' ... compute_glci(save=True)` (GLCI)
    - `python - <<'PY' ... compute_risk_metrics(save=True)` (Risk metrics)
+   - `python - <<'PY' ... compute_backtest(save=True)` (Track record backtest)
    - `python scripts/export_to_json.py --output data/export/latest --snapshot` (API-shaped JSON)
    - Force-publishes `latest/` and a few `snapshots/` to the `gh-pages` branch.
 
@@ -297,6 +332,7 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
    - `latest/api/indices/index.json`, `latest/api/indices/{id}/index.json`
    - `latest/api/glci/index.json`, `latest/api/glci/latest/index.json`, `latest/api/glci/pillars/index.json`, `latest/api/glci/freshness/index.json`, `latest/api/glci/regime-history/index.json`
    - `latest/api/risk/index.json`, `latest/api/risk/{asset_id}/index.json`
+   - `latest/api/backtest/track_record/index.json`
    - Snapshots mirror the same layout under `snapshots/YYYY-MM-DD/`.
 
 ### Local development (optional live backend)

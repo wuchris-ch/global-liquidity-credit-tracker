@@ -525,9 +525,16 @@ def validate_required_exports(output_dir: Path) -> list[str]:
             rel_path.startswith("api/series/")
             and rel_path.endswith("/index.json")
             and rel_path != "api/series/index.json"
+            and "/latest/" not in rel_path
             and not payload.get("data")
         ):
             errors.append(f"empty data in {rel_path}")
+        elif (
+            rel_path.startswith("api/series/")
+            and "/latest/" in rel_path
+            and ("date" not in payload or "value" not in payload)
+        ):
+            errors.append(f"incomplete latest payload in {rel_path}")
         elif (
             rel_path.startswith("api/indices/")
             and rel_path.endswith("/index.json")

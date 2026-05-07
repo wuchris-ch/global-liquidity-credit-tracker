@@ -85,6 +85,29 @@ CATEGORY_MAP: Dict[str, str] = {
 
 REGIME_LABELS = {-1: "tight", 0: "neutral", 1: "loose"}
 
+REQUIRED_PRODUCTION_EXPORT_PATHS = (
+    "api/series/index.json",
+    "api/series/fed_total_assets/index.json",
+    "api/series/fed_total_assets/latest/index.json",
+    "api/series/fed_treasury_general_account/index.json",
+    "api/series/fed_reverse_repo/index.json",
+    "api/series/sofr/index.json",
+    "api/series/sofr/latest/index.json",
+    "api/series/fed_funds_rate/index.json",
+    "api/series/ice_bofa_us_high_yield_spread/index.json",
+    "api/series/ice_bofa_us_high_yield_spread/latest/index.json",
+    "api/series/ice_bofa_us_ig_spread/index.json",
+    "api/indices/fed_net_liquidity/index.json",
+    "api/indices/usd_funding_stress/index.json",
+    "api/glci/index.json",
+    "api/glci/latest/index.json",
+    "api/glci/pillars/index.json",
+    "api/glci/freshness/index.json",
+    "api/glci/regime-history/index.json",
+    "api/risk/index.json",
+    "api/backtest/track_record/index.json",
+)
+
 
 def fmt_date(value: Any) -> str:
     if pd.isna(value):
@@ -100,9 +123,15 @@ def write_json(path: Path, payload: Any) -> None:
         json.dump(payload, f, indent=2, default=str)
 
 
-def export_series_list(series_cfg: Dict[str, dict], output_dir: Path) -> None:
+def export_series_list(
+    series_cfg: Dict[str, dict],
+    output_dir: Path,
+    exported_series_ids: set[str] | None = None,
+) -> None:
     items = []
     for series_id, cfg in series_cfg.items():
+        if exported_series_ids is not None and series_id not in exported_series_ids:
+            continue
         items.append(
             {
                 "id": series_id,
@@ -475,19 +504,69 @@ def export_backtest(output_dir: Path) -> bool:
     return True
 
 
-def export_all(output_dir: Path, add_snapshot: bool) -> None:
+def validate_required_exports(output_dir: Path) -> list[str]:
+    """Validate the static endpoints that production pages need to render."""
+    errors = []
+
+    for rel_path in REQUIRED_PRODUCTION_EXPORT_PATHS:
+        path = output_dir / rel_path
+        if not path.is_file():
+            errors.append(f"missing {rel_path}")
+            continue
+
+        try:
+            with open(path, "r") as f:
+                payload = json.load(f)
+        except json.JSONDecodeError as exc:
+            errors.append(f"invalid JSON in {rel_path}: {exc}")
+            continue
+
+        if (
+            rel_path.startswith("api/series/")
+            and rel_path.endswith("/index.json")
+            and rel_path != "api/series/index.json"
+            and not payload.get("data")
+        ):
+            errors.append(f"empty data in {rel_path}")
+        elif (
+            rel_path.startswith("api/indices/")
+            and rel_path.endswith("/index.json")
+            and not payload.get("data")
+        ):
+            errors.append(f"empty data in {rel_path}")
+        elif rel_path == "api/glci/index.json" and not payload.get("data"):
+            errors.append(f"empty data in {rel_path}")
+        elif rel_path == "api/risk/index.json" and not payload.get("assets"):
+            errors.append(f"empty assets in {rel_path}")
+        elif rel_path == "api/backtest/track_record/index.json" and not payload.get("assets"):
+            errors.append(f"empty assets in {rel_path}")
+
+    return errors
+
+
+def export_all(
+    output_dir: Path,
+    add_snapshot: bool,
+    require_production: bool = False,
+) -> None:
     storage = DataStorage(raw_path=RAW_DATA_PATH, curated_path=CURATED_DATA_PATH)
     series_cfg = get_all_series()
     index_cfg = get_all_indices()
 
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
+
     print(f"[export] Writing JSON to {output_dir}")
 
     # Series
-    export_series_list(series_cfg, output_dir)
+    exported_series_ids = set()
     for sid, cfg in series_cfg.items():
         ok = export_single_series(storage, sid, cfg, output_dir)
         if not ok:
             print(f"[export] Skipped series (no data): {sid}")
+            continue
+        exported_series_ids.add(sid)
+    export_series_list(series_cfg, output_dir, exported_series_ids)
 
     # Indices
     export_indices_list(index_cfg, output_dir)
@@ -517,6 +596,15 @@ def export_all(output_dir: Path, add_snapshot: bool) -> None:
     else:
         print("[export] Exported backtest track record")
 
+    if require_production:
+        errors = validate_required_exports(output_dir)
+        if errors:
+            print("[export] Production export validation failed:")
+            for error in errors:
+                print(f"  - {error}")
+            raise SystemExit(1)
+        print("[export] Production export validation passed")
+
     if add_snapshot:
         date_stamp = datetime.utcnow().strftime("%Y-%m-%d")
         snap_dir = output_dir.parent / "snapshots" / date_stamp
@@ -541,10 +629,14 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Also copy output to snapshots/YYYY-MM-DD for long-cache hosting",
     )
+    parser.add_argument(
+        "--require-production",
+        action="store_true",
+        help="Fail if required production static endpoints are missing or empty",
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    export_all(args.output, args.snapshot)
-
+    export_all(args.output, args.snapshot, args.require_production)

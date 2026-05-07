@@ -59,7 +59,7 @@ jobs:
 
       - name: Export JSON artifacts
         run: |
-          python scripts/export_to_json.py --output data/export/latest --snapshot
+          python scripts/export_to_json.py --output data/export/latest --snapshot --require-production
 
       - name: Copy artifacts aside
         run: |

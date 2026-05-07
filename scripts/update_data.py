@@ -41,7 +41,9 @@ def main():
     # 1. Fetch all series
     print("\n[1/3] Fetching raw data...")
     
-    # Priority series (daily/weekly)
+    # Series that production pages depend on directly. If any of these fail on
+    # a clean CI runner, publishing would replace the last good static export
+    # with 404s for visible dashboard routes.
     priority_series = [
         "fed_total_assets",
         "fed_treasury_general_account", 
@@ -54,6 +56,17 @@ def main():
     ]
     
     results = fetcher.fetch_multiple(priority_series, start_date, end_date)
+    missing_required = [
+        series_id
+        for series_id in priority_series
+        if series_id not in results or results[series_id].empty
+    ]
+    if missing_required:
+        print("\nERROR: Required production series failed to fetch:")
+        for series_id in missing_required:
+            print(f"  - {series_id}")
+        print("Aborting before export so the existing published data stays intact.")
+        sys.exit(1)
     
     for series_id, df in results.items():
         if not df.empty:

@@ -46,6 +46,8 @@ def main():
     # with 404s for visible dashboard routes.
     priority_series = [
         "fed_total_assets",
+        "ecb_total_assets",
+        "boj_total_assets",
         "fed_treasury_general_account", 
         "fed_reverse_repo",
         "sofr",

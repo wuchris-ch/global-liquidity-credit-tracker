@@ -53,14 +53,16 @@ export default function LiquidityPage() {
   const netLiquidity = useIndexData("fed_net_liquidity", { ...analyticsRange });
   const sp500 = useSeriesData("sp500_price", { ...analyticsRange });
 
-  const isLoading =
+  const isCoreLoading =
     fedAssets.isLoading ||
     tga.isLoading ||
     rrp.isLoading ||
-    netLiquidity.isLoading ||
-    sp500.isLoading;
+    netLiquidity.isLoading;
+  const isLoading = isCoreLoading || sp500.isLoading;
   const hasError =
-    fedAssets.error || tga.error || rrp.error || netLiquidity.error || sp500.error;
+    fedAssets.error || tga.error || rrp.error || netLiquidity.error;
+  const sp500Unavailable =
+    Boolean(sp500.error) || (!sp500.isLoading && sp500.data.length === 0);
 
   const handleRefresh = useCallback(async () => {
     await Promise.all([
@@ -163,7 +165,10 @@ export default function LiquidityPage() {
             <CardContent className="flex flex-col items-center gap-4 p-6">
               <AlertCircle className="h-12 w-12 text-destructive" />
               <h2 className="text-lg font-semibold">Failed to Load Data</h2>
-              <p className="text-center text-sm text-muted-foreground">Could not connect to the data API. Make sure the Python backend is running:</p>
+              <p className="text-center text-sm text-muted-foreground">
+                Could not load required Fed liquidity series. If this is production, check that the data
+                workflow published to GitHub Pages; locally, start the API with:
+              </p>
               <code className="rounded bg-muted px-3 py-2 text-sm">uvicorn src.api:app --reload</code>
             </CardContent>
           </Card>
@@ -214,7 +219,7 @@ export default function LiquidityPage() {
             <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
               <MetricCard
                 title="Net Liquidity (Stock)"
-                value={isLoading ? "Loading..." : latestNet !== null ? formatCurrency(latestNet) : "No data"}
+                value={isCoreLoading ? "Loading..." : latestNet !== null ? formatCurrency(latestNet) : "No data"}
                 change={calcChange(netLiquidity.data)}
                 trend={(calcChange(netLiquidity.data) ?? 0) >= 0 ? "up" : "down"}
                 icon={<Activity className="h-5 w-5" />}
@@ -224,7 +229,7 @@ export default function LiquidityPage() {
               <MetricCard
                 title="4W Flow"
                 value={
-                  isLoading
+                  isCoreLoading
                     ? "Loading..."
                     : change4w !== null
                       ? `${change4w.deltaAbs >= 0 ? "+" : ""}${formatCurrency(change4w.deltaAbs)}`
@@ -239,7 +244,7 @@ export default function LiquidityPage() {
               <MetricCard
                 title="13W Change"
                 value={
-                  isLoading
+                  isCoreLoading
                     ? "Loading..."
                     : change13w !== null
                       ? `${change13w.deltaPct >= 0 ? "+" : ""}${change13w.deltaPct.toFixed(2)}%`
@@ -253,11 +258,13 @@ export default function LiquidityPage() {
               <MetricCard
                 title="52W Δ Corr (SPX)"
                 value={
-                  isLoading
+                  isCoreLoading || sp500.isLoading
                     ? "Loading..."
-                    : correlation52w !== null
-                      ? `${correlation52w >= 0 ? "+" : ""}${correlation52w.toFixed(2)}`
-                      : "N/A"
+                    : sp500Unavailable
+                      ? "N/A"
+                      : correlation52w !== null
+                        ? `${correlation52w >= 0 ? "+" : ""}${correlation52w.toFixed(2)}`
+                        : "N/A"
                 }
                 trend={
                   correlation52w === null
@@ -271,16 +278,39 @@ export default function LiquidityPage() {
               />
             </div>
 
-            {!isLoading && correlation52w !== null && (
+            {!isCoreLoading && !sp500Unavailable && correlation52w !== null && (
               <p className="text-xs text-muted-foreground px-1">
                 {correlationInterpretation(correlation52w)}
               </p>
             )}
 
-            {isLoading ? (
+            {sp500Unavailable && !isCoreLoading && (
+              <Card className="border-amber-500/30 bg-amber-500/5">
+                <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
+                  <AlertCircle className="h-5 w-5 shrink-0 text-amber-500" />
+                  <p>
+                    S&amp;P 500 overlay is temporarily unavailable (series not in static export yet).
+                    Fed liquidity levels and flows below are still live. Re-run the data workflow after
+                    deploy to populate <code className="text-xs">sp500_price</code>.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {isCoreLoading ? (
               <Card className="flex h-[420px] items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </Card>
+            ) : sp500Unavailable ? (
+              <LiquidityChart
+                title="Fed Net Liquidity"
+                description="Total Assets minus TGA and Reverse Repo"
+                data={scaledNetLiqDisplay}
+                color="var(--chart-1)"
+                height={420}
+                valueFormatter={(v) => formatCurrency(v)}
+                info={chartDefinitions.net_liquidity_chart}
+              />
             ) : (
               <NetLiquidityRiskChart
                 title="Net Liquidity vs S&P 500"
@@ -293,7 +323,7 @@ export default function LiquidityPage() {
             )}
 
             <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-              {isLoading ? (
+              {isCoreLoading ? (
                 <>
                   <Card className="flex h-[320px] items-center justify-center">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

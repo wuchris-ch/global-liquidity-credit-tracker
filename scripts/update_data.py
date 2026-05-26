@@ -48,13 +48,15 @@ def main():
         "fed_total_assets",
         "ecb_total_assets",
         "boj_total_assets",
-        "fed_treasury_general_account", 
+        "fed_treasury_general_account",
         "fed_reverse_repo",
         "sofr",
         "fed_funds_rate",
         "ted_spread",
         "ice_bofa_us_high_yield_spread",
         "ice_bofa_us_ig_spread",
+        # Liquidity Monitor overlay + risk dashboard
+        "sp500_price",
     ]
     
     results = fetcher.fetch_multiple(priority_series, start_date, end_date)

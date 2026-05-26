@@ -51,6 +51,33 @@ export const metricDefinitions: Record<string, InfoTooltipProps> = {
     interpretation: "Rising net liquidity historically correlates with equity market strength. Falls below ~$5.5T have preceded market stress.",
   },
 
+  net_liquidity_4w_change: {
+    title: "4-Week Net Liquidity Flow",
+    description: "Dollar change in Fed net liquidity over the last four weekly observations",
+    calculation: "Net Liquidity(t) − Net Liquidity(t−4 weeks)",
+    source: "Derived from fed_net_liquidity index",
+    frequency: "Weekly",
+    interpretation: "Flow matters for risk assets: expanding net liquidity often supports equities even when the level is already high.",
+  },
+
+  net_liquidity_13w_change: {
+    title: "13-Week Net Liquidity Change",
+    description: "Percent change in Fed net liquidity over ~one quarter",
+    calculation: "(Net Liquidity(t) / Net Liquidity(t−13) − 1) × 100",
+    source: "Derived from fed_net_liquidity index",
+    frequency: "Weekly",
+    interpretation: "Smoother than 4-week flow; useful for medium-term risk-on/risk-off context.",
+  },
+
+  net_liquidity_sp500_corr: {
+    title: "52-Week Change Correlation",
+    description: "Correlation between weekly % changes in net liquidity and the S&P 500",
+    calculation: "Pearson r of week-over-week % changes over the last 52 aligned weekly points",
+    source: "Fed net liquidity vs FRED SP500",
+    frequency: "Updated weekly",
+    interpretation: "Positive values mean liquidity flows and equity moves have recently aligned. Correlation varies by regime—use with levels and credit spreads.",
+  },
+
   // Treasury General Account
   tga: {
     title: "Treasury General Account",
@@ -129,6 +156,22 @@ export const chartDefinitions: Record<string, InfoTooltipProps> = {
     calculation: "WALCL − WTREGEN − (RRPONTSYD × 1000)",
     source: "Calculated composite from Federal Reserve data",
     interpretation: "Most accurate measure of 'spendable' liquidity in the financial system.",
+  },
+
+  net_liquidity_vs_sp500_chart: {
+    title: "Net Liquidity vs S&P 500",
+    description: "Weekly Fed net liquidity (USD) against the S&P 500 index",
+    calculation: "Dual-axis overlay; equity aligned to each Fed liquidity print",
+    source: "Fed net liquidity + FRED SP500",
+    interpretation: "Compare whether liquidity is expanding while risk assets rise. The 52-week change correlation summarizes how closely weekly flows and equities have moved together.",
+  },
+
+  net_liquidity_flow_chart: {
+    title: "4-Week Net Liquidity Flow",
+    description: "Weekly change in net liquidity versus four weeks prior",
+    calculation: "Δ Net Liquidity over 4 weekly observations",
+    source: "Derived from fed_net_liquidity",
+    interpretation: "Positive bars = liquidity injection into the system over the past month; negative = drain.",
   },
 
   funding_rates_chart: {

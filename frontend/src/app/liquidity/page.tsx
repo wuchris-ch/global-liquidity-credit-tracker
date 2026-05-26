@@ -14,12 +14,24 @@ import {
   ArrowUpRight,
   Building2,
   Landmark,
+  LineChart,
+  TrendingUp,
   Wallet,
   AlertCircle,
   Loader2,
 } from "lucide-react";
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
+import { NetLiquidityRiskChart } from "@/components/net-liquidity-risk-chart";
 import { formatCurrency, getDateRange, UNIT_SCALES } from "@/lib/utils";
+import {
+  correlationInterpretation,
+  getLiquidityAnalyticsRange,
+  mergeNetLiquidityWithEquity,
+  netLiquidityFlowSeries,
+  periodChange,
+  rollingWeeklyChangeCorrelation,
+  scaleNetLiquidity,
+} from "@/lib/liquidity-analytics";
 import { metricDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
 import {
   formatShortDate,
@@ -30,18 +42,35 @@ import {
 export default function LiquidityPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>("1y");
   const dateRange = useMemo(() => getDateRange(timeRange), [timeRange]);
+  const analyticsRange = useMemo(
+    () => getLiquidityAnalyticsRange(timeRange),
+    [timeRange]
+  );
 
   const fedAssets = useSeriesData("fed_total_assets", { ...dateRange });
   const tga = useSeriesData("fed_treasury_general_account", { ...dateRange });
   const rrp = useSeriesData("fed_reverse_repo", { ...dateRange });
-  const netLiquidity = useIndexData("fed_net_liquidity", { ...dateRange });
+  const netLiquidity = useIndexData("fed_net_liquidity", { ...analyticsRange });
+  const sp500 = useSeriesData("sp500_price", { ...analyticsRange });
 
-  const isLoading = fedAssets.isLoading || tga.isLoading || rrp.isLoading || netLiquidity.isLoading;
-  const hasError = fedAssets.error || tga.error || rrp.error || netLiquidity.error;
+  const isLoading =
+    fedAssets.isLoading ||
+    tga.isLoading ||
+    rrp.isLoading ||
+    netLiquidity.isLoading ||
+    sp500.isLoading;
+  const hasError =
+    fedAssets.error || tga.error || rrp.error || netLiquidity.error || sp500.error;
 
   const handleRefresh = useCallback(async () => {
-    await Promise.all([fedAssets.refetch(), tga.refetch(), rrp.refetch(), netLiquidity.refetch()]);
-  }, [fedAssets, tga, rrp, netLiquidity]);
+    await Promise.all([
+      fedAssets.refetch(),
+      tga.refetch(),
+      rrp.refetch(),
+      netLiquidity.refetch(),
+      sp500.refetch(),
+    ]);
+  }, [fedAssets, tga, rrp, netLiquidity, sp500]);
 
   const handleTimeRangeChange = useCallback((range: TimeRange) => setTimeRange(range), []);
 
@@ -69,12 +98,59 @@ export default function LiquidityPage() {
     return prev !== 0 ? ((latest - prev) / prev) * 100 : undefined;
   };
 
+  const scaledNetLiqFull = useMemo(
+    () => scaleNetLiquidity(netLiquidity.data, scaleMillions),
+    [netLiquidity.data, scaleMillions]
+  );
+
+  const scaledNetLiqDisplay = useMemo(() => {
+    const startMs = new Date(dateRange.start).getTime();
+    return scaledNetLiqFull.filter(
+      (d) => new Date(d.date).getTime() >= startMs
+    );
+  }, [scaledNetLiqFull, dateRange.start]);
+
+  const change4w = useMemo(
+    () => periodChange(netLiquidity.data, 4, scaleMillions),
+    [netLiquidity.data, scaleMillions]
+  );
+
+  const change13w = useMemo(
+    () => periodChange(netLiquidity.data, 13, scaleMillions),
+    [netLiquidity.data, scaleMillions]
+  );
+
+  const mergedForAnalytics = useMemo(
+    () => mergeNetLiquidityWithEquity(netLiquidity.data, sp500.data, scaleMillions),
+    [netLiquidity.data, sp500.data, scaleMillions]
+  );
+
+  const mergedDisplay = useMemo(() => {
+    const startMs = new Date(dateRange.start).getTime();
+    return mergedForAnalytics.filter(
+      (d) => new Date(d.date).getTime() >= startMs
+    );
+  }, [mergedForAnalytics, dateRange.start]);
+
+  const correlation52w = useMemo(
+    () => rollingWeeklyChangeCorrelation(mergedForAnalytics, 52),
+    [mergedForAnalytics]
+  );
+
+  const flow4wSeries = useMemo(() => {
+    const startMs = new Date(dateRange.start).getTime();
+    return netLiquidityFlowSeries(scaledNetLiqFull, 4).filter(
+      (d) => new Date(d.date).getTime() >= startMs
+    );
+  }, [scaledNetLiqFull, dateRange.start]);
+
   const pageStatus = getFreshnessStatus(
     getLatestDate(
       fedAssets.latestDate,
       tga.latestDate,
       rrp.latestDate,
-      netLiquidity.latestDate
+      netLiquidity.latestDate,
+      sp500.latestDate
     )
   );
 
@@ -136,17 +212,128 @@ export default function LiquidityPage() {
             </Card>
 
             <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-              <MetricCard title="Fed Total Assets" value={isLoading ? "Loading..." : latestFed !== null ? formatCurrency(latestFed) : "No data"} change={calcChange(fedAssets.data)} trend={(calcChange(fedAssets.data) ?? 0) >= 0 ? "up" : "down"} icon={<Building2 className="h-5 w-5" />} variant="highlight" info={metricDefinitions.fed_balance_sheet} />
-              <MetricCard title="Treasury General Account" value={isLoading ? "Loading..." : latestTga !== null ? formatCurrency(latestTga) : "No data"} change={calcChange(tga.data)} trend={(calcChange(tga.data) ?? 0) >= 0 ? "up" : "down"} icon={<Landmark className="h-5 w-5" />} info={metricDefinitions.tga} />
-              <MetricCard title="Reverse Repo Facility" value={isLoading ? "Loading..." : latestRrp !== null ? formatCurrency(latestRrp) : "No data"} change={calcChange(rrp.data)} trend={(calcChange(rrp.data) ?? 0) >= 0 ? "up" : "down"} icon={<Wallet className="h-5 w-5" />} info={metricDefinitions.rrp} />
-              <MetricCard title="Net Liquidity" value={isLoading ? "Loading..." : latestNet !== null ? formatCurrency(latestNet) : "No data"} change={calcChange(netLiquidity.data)} trend={(calcChange(netLiquidity.data) ?? 0) >= 0 ? "up" : "down"} icon={<Activity className="h-5 w-5" />} variant="highlight" info={metricDefinitions.net_liquidity} />
+              <MetricCard
+                title="Net Liquidity (Stock)"
+                value={isLoading ? "Loading..." : latestNet !== null ? formatCurrency(latestNet) : "No data"}
+                change={calcChange(netLiquidity.data)}
+                trend={(calcChange(netLiquidity.data) ?? 0) >= 0 ? "up" : "down"}
+                icon={<Activity className="h-5 w-5" />}
+                variant="highlight"
+                info={metricDefinitions.net_liquidity}
+              />
+              <MetricCard
+                title="4W Flow"
+                value={
+                  isLoading
+                    ? "Loading..."
+                    : change4w !== null
+                      ? `${change4w.deltaAbs >= 0 ? "+" : ""}${formatCurrency(change4w.deltaAbs)}`
+                      : "No data"
+                }
+                change={change4w?.deltaPct}
+                trend={(change4w?.deltaAbs ?? 0) >= 0 ? "up" : "down"}
+                icon={<TrendingUp className="h-5 w-5" />}
+                variant="highlight"
+                info={metricDefinitions.net_liquidity_4w_change}
+              />
+              <MetricCard
+                title="13W Change"
+                value={
+                  isLoading
+                    ? "Loading..."
+                    : change13w !== null
+                      ? `${change13w.deltaPct >= 0 ? "+" : ""}${change13w.deltaPct.toFixed(2)}%`
+                      : "No data"
+                }
+                change={change13w?.deltaPct}
+                trend={(change13w?.deltaPct ?? 0) >= 0 ? "up" : "down"}
+                icon={<LineChart className="h-5 w-5" />}
+                info={metricDefinitions.net_liquidity_13w_change}
+              />
+              <MetricCard
+                title="52W Δ Corr (SPX)"
+                value={
+                  isLoading
+                    ? "Loading..."
+                    : correlation52w !== null
+                      ? `${correlation52w >= 0 ? "+" : ""}${correlation52w.toFixed(2)}`
+                      : "N/A"
+                }
+                trend={
+                  correlation52w === null
+                    ? "neutral"
+                    : correlation52w >= 0
+                      ? "up"
+                      : "down"
+                }
+                icon={<TrendingUp className="h-5 w-5" />}
+                info={metricDefinitions.net_liquidity_sp500_corr}
+              />
             </div>
 
-            {isLoading ? (
-              <Card className="flex h-[400px] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></Card>
-            ) : (
-              <LiquidityChart title="Fed Net Liquidity" description="Total Assets minus TGA and Reverse Repo" data={netLiquidity.data.map(d => ({ ...d, value: d.value * scaleMillions }))} color="var(--chart-1)" height={400} valueFormatter={(v) => formatCurrency(v)} info={chartDefinitions.net_liquidity_chart} />
+            {!isLoading && correlation52w !== null && (
+              <p className="text-xs text-muted-foreground px-1">
+                {correlationInterpretation(correlation52w)}
+              </p>
             )}
+
+            {isLoading ? (
+              <Card className="flex h-[420px] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </Card>
+            ) : (
+              <NetLiquidityRiskChart
+                title="Net Liquidity vs S&P 500"
+                description="Stock of Fed liquidity (left) vs risk assets (right)—see if flows are supporting equities"
+                data={mergedDisplay}
+                correlation52w={correlation52w}
+                height={420}
+                info={chartDefinitions.net_liquidity_vs_sp500_chart}
+              />
+            )}
+
+            <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
+              {isLoading ? (
+                <>
+                  <Card className="flex h-[320px] items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </Card>
+                  <Card className="flex h-[320px] items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </Card>
+                </>
+              ) : (
+                <>
+                  <LiquidityChart
+                    title="Fed Net Liquidity"
+                    description="Total Assets minus TGA and Reverse Repo"
+                    data={scaledNetLiqDisplay}
+                    color="var(--chart-1)"
+                    height={320}
+                    valueFormatter={(v) => formatCurrency(v)}
+                    info={chartDefinitions.net_liquidity_chart}
+                  />
+                  <LiquidityChart
+                    title="4-Week Net Liquidity Flow"
+                    description="Weekly injection (+) or drain (−) vs four weeks ago"
+                    data={flow4wSeries}
+                    chartType="line"
+                    color="var(--chart-2)"
+                    height={320}
+                    valueFormatter={(v) => formatCurrency(v)}
+                    referenceLine={0}
+                    referenceLabel="0"
+                    info={chartDefinitions.net_liquidity_flow_chart}
+                  />
+                </>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+              <MetricCard title="Fed Total Assets" value={isLoading ? "Loading..." : latestFed !== null ? formatCurrency(latestFed) : "No data"} change={calcChange(fedAssets.data)} trend={(calcChange(fedAssets.data) ?? 0) >= 0 ? "up" : "down"} icon={<Building2 className="h-5 w-5" />} info={metricDefinitions.fed_balance_sheet} />
+              <MetricCard title="Treasury General Account" value={isLoading ? "Loading..." : latestTga !== null ? formatCurrency(latestTga) : "No data"} change={calcChange(tga.data)} trend={(calcChange(tga.data) ?? 0) >= 0 ? "up" : "down"} icon={<Landmark className="h-5 w-5" />} info={metricDefinitions.tga} />
+              <MetricCard title="Reverse Repo Facility" value={isLoading ? "Loading..." : latestRrp !== null ? formatCurrency(latestRrp) : "No data"} change={calcChange(rrp.data)} trend={(calcChange(rrp.data) ?? 0) >= 0 ? "up" : "down"} icon={<Wallet className="h-5 w-5" />} info={metricDefinitions.rrp} />
+            </div>
 
             <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
               {isLoading ? (

@@ -87,6 +87,7 @@ def main():
         "russell2000_price",
         "bitcoin_price",
         "ethereum_price",
+        "zcash_price",
         "long_bond_price",
         "semis_price",
         "nasdaq100",

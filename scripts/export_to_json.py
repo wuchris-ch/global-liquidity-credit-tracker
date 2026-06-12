@@ -74,6 +74,7 @@ CATEGORY_MAP: Dict[str, str] = {
     "silver_price": "Commodities",
     "bitcoin_price": "Crypto",
     "ethereum_price": "Crypto",
+    "zcash_price": "Crypto",
     "long_bond_price": "Fixed Income",
     "vix": "Volatility",
     "move_index": "Volatility",

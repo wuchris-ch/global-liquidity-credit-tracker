@@ -465,6 +465,16 @@ series:
     unit: usd
     description: "Ethereum Price (USD, Coinbase)"
 
+  # FRED has no Coinbase ZEC series, so Zcash comes from Yahoo like the ETFs.
+  zcash_price:
+    source: yfinance
+    source_id: ZEC-USD
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "Zcash Price (USD)"
+
   long_bond_price:
     source: yfinance
     source_id: TLT

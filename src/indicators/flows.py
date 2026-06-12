@@ -36,6 +36,7 @@ FLOW_DESTINATIONS = [
     {"id": "megacap_tech", "series_id": "nasdaq100", "name": "Nasdaq 100", "group": "AI trade"},
     {"id": "bitcoin", "series_id": "bitcoin_price", "name": "Bitcoin", "group": "Crypto"},
     {"id": "ethereum", "series_id": "ethereum_price", "name": "Ethereum", "group": "Crypto"},
+    {"id": "zcash", "series_id": "zcash_price", "name": "Zcash", "group": "Crypto"},
     {"id": "sp500", "series_id": "sp500_price", "name": "S&P 500", "group": "Broad equities"},
     {"id": "small_caps", "series_id": "russell2000_price", "name": "Small caps (IWM)", "group": "Broad equities"},
     {"id": "gold", "series_id": "gold_price", "name": "Gold (GLD)", "group": "Hedges"},

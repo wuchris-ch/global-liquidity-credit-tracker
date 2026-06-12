@@ -90,6 +90,7 @@ ASSET_CONFIG = {
     "silver_price": {"name": "Silver", "category": "Commodities"},
     "bitcoin_price": {"name": "Bitcoin", "category": "Crypto"},
     "ethereum_price": {"name": "Ethereum", "category": "Crypto"},
+    "zcash_price": {"name": "Zcash", "category": "Crypto"},
     "long_bond_price": {"name": "Long Bonds (TLT)", "category": "Fixed Income"},
 }
 

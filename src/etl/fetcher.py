@@ -1,4 +1,6 @@
 """Data fetcher that orchestrates pulling data from all sources."""
+import time
+
 import pandas as pd
 from datetime import datetime
 from typing import Literal
@@ -76,21 +78,36 @@ class DataFetcher:
         return df
     
     def fetch_multiple(self, series_ids: list[str], start_date: str | None = None,
-                       end_date: str | None = None) -> dict[str, pd.DataFrame]:
+                       end_date: str | None = None,
+                       retries: int = 2) -> dict[str, pd.DataFrame]:
         """Fetch multiple series.
-        
+
+        Failed fetches are retried with backoff; rate limits and transient
+        network errors (Yahoo throttling, FRED hiccups) usually clear within
+        seconds, and one missed asset otherwise drops it from the publish.
+
         Returns:
             Dict mapping series_id to DataFrame
         """
         results = {}
         errors = {}
-        
+
         for series_id in series_ids:
-            try:
-                results[series_id] = self.fetch_series(series_id, start_date, end_date)
-            except Exception as e:
-                errors[series_id] = str(e)
-                print(f"Warning: Failed to fetch {series_id}: {e}")
+            last_error: Exception | None = None
+            for attempt in range(retries + 1):
+                try:
+                    results[series_id] = self.fetch_series(series_id, start_date, end_date)
+                    last_error = None
+                    break
+                except Exception as e:
+                    last_error = e
+                    if attempt < retries:
+                        delay = 2 * (attempt + 1)
+                        print(f"Warning: fetch {series_id} failed ({e}), retrying in {delay}s")
+                        time.sleep(delay)
+            if last_error is not None:
+                errors[series_id] = str(last_error)
+                print(f"Warning: Failed to fetch {series_id}: {last_error}")
         
         if errors:
             print(f"\nFailed to fetch {len(errors)} series: {list(errors.keys())}")

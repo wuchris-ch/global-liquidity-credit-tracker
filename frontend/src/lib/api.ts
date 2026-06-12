@@ -286,7 +286,11 @@ class ApiClient {
 
   private async fetch<T>(endpoint: string): Promise<T> {
     const url = this.buildUrl(endpoint);
-    const response = await fetch(url);
+    // GitHub Pages serves the JSON with max-age=600, which lets a browser
+    // show pre-publish data for up to 10 minutes after the pipeline runs.
+    // "no-cache" keeps the cached copy but revalidates it (ETag/304), so a
+    // reload always reflects the latest publish.
+    const response = await fetch(url, { cache: "no-cache" });
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: "Unknown error" }));
       throw new Error(error.detail || `HTTP ${response.status}`);

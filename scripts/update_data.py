@@ -15,6 +15,8 @@ import os
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import pandas as pd
+
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -137,6 +139,19 @@ def main():
             days_old = (datetime.now() - latest.to_pydatetime()).days
             if days_old > 7:
                 errors.append(f"{series_id}: data is {days_old} days old")
+
+    # Asset prices are best effort, so a throttled or broken source never
+    # fails the run; surface it here instead of letting the asset go stale
+    # unnoticed across publishes.
+    for series_id in asset_series:
+        df = asset_results.get(series_id)
+        if df is None or df.empty:
+            errors.append(f"{series_id}: fetch returned no data this run")
+            continue
+        latest = pd.to_datetime(df["date"]).max()
+        days_old = (datetime.now() - latest.to_pydatetime()).days
+        if days_old > 7:
+            errors.append(f"{series_id}: data is {days_old} days old")
     
     if errors:
         print("\n⚠️  Warnings:")

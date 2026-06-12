@@ -1,5 +1,19 @@
 # Global Liquidity Tracker - Series Configuration
-# Each series defines: source, source_id, country, frequency, type, description
+#
+# Every entry under `series:` follows the same schema:
+#   source:      fred | yfinance | bis | worldbank | nyfed
+#   source_id:   identifier at the source (FRED series ID, Yahoo ticker, ...)
+#   country:     US | EU | JP | CN | GB
+#   frequency:   daily | weekly | monthly | quarterly | annual
+#   type:        stock | flow | rate | spread | price | index | ratio
+#   unit:        e.g. millions_usd, billions_usd, percent, usd
+#   description: human-readable label, shown in exports and the UI
+#
+# Registering a series here only makes it fetchable. Asset prices also need
+# entries in src/indicators/risk_metrics.py (ASSET_CONFIG), flows.py
+# (FLOW_DESTINATIONS), scripts/update_data.py (asset_series), and the
+# CATEGORY_MAPs in scripts/export_to_json.py and src/api/server.py; see
+# docs/OPERATIONS.md.
 
 series:
   # ===================

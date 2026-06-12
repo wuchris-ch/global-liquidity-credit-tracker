@@ -160,6 +160,21 @@
     color: var(--regime-tight);
   }
 
+  /* Inset a washed table cell from its edge with a paper-colored gutter, so
+     regime bands don't bleed into neighboring columns (cell backgrounds fill
+     the full cell box, and border-radius is ignored in collapsed tables). */
+  .band-inset-l {
+    box-shadow: inset 8px 0 0 0 var(--background);
+  }
+  .band-inset-r {
+    box-shadow: inset -8px 0 0 0 var(--background);
+  }
+  .band-inset-x {
+    box-shadow:
+      inset 8px 0 0 0 var(--background),
+      inset -8px 0 0 0 var(--background);
+  }
+
   /* Hairline rule used between editorial sections */
   .rule {
     border-top: 1px solid var(--border);

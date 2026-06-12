@@ -147,9 +147,15 @@ function HitCell({ stats }: { stats: BacktestStats | null }) {
 }
 
 /** Median forward return, signed, one decimal. */
-function MedianCell({ stats }: { stats: BacktestStats | null }) {
+function MedianCell({
+  stats,
+  className = "",
+}: {
+  stats: BacktestStats | null;
+  className?: string;
+}) {
   return (
-    <td className="py-3 pl-5 text-right align-top">
+    <td className={`py-3 pl-5 text-right align-top ${className}`}>
       <span className="font-mono text-sm tabular-nums">{medPct(stats?.median)}</span>
     </td>
   );
@@ -217,7 +223,7 @@ function ForwardReturnsTable({
             </th>
             <th
               colSpan={4}
-              className={`${groupHead} ${REGIME_WASH[regime]} ${REGIME_TEXT[regime]} rounded-t-sm`}
+              className={`${groupHead} ${REGIME_WASH[regime]} ${REGIME_TEXT[regime]} band-inset-x`}
             >
               13 weeks · {regimeLabel(regime)} regime
             </th>
@@ -231,10 +237,10 @@ function ForwardReturnsTable({
             </th>
             <th className={subHead}>Hit</th>
             <th className={subHead}>Median</th>
-            <th className={`${subHead} ${REGIME_WASH[regime]}`}>Hit</th>
+            <th className={`${subHead} ${REGIME_WASH[regime]} band-inset-l`}>Hit</th>
             <th className={`${subHead} ${REGIME_WASH[regime]}`}>Base</th>
             <th className={`${subHead} ${REGIME_WASH[regime]}`}>Edge</th>
-            <th className={`${subHead} ${REGIME_WASH[regime]}`}>Median</th>
+            <th className={`${subHead} ${REGIME_WASH[regime]} band-inset-r pr-3`}>Median</th>
             <th className={subHead}>Hit</th>
             <th className={subHead}>Median</th>
           </tr>
@@ -262,7 +268,7 @@ function ForwardReturnsTable({
                   </span>
                 </td>
                 <EdgeCell stats={s13} base={b13} />
-                <MedianCell stats={s13} />
+                <MedianCell stats={s13} className="pr-3" />
                 <HitCell stats={s26} />
                 <MedianCell stats={s26} />
               </tr>
@@ -296,7 +302,7 @@ function RegimeComparisonTable({
             {REGIME_ORDER.map((r) => (
               <th
                 key={r}
-                className={`border-b border-border pb-2 pl-6 text-right font-sans text-[0.6875rem] font-semibold uppercase tracking-wider ${REGIME_WASH[r]} ${REGIME_TEXT[r]}`}
+                className={`border-b border-border pb-2 pl-6 pr-3 text-right font-sans text-[0.6875rem] font-semibold uppercase tracking-wider ${REGIME_WASH[r]} ${REGIME_TEXT[r]} band-inset-x`}
               >
                 {regimeLabel(r)}
                 {r === currentRegime && (
@@ -317,8 +323,8 @@ function RegimeComparisonTable({
                 return (
                   <td
                     key={r}
-                    className={`py-3 pl-6 text-right align-top ${
-                      r === currentRegime ? REGIME_WASH[r] : ""
+                    className={`py-3 pl-6 pr-3 text-right align-top ${
+                      r === currentRegime ? `${REGIME_WASH[r]} band-inset-x` : ""
                     }`}
                   >
                     <span className="font-mono text-sm tabular-nums">{hitPct(s?.hit_rate)}</span>

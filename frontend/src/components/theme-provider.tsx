@@ -6,7 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -18,6 +18,7 @@ type ThemeContextValue = {
 };
 
 const STORAGE_KEY = "glct-theme";
+const CHANGE_EVENT = "glct-theme-change";
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -30,26 +31,35 @@ function applyTheme(next: Theme) {
   root.style.colorScheme = next;
 }
 
+function readTheme(): Theme {
+  const stored = window.localStorage.getItem(STORAGE_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function subscribe(callback: () => void) {
+  window.addEventListener(CHANGE_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(CHANGE_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  // localStorage is the source of truth; the server (and hydration pass)
+  // sees "dark", then React re-syncs to the stored preference on the client.
+  const theme = useSyncExternalStore(subscribe, readTheme, () => "dark" as Theme);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const preferred =
-      stored === "light" || stored === "dark"
-        ? stored
-        : window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
-
-    applyTheme(preferred);
-    setThemeState(preferred);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   const handleSetTheme = useCallback((next: Theme) => {
-    setThemeState(next);
-    applyTheme(next);
     window.localStorage.setItem(STORAGE_KEY, next);
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   }, []);
 
   const value = useMemo(
@@ -72,4 +82,3 @@ export function useTheme() {
 
   return context;
 }
-

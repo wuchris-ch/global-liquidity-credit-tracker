@@ -11,6 +11,9 @@ const API_BASE_URL =
 
 const IS_STATIC = Boolean(process.env.NEXT_PUBLIC_DATA_BASE_URL);
 
+/** True when the app reads pre-computed JSON (GitHub Pages) instead of a live API. */
+export const isStaticMode = IS_STATIC;
+
 type WithDate = { date: string };
 
 const isInRange = (date: string, start?: string, end?: string) => {

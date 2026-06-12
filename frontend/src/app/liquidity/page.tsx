@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { Header, TimeRange } from "@/components/header";
+import { DataLoadError } from "@/components/data-load-error";
 import { MetricCard } from "@/components/metric-card";
 import { LiquidityChart } from "@/components/liquidity-chart";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -160,19 +161,7 @@ export default function LiquidityPage() {
     return (
       <div className="flex h-screen flex-col bg-background">
         <Header title="Liquidity Monitor" description="Federal Reserve balance sheet and net liquidity tracking" timeRange={timeRange} onTimeRangeChange={handleTimeRangeChange} onRefresh={handleRefresh} isRefreshing={isLoading} status={pageStatus} />
-        <div className="flex flex-1 items-center justify-center">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-6">
-              <AlertCircle className="h-12 w-12 text-destructive" />
-              <h2 className="text-lg font-semibold">Failed to Load Data</h2>
-              <p className="text-center text-sm text-muted-foreground">
-                Could not load required Fed liquidity series. If this is production, check that the data
-                workflow published to GitHub Pages; locally, start the API with:
-              </p>
-              <code className="rounded bg-muted px-3 py-2 text-sm">uvicorn src.api:app --reload</code>
-            </CardContent>
-          </Card>
-        </div>
+        <DataLoadError title="Failed to Load Fed Liquidity Data" onRetry={handleRefresh} />
       </div>
     );
   }

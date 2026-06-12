@@ -18,6 +18,10 @@ dependencies = [
     "scipy>=1.11.0",
     "pydantic>=2.0.0",
     "yfinance>=0.2.0",
+    # Used by the GLCI factor model (PCA + shrinkage). Must be a hard
+    # dependency: without it CI silently falls back to a different
+    # factor-extraction path than local dev.
+    "scikit-learn>=1.3.0",
 ]
 
 [project.optional-dependencies]
@@ -33,3 +37,7 @@ liquidity-api = "uvicorn:main"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

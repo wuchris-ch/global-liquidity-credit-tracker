@@ -319,7 +319,9 @@ class RiskMetricsComputer:
         mean_return = clean_returns.mean()
         std_return = clean_returns.std()
 
-        if std_return == 0 or pd.isna(std_return):
+        # Epsilon guard: a constant series has std ~1e-18 from float error,
+        # not exactly 0, which would otherwise explode the ratio.
+        if pd.isna(std_return) or std_return < 1e-12:
             return 0.0
 
         return float((mean_return / std_return) * np.sqrt(self.ANNUALIZATION_FACTOR))

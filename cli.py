@@ -57,6 +57,16 @@ def main():
     backtest_parser.add_argument("--save", action="store_true", help="Save to storage")
     backtest_parser.add_argument("--quiet", action="store_true", help="Suppress progress output")
 
+    # Smoke command (no API key required)
+    smoke_parser = subparsers.add_parser(
+        "smoke",
+        help="Validate config, numerics, and artifacts without API keys",
+    )
+    smoke_parser.add_argument(
+        "--live", action="store_true",
+        help="Also check the published GitHub Pages endpoints",
+    )
+
     args = parser.parse_args()
     
     if not args.command:
@@ -79,6 +89,10 @@ def main():
         cmd_show(args)
     elif args.command == "backtest":
         cmd_backtest(args)
+    elif args.command == "smoke":
+        from scripts.smoke import main as smoke_main
+        sys.argv = ["smoke"] + (["--live"] if args.live else [])
+        sys.exit(smoke_main())
 
 
 def cmd_fetch(args):

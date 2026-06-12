@@ -44,7 +44,6 @@ export function PredictivePanel({
   momentum,
   regime,
   probRegimeChange,
-  historicalData = [],
   className,
 }: PredictivePanelProps) {
   // Calculate distance to regime boundaries
@@ -54,19 +53,6 @@ export function PredictivePanel({
   // Determine nearest boundary
   const nearestBoundary = distToTight < distToLoose ? "tight" : "loose";
   const distToNearest = Math.min(Math.abs(distToTight), Math.abs(distToLoose));
-
-  // Calculate momentum trend
-  const momentumTrend = useMemo(() => {
-    if (historicalData.length < 4) return { direction: "neutral", strength: 0 };
-    
-    const recent = historicalData.slice(-4);
-    const changes = recent.slice(1).map((d, i) => d.value - recent[i].value);
-    const avgChange = changes.reduce((a, b) => a + b, 0) / changes.length;
-    
-    if (avgChange > 0.5) return { direction: "up", strength: Math.min(avgChange / 2, 1) };
-    if (avgChange < -0.5) return { direction: "down", strength: Math.min(Math.abs(avgChange) / 2, 1) };
-    return { direction: "neutral", strength: 0 };
-  }, [historicalData]);
 
   // Calculate projected value (simple linear extrapolation)
   const projectedValue = currentValue + (momentum * 4); // 4-week projection

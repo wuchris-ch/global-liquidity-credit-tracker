@@ -2,6 +2,8 @@
 
 Track global liquidity and credit metrics from central banks, BIS, World Bank, and market data sources.
 
+**Docs:** [Methodology & formulas](docs/METHODOLOGY.md) · [Data sources](docs/SOURCES.md) · [Sample output](docs/SAMPLE_OUTPUT.md) · [Claim → evidence map](docs/PROOF.md)
+
 ## Live Demo
 
 **[global-liquidity-credit-tracker.vercel.app](https://global-liquidity-credit-tracker.vercel.app)**
@@ -38,30 +40,48 @@ All dashboard pages display data freshness indicators showing when the data was 
 ## Quick Start
 
 ```bash
-# Install dependencies
-pip install -e .
+# Install dependencies (incl. pytest/dev tools)
+pip install -e ".[dev]"
 
-# Set up your FRED API key
-cp .env.example .env
-# Edit .env and add your FRED API key (get one free at https://fred.stlouisfed.org/docs/api/api_key.html)
+# Verify the install without any API keys
+python cli.py smoke
 
-# Start the API server (required for frontend)
-uvicorn src.api:app --reload --port 8000
-
-# In another terminal, run the frontend
-cd frontend && npm run dev
+# Run the frontend against the published production data
+cd frontend && npm install && npm run dev
 ```
 
-The frontend will be available at http://localhost:3000 and will fetch live data from the Python API.
-
-### CLI Usage
+The frontend will be available at http://localhost:3000. With
+`NEXT_PUBLIC_DATA_BASE_URL` set (see `frontend/.env.example`) it reads the
+pre-computed JSON from GitHub Pages — no local backend needed. To fetch and
+compute data yourself, add a free FRED API key:
 
 ```bash
-python cli.py list series
+cp .env.example .env   # add FRED_API_KEY
 python cli.py fetch --series fed_total_assets sofr --save
 python cli.py compute --index fed_net_liquidity
 python cli.py backtest --save
 ```
+
+## Testing & Verification
+
+Everything below runs offline (no API keys, no network):
+
+```bash
+make test    # 80+ unit tests: transforms, GLCI factor model, Sharpe/regime
+             # metrics, backtest look-ahead safety, export validation
+make smoke   # config integrity + numerics + local artifact validation
+```
+
+Network smoke against the published site:
+
+```bash
+make smoke-live   # validates the live GitHub Pages JSON and its freshness
+```
+
+CI runs the test suite and smoke checks on every push
+([`ci.yml`](.github/workflows/ci.yml)), and the scheduled pipeline runs them
+again as a gate before anything is published to `gh-pages`
+([`update-data.yml`](.github/workflows/update-data.yml)).
 
 ## Data Sources
 
@@ -185,6 +205,12 @@ global_liquidity_tracker/
 ├── data/
 │   ├── raw/                    # Raw fetched data (parquet)
 │   └── curated/                # Computed indices (parquet + JSON)
+├── docs/                       # Methodology, sources, proof map, samples
+├── tests/                      # Offline calculation test suite (pytest)
+├── scripts/
+│   ├── update_data.py          # Scheduled fetch + compute
+│   ├── export_to_json.py       # Static JSON export + validation
+│   └── smoke.py                # No-key smoke checks (config/numerics/artifacts)
 ├── frontend/                   # Next.js dashboard
 ├── cli.py                      # Command-line interface
 └── pyproject.toml

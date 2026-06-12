@@ -31,7 +31,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
+          pip install -e ".[dev]"
+
+      - name: Run calculation tests (publish gate)
+        run: python -m pytest tests/
 
       - name: Update data (fetch + indices)
         run: python scripts/update_data.py
@@ -60,6 +63,9 @@ jobs:
       - name: Export JSON artifacts
         run: |
           python scripts/export_to_json.py --output data/export/latest --snapshot --require-production
+
+      - name: Smoke-check artifacts before publishing
+        run: python scripts/smoke.py
 
       - name: Copy artifacts aside
         run: |

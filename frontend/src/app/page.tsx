@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { Header, TimeRange } from "@/components/header";
+import { DataLoadError } from "@/components/data-load-error";
 import { MetricCard } from "@/components/metric-card";
 import { LiquidityChart } from "@/components/liquidity-chart";
 import { MultiLineChart } from "@/components/multi-line-chart";
@@ -13,9 +14,7 @@ import {
   Activity,
   Building2,
   CircleDollarSign,
-  TrendingDown,
   TrendingUp,
-  AlertCircle,
   Loader2,
 } from "lucide-react";
 import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
@@ -146,20 +145,7 @@ export default function DashboardPage() {
           isRefreshing={isLoading}
           status={pageStatus}
         />
-        <div className="flex flex-1 items-center justify-center">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-6">
-              <AlertCircle className="h-12 w-12 text-destructive" />
-              <h2 className="text-lg font-semibold">Failed to Load Data</h2>
-              <p className="text-center text-sm text-muted-foreground">
-                Could not connect to the data API. Make sure the Python backend is running:
-              </p>
-              <code className="rounded bg-muted px-3 py-2 text-sm">
-                uvicorn src.api:app --reload
-              </code>
-            </CardContent>
-          </Card>
-        </div>
+        <DataLoadError title="Failed to Load Data" onRetry={handleRefresh} />
       </div>
     );
   }

@@ -2,11 +2,12 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Header, TimeRange } from "@/components/header";
+import { DataLoadError } from "@/components/data-load-error";
 import { MetricCard } from "@/components/metric-card";
 import { LiquidityChart } from "@/components/liquidity-chart";
 import { MultiLineChart } from "@/components/multi-line-chart";
 import { WaterfallChart, ContributionBreakdown } from "@/components/waterfall-chart";
-import { RegimeTimeline, RegimeBadge } from "@/components/regime-timeline";
+import { RegimeTimeline } from "@/components/regime-timeline";
 import { DataFreshness, FreshnessSummary } from "@/components/data-freshness";
 import { PredictivePanel } from "@/components/predictive-panel";
 import { InfoTooltip } from "@/components/info-tooltip";
@@ -17,7 +18,6 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Activity,
-  AlertCircle,
   ArrowDown,
   ArrowUp,
   Gauge,
@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { useGLCIData } from "@/hooks/use-series-data";
 import api, { DataFreshnessItem, RegimeHistory } from "@/lib/api";
-import { glciDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
+import { glciDefinitions } from "@/lib/indicator-definitions";
 import { getFreshnessStatus } from "@/lib/data-status";
 
 function getDateRange(range: TimeRange): { start: string; end: string } {
@@ -171,20 +171,7 @@ export default function GLCIPage() {
           isRefreshing={isLoading}
           status={pageStatus}
         />
-        <div className="flex flex-1 items-center justify-center">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-6">
-              <AlertCircle className="h-12 w-12 text-destructive" />
-              <h2 className="text-lg font-semibold">Failed to Load GLCI</h2>
-              <p className="text-center text-sm text-muted-foreground">
-                Could not compute the Global Liquidity & Credit Index. Make sure the Python backend is running:
-              </p>
-              <code className="rounded bg-muted px-3 py-2 text-sm">
-                uvicorn src.api.server:app --reload
-              </code>
-            </CardContent>
-          </Card>
-        </div>
+        <DataLoadError title="Failed to Load GLCI" onRetry={handleRefresh} />
       </div>
     );
   }

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { Header, TimeRange } from "@/components/header";
+import { DataLoadError } from "@/components/data-load-error";
 import { MultiLineChart } from "@/components/multi-line-chart";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  AlertCircle,
   Check,
   Database,
   Download,
@@ -114,6 +114,39 @@ export default function ExplorerPage() {
   const handleTimeRangeChange = useCallback((range: TimeRange) => {
     setTimeRange(range);
   }, []);
+
+  const handleExportCsv = useCallback(() => {
+    if (selectedSeries.length === 0) return;
+
+    // Union of all dates across selected series, one column per series
+    const byDate = new Map<string, Record<string, number>>();
+    for (const id of selectedSeries) {
+      for (const point of seriesData[id] || []) {
+        const row = byDate.get(point.date) ?? {};
+        row[id] = point.value;
+        byDate.set(point.date, row);
+      }
+    }
+    const dates = Array.from(byDate.keys()).sort();
+    const escape = (s: string) => (/[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
+    const header = ["date", ...selectedSeries.map((id) => {
+      const name = availableSeries.find((s) => s.id === id)?.name || id;
+      return escape(name);
+    })];
+    const lines = [header.join(",")];
+    for (const date of dates) {
+      const row = byDate.get(date)!;
+      lines.push([date, ...selectedSeries.map((id) => row[id] ?? "")].join(","));
+    }
+
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `liquidity-tracker-${dateRange.start}-to-${dateRange.end}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [selectedSeries, seriesData, availableSeries, dateRange]);
 
   const categories = useMemo(() => {
     const cats = new Set(availableSeries.map((s) => s.category));
@@ -297,18 +330,7 @@ export default function ExplorerPage() {
           onRefresh={handleRefresh}
           isRefreshing={dataLoading}
         />
-        <div className="flex flex-1 items-center justify-center">
-          <Card className="max-w-md">
-            <CardContent className="flex flex-col items-center gap-4 p-6">
-              <AlertCircle className="h-12 w-12 text-destructive" />
-              <h2 className="text-lg font-semibold">Failed to Load Series</h2>
-              <p className="text-center text-sm text-muted-foreground">
-                Could not connect to the data API. Make sure the Python backend is running:
-              </p>
-              <code className="rounded bg-muted px-3 py-2 text-sm">uvicorn src.api:app --reload</code>
-            </CardContent>
-          </Card>
-        </div>
+        <DataLoadError title="Failed to Load Series" onRetry={handleRefresh} />
       </div>
     );
   }
@@ -403,9 +425,15 @@ export default function ExplorerPage() {
                           </TabsTrigger>
                         </TabsList>
                       </Tabs>
-                      <Button variant="outline" size="sm" className="w-full gap-2 sm:w-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-2 sm:w-auto"
+                        onClick={handleExportCsv}
+                        disabled={dataLoading || selectedSeries.length === 0}
+                      >
                         <Download className="h-4 w-4" />
-                        Export
+                        Export CSV
                       </Button>
                     </div>
 

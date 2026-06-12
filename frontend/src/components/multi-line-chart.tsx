@@ -86,7 +86,6 @@ export function MultiLineChart({
   height = 300,
   mobileHeight,
   className,
-  valueFormatter = (v) => v.toLocaleString(),
   normalized = false,
   info,
 }: MultiLineChartProps) {

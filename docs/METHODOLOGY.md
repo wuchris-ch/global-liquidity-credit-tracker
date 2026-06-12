@@ -125,8 +125,9 @@ calculation has an epsilon guard (σ < 1e-12 → 0) so constant series do not
 produce astronomically large ratios
 (`tests/test_risk_metrics.py::test_zero_volatility_returns_zero`).
 
-Assets: S&P 500, Russell 2000 (IWM), Gold (GLD), Silver (SLV), Bitcoin,
-Ethereum, Long Bonds (TLT).
+Assets: S&P 500, Nasdaq 100, Semiconductors (SMH), Russell 2000 (IWM),
+Gold (GLD), Silver (SLV), Bitcoin, Ethereum, Long Bonds (TLT).
+Crypto prices come from FRED's Coinbase series (CBBTCUSD, CBETHUSD).
 
 ## 5. Track Record backtest
 
@@ -178,6 +179,39 @@ reproducibility):
 Implementation: `block_bootstrap_ci` in
 [`src/indicators/backtest.py`](../src/indicators/backtest.py); determinism is
 asserted by `tests/test_backtest.py::test_deterministic_with_seeded_rng`.
+
+## 6. Flows (liquidity destinations)
+
+**Code:** [`src/indicators/flows.py`](../src/indicators/flows.py)
+
+Ranks liquidity-sensitive destinations by how unusual their trailing bid is
+relative to their own history. All prices collapse to weekly Friday closes
+(`resample("W-FRI").last()`), which puts crypto's seven-day calendar and
+equities' five-day calendar on the same grid.
+
+Per destination, with weekly closes `P_w`:
+
+```
+ret_kw   = P_w / P_{w−k} − 1                      for k ∈ {4, 13, 26}
+flow_z   = (R_now − mean(R)) / std(R)
+           where R = trailing 156 weeks of overlapping 13-week returns
+corr_52w = corr(weekly returns, ΔGLCI) over the trailing 52 weeks
+```
+
+`flow_z` normalizes each asset against itself, so a volatile asset must rally
+harder to score: it reads as "where is the marginal dollar showing up," not
+"which asset returned the most." A z-score is only emitted with ≥ 52 weeks of
+13-week-return history; degenerate dispersion (σ < 1e-12) yields none.
+Because consecutive 13-week windows overlap, the score is slow-moving by
+construction and readings beyond ±2σ are rare.
+
+The headline pair is bitcoin / SMH (crypto priced in the AI trade), indexed
+to 100 at the start of a 156-week window. This is a **bid gauge built from
+prices**, not flow-of-funds accounting (Z.1 data is quarterly and lagged);
+the page discloses that limitation.
+
+Tests: `tests/test_flows.py` (return arithmetic, z-score vs a manual
+computation, weekly collapse of seven-day data, missing-series resilience).
 
 ---
 

@@ -228,6 +228,43 @@ export interface BacktestResponse {
   assets: BacktestAssetResult[];
 }
 
+// Liquidity flows (where the marginal dollar is going)
+export interface FlowDestination {
+  id: string;
+  series_id: string;
+  name: string;
+  group: string;
+  last_date: string;
+  ret_4w: number | null;
+  ret_13w: number | null;
+  ret_26w: number | null;
+  /** Current 13w return as a z-score vs the asset's own trailing history. */
+  flow_z: number | null;
+  glci_corr_52w: number | null;
+  spark: DataPoint[];
+}
+
+export interface FlowsPair {
+  id: string;
+  name: string;
+  numerator: string;
+  denominator: string;
+  /** 13w return of the numerator minus the denominator. */
+  spread_13w: number | null;
+  /** Weekly ratio indexed to 100 at the start of the window. */
+  ratio: DataPoint[];
+}
+
+export interface FlowsResponse {
+  computed_at: string;
+  as_of: string;
+  flow_window_weeks: number;
+  flow_history_weeks: number;
+  glci_corr_window_weeks: number;
+  destinations: FlowDestination[];
+  pair: FlowsPair | null;
+}
+
 class ApiClient {
   private baseUrl: string;
   private isStatic: boolean;
@@ -365,6 +402,10 @@ class ApiClient {
 
   async getBacktest(): Promise<BacktestResponse> {
     return this.fetch<BacktestResponse>("/api/backtest/track_record");
+  }
+
+  async getFlows(): Promise<FlowsResponse> {
+    return this.fetch<FlowsResponse>("/api/flows");
   }
 
 }

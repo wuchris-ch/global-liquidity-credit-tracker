@@ -10,7 +10,7 @@ A single primary user: a macro investor (the project owner) checking conditions 
 
 ## Product Purpose
 
-Track global liquidity and credit conditions and turn them into one actionable read: what regime are we in (Loose / Neutral / Tight), is it strengthening or fading, what is driving it, and what has that regime historically meant for risk assets. The pipeline computes the GLCI (a tri-pillar liquidity/credit/stress factor index), Fed net liquidity, funding stress, and a no-look-ahead backtest of regime forward returns. Success: the user gets the regime read in under 30 seconds and trusts it enough to act on it.
+Track global liquidity and credit conditions and turn them into one actionable read: what regime are we in (Loose / Neutral / Tight), is it strengthening or fading, what is driving it, where the marginal dollar is going (AI, crypto, gold, small caps, duration), and what has that regime historically meant for risk assets. The pipeline computes the GLCI (a tri-pillar liquidity/credit/stress factor index), Fed net liquidity, funding stress, a liquidity-destinations scoreboard (the Flows page), and a no-look-ahead backtest of regime forward returns. Success: the user gets the regime read in under 30 seconds and trusts it enough to act on it.
 
 ## Brand Personality
 

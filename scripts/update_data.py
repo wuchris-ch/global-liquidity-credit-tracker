@@ -77,7 +77,32 @@ def main():
             source = df["source"].iloc[0]
             storage.append_raw(df, source, series_id)
             print(f"  ✓ {series_id}: {len(df)} obs")
-    
+
+    # Asset prices for the Playbook and Flows pages. Best effort: a failed
+    # fetch here (e.g. Yahoo throttling the runner) skips that asset but
+    # never blocks the publish, so these are kept out of priority_series.
+    asset_series = [
+        "gold_price",
+        "silver_price",
+        "russell2000_price",
+        "bitcoin_price",
+        "ethereum_price",
+        "long_bond_price",
+        "semis_price",
+        "nasdaq100",
+    ]
+
+    print("\n[1b/3] Fetching asset prices (best effort)...")
+    asset_results = fetcher.fetch_multiple(asset_series, start_date, end_date)
+    for series_id in asset_series:
+        df = asset_results.get(series_id)
+        if df is None or df.empty:
+            print(f"  ✗ {series_id}: no data (skipped)")
+            continue
+        source = df["source"].iloc[0]
+        storage.append_raw(df, source, series_id)
+        print(f"  ✓ {series_id}: {len(df)} obs")
+
     # 2. Compute indices
     print("\n[2/3] Computing indices...")
     

@@ -69,6 +69,12 @@ class TestValidateRequiredExports:
         errors = validate_required_exports(tmp_path)
         assert any("incomplete latest payload" in e for e in errors)
 
+    def test_empty_flows_destinations_reported(self, tmp_path):
+        path = tmp_path / "api" / "flows" / "index.json"
+        write_json(path, {"as_of": "2026-01-02", "destinations": []})
+        errors = validate_required_exports(tmp_path)
+        assert any("empty destinations in api/flows/index.json" in e for e in errors)
+
     def test_valid_local_export_passes(self):
         """If a full local export exists (after a pipeline run), it must validate.
 

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const SECTIONS = [
   { href: "/", label: "Today" },
   { href: "/glci", label: "Index" },
+  { href: "/flows", label: "Flows" },
   { href: "/playbook", label: "Playbook" },
   { href: "/plumbing", label: "Plumbing" },
   { href: "/explorer", label: "Explorer" },

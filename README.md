@@ -8,10 +8,11 @@ Track global liquidity and credit metrics from central banks, BIS, World Bank, a
 
 **[global-liquidity-credit-tracker.vercel.app](https://global-liquidity-credit-tracker.vercel.app)**
 
-The frontend is organized as a daily research note in five sections:
+The frontend is organized as a daily research note in six sections:
 
 - [Today](https://global-liquidity-credit-tracker.vercel.app/), the 30-second brief: regime verdict, what changed, what it has meant, plumbing vitals
 - [Index](https://global-liquidity-credit-tracker.vercel.app/glci), the GLCI deep dive: pillar decomposition, regime history, methodology
+- [Flows](https://global-liquidity-credit-tracker.vercel.app/flows), where the marginal dollar is going: AI/semis vs crypto vs gold vs small caps vs duration, each scored against its own norm, plus bitcoin priced in semiconductors
 - [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns by regime with no-look-ahead backtest and honest confidence intervals
 - [Plumbing](https://global-liquidity-credit-tracker.vercel.app/plumbing), net liquidity vs S&P 500, TGA/RRP components, credit spreads, central banks
 - [Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), chart any series against any other, with preset overlays
@@ -122,13 +123,15 @@ again as a gate before anything is published to `gh-pages`
 - `fx_eurusd`, `fx_usdjpy`, `fx_gbpusd`, `fx_usdcny` - Major FX pairs
 - `us_cpi`, `eu_hicp`, `jp_cpi` - Inflation indices
 
-### Asset Prices (for Risk & Track Record dashboards)
+### Asset Prices (for the Flows page, Playbook and Risk dashboards)
 - `sp500_price` - S&P 500 Index (FRED)
+- `nasdaq100` - Nasdaq-100 Index (FRED)
+- `semis_price` - Semiconductor ETF (SMH), AI-hardware proxy
 - `russell2000_price` - Russell 2000 ETF (IWM)
 - `gold_price` - Gold ETF (GLD)
 - `silver_price` - Silver ETF (SLV)
-- `bitcoin_price` - Bitcoin (BTC-USD)
-- `ethereum_price` - Ethereum (ETH-USD)
+- `bitcoin_price` - Bitcoin (FRED, Coinbase CBBTCUSD)
+- `ethereum_price` - Ethereum (FRED, Coinbase CBETHUSD)
 - `long_bond_price` - 20+ Year Treasury Bond ETF (TLT)
 
 ## Composite Indices
@@ -165,11 +168,33 @@ The Risk by Regime dashboard shows how different asset classes perform under var
 - Rolling 252-day Sharpe ratio time series
 
 **Assets tracked:**
-- Large Cap Equities: S&P 500
+- Large Cap Equities: S&P 500, Nasdaq 100
+- AI Trade: Semiconductors (SMH)
 - Small Cap Equities: Russell 2000
 - Commodities: Gold, Silver
 - Crypto: Bitcoin, Ethereum
 - Fixed Income: Long Bonds (TLT)
+
+## Flows (Liquidity Destinations)
+
+The Flows page answers "where is the marginal liquidity dollar going?" by ranking
+destinations (AI/semis, megacap tech, crypto, gold, small caps, long Treasuries,
+broad equities) by how unusual their trailing 13-week return is against their own
+trailing three-year history.
+
+**Methodology (`src/indicators/flows.py`):**
+- Prices collapse to weekly (Friday) closes; crypto's seven-day data and
+  equities' five-day data land on the same grid
+- Flow score = current 13-week return as a z-score against the asset's own
+  trailing 156 weeks of overlapping 13-week returns (so a volatile asset has to
+  rally harder to rank)
+- 52-week correlation of weekly returns with weekly GLCI changes measures how
+  liquidity-sensitive each destination has recently been
+- Headline pair: bitcoin / SMH ratio, indexed to 100 three years back, i.e.
+  "crypto priced in the AI trade"
+
+This is a bid gauge built from prices, not flow-of-funds accounting; the page
+says so explicitly.
 
 ## Track Record Dashboard
 

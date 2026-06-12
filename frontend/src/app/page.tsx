@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useGLCIData, useIndexData, useSeriesData } from "@/hooks/use-series-data";
 import { useRegimeHistory } from "@/hooks/use-regime-history";
 import { useBacktestData } from "@/hooks/use-backtest-data";
+import { useFlowsData } from "@/hooks/use-flows-data";
 import { GlciChart } from "@/components/glci-chart";
 import { ChartSection } from "@/components/chart-section";
 import { RangeTabs } from "@/components/range-tabs";
@@ -25,6 +26,7 @@ import {
   type ChangeItem,
   type ChangeSpec,
 } from "@/lib/brief";
+import { flowsHeadline, flowsTeaserSentence } from "@/lib/flows-brief";
 import type { DataPoint } from "@/lib/api";
 
 const VITALS_RANGE = getDateRange("6m");
@@ -101,6 +103,7 @@ export default function TodayPage() {
   const glci = useGLCIData({ start: chartDates.start, end: chartDates.end });
   const history = useRegimeHistory();
   const backtest = useBacktestData();
+  const flows = useFlowsData();
 
   const netLiquidity = useIndexData("fed_net_liquidity", VITALS_RANGE);
   const rrp = useSeriesData("fed_reverse_repo", VITALS_RANGE);
@@ -139,6 +142,11 @@ export default function TodayPage() {
         ? playbookSentence(backtest.data, glci.data.regime, "gold_price", "gold")
         : null,
     [backtest.data, glci.data]
+  );
+
+  const flowsTeaser = useMemo(
+    () => (flows.data ? flowsTeaserSentence(flows.data.destinations) : null),
+    [flows.data]
   );
 
   const freshness = glci.data ? getFreshnessStatus(glci.data.date) : null;
@@ -252,6 +260,29 @@ export default function TodayPage() {
           )}
         </aside>
       </div>
+
+      {/* Where the marginal dollar is going */}
+      {flows.data && flowsTeaser && (
+        <>
+          <div className="rule mt-10" />
+          <section className="mt-8">
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-sm font-semibold tracking-tight">
+                Where the marginal dollar is going
+              </h2>
+              <Link
+                href="/flows"
+                className="font-mono text-xs text-primary underline-offset-4 hover:underline"
+              >
+                The flows →
+              </Link>
+            </div>
+            <p className="mt-4 max-w-[70ch] font-serif text-[1.0625rem] leading-relaxed">
+              {flowsHeadline(flows.data.destinations)} {flowsTeaser}
+            </p>
+          </section>
+        </>
+      )}
 
       {/* Vitals */}
       <div className="mt-12" />

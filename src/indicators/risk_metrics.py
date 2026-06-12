@@ -9,6 +9,20 @@ from ..etl.fetcher import DataFetcher
 from ..etl.storage import DataStorage
 
 
+def _as_ns_dates(df: pd.DataFrame) -> pd.DataFrame:
+    """Coerce the date column to tz-naive datetime64[ns].
+
+    merge_asof requires both keys to have the exact same dtype. Under
+    pandas >= 3, parquet roundtrips yield datetime64[us] while yfinance
+    yields datetime64[s], which makes the merge raise instead of coerce.
+    """
+    dates = pd.to_datetime(df["date"])
+    if dates.dt.tz is not None:
+        dates = dates.dt.tz_localize(None)
+    df["date"] = dates.astype("datetime64[ns]")
+    return df
+
+
 @dataclass
 class AssetRiskMetrics:
     """Risk metrics for a single asset."""
@@ -65,9 +79,12 @@ class RiskDashboardResult:
         }
 
 
-# Asset configuration: maps series_id to display info
+# Asset configuration: maps series_id to display info.
+# Shared by the risk dashboard and the backtest (the Playbook page).
 ASSET_CONFIG = {
     "sp500_price": {"name": "S&P 500", "category": "Large Cap Equities"},
+    "nasdaq100": {"name": "Nasdaq 100", "category": "Large Cap Equities"},
+    "semis_price": {"name": "Semiconductors (SMH)", "category": "AI Trade"},
     "russell2000_price": {"name": "Russell 2000", "category": "Small Cap Equities"},
     "gold_price": {"name": "Gold", "category": "Commodities"},
     "silver_price": {"name": "Silver", "category": "Commodities"},
@@ -184,7 +201,7 @@ class RiskMetricsComputer:
         if glci_df is None:
             return None
 
-        glci_df["date"] = pd.to_datetime(glci_df["date"])
+        glci_df = _as_ns_dates(glci_df)
         glci_df = glci_df.sort_values("date")
 
         # Ensure regime column exists
@@ -202,7 +219,7 @@ class RiskMetricsComputer:
         """Load 3-month Treasury rate for Sharpe calculation."""
         try:
             df = self.fetcher.fetch_series("treasury_3m")
-            df["date"] = pd.to_datetime(df["date"])
+            df = _as_ns_dates(df)
             df = df.sort_values("date")
             # Convert annual rate to daily (divide by 252)
             df["daily_rf"] = df["value"] / 100 / self.ANNUALIZATION_FACTOR
@@ -223,10 +240,7 @@ class RiskMetricsComputer:
         """Compute risk metrics for a single asset."""
         # Fetch price data
         price_df = self.fetcher.fetch_series(asset_id, start_date, end_date)
-        price_df["date"] = pd.to_datetime(price_df["date"])
-        # Remove timezone info if present (yfinance returns tz-aware dates)
-        if price_df["date"].dt.tz is not None:
-            price_df["date"] = price_df["date"].dt.tz_localize(None)
+        price_df = _as_ns_dates(price_df)
         price_df = price_df.sort_values("date")
 
         # Compute daily returns

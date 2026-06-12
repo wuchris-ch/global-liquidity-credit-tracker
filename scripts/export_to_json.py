@@ -67,6 +67,14 @@ CATEGORY_MAP: Dict[str, str] = {
     "ice_bofa_us_high_yield_spread": "Credit Spreads",
     "ice_bofa_us_ig_spread": "Credit Spreads",
     "sp500_price": "Equities",
+    "russell2000_price": "Equities",
+    "nasdaq100": "Equities",
+    "semis_price": "Equities",
+    "gold_price": "Commodities",
+    "silver_price": "Commodities",
+    "bitcoin_price": "Crypto",
+    "ethereum_price": "Crypto",
+    "long_bond_price": "Fixed Income",
     "vix": "Volatility",
     "move_index": "Volatility",
     "nfci": "Financial Conditions",
@@ -113,6 +121,7 @@ REQUIRED_PRODUCTION_EXPORT_PATHS = (
     "api/glci/regime-history/index.json",
     "api/risk/index.json",
     "api/backtest/track_record/index.json",
+    "api/flows/index.json",
 )
 
 
@@ -511,6 +520,22 @@ def export_backtest(output_dir: Path) -> bool:
     return True
 
 
+def export_flows(output_dir: Path) -> bool:
+    """Export the liquidity-destinations payload to /api/flows/index.json.
+
+    Reads the structured JSON written by FlowsComputer.compute(save=True).
+    """
+    source_path = CURATED_DATA_PATH / "flows" / "flows.json"
+    if not source_path.exists():
+        return False
+
+    with open(source_path, "r") as f:
+        payload = json.load(f)
+
+    write_json(output_dir / "api" / "flows" / "index.json", payload)
+    return True
+
+
 def validate_required_exports(output_dir: Path) -> list[str]:
     """Validate the static endpoints that production pages need to render."""
     errors = []
@@ -554,6 +579,8 @@ def validate_required_exports(output_dir: Path) -> list[str]:
             errors.append(f"empty assets in {rel_path}")
         elif rel_path == "api/backtest/track_record/index.json" and not payload.get("assets"):
             errors.append(f"empty assets in {rel_path}")
+        elif rel_path == "api/flows/index.json" and not payload.get("destinations"):
+            errors.append(f"empty destinations in {rel_path}")
 
     return errors
 
@@ -609,6 +636,13 @@ def export_all(
         print("[export] Skipped backtest (no data - run backtest computation first)")
     else:
         print("[export] Exported backtest track record")
+
+    # Liquidity flows endpoint
+    flows_ok = export_flows(output_dir)
+    if not flows_ok:
+        print("[export] Skipped flows (no data - run flows computation first)")
+    else:
+        print("[export] Exported liquidity flows")
 
     if require_production:
         errors = validate_required_exports(output_dir)

@@ -38,6 +38,7 @@ LIVE_ENDPOINTS = (
     "api/indices/fed_net_liquidity/index.json",
     "api/risk/index.json",
     "api/backtest/track_record/index.json",
+    "api/flows/index.json",
     "api/series/fed_total_assets/latest/index.json",
 )
 MAX_LIVE_AGE_DAYS = 30

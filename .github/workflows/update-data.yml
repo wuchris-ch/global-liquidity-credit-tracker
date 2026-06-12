@@ -60,6 +60,13 @@ jobs:
           compute_backtest(save=True)
           PY
 
+      - name: Compute liquidity flows and save
+        run: |
+          python - <<'PY'
+          from src.indicators.flows import compute_flows
+          compute_flows(save=True)
+          PY
+
       - name: Export JSON artifacts
         run: |
           python scripts/export_to_json.py --output data/export/latest --snapshot --require-production

@@ -445,23 +445,25 @@ series:
     unit: usd
     description: "Silver ETF (SLV)"
 
+  # Crypto prices come from FRED's Coinbase series rather than Yahoo so the
+  # scheduled CI pipeline depends on one keyed, stable API for them.
   bitcoin_price:
-    source: yfinance
-    source_id: BTC-USD
+    source: fred
+    source_id: CBBTCUSD
     country: US
     frequency: daily
     type: price
     unit: usd
-    description: "Bitcoin Price (USD)"
+    description: "Bitcoin Price (USD, Coinbase)"
 
   ethereum_price:
-    source: yfinance
-    source_id: ETH-USD
+    source: fred
+    source_id: CBETHUSD
     country: US
     frequency: daily
     type: price
     unit: usd
-    description: "Ethereum Price (USD)"
+    description: "Ethereum Price (USD, Coinbase)"
 
   long_bond_price:
     source: yfinance
@@ -471,6 +473,27 @@ series:
     type: price
     unit: usd
     description: "20+ Year Treasury Bond ETF (TLT)"
+
+  # ===================
+  # Liquidity Destinations (for the Flows page)
+  # ===================
+  semis_price:
+    source: yfinance
+    source_id: SMH
+    country: US
+    frequency: daily
+    type: price
+    unit: usd
+    description: "Semiconductor ETF (SMH), AI-hardware proxy"
+
+  nasdaq100:
+    source: fred
+    source_id: NASDAQ100
+    country: US
+    frequency: daily
+    type: price
+    unit: index
+    description: "Nasdaq-100 Index"
 
 # ===================
 # Composite Index Definitions

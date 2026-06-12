@@ -27,7 +27,7 @@ OKLCH throughout. Color strategy: Restrained. Regime color is the only committed
 
 ## Layout
 
-- Masthead top navigation (publication-style): wordmark left, five sections (Today, Index, Playbook, Plumbing, Explorer), dateline + data freshness right. Hairline rule below. No sidebar.
+- Masthead top navigation (publication-style): wordmark left, six sections (Today, Index, Flows, Playbook, Plumbing, Explorer), dateline + data freshness right. Hairline rule below. No sidebar.
 - Content column: max-w ~72rem, generous top whitespace; prose blocks capped near 70ch.
 - Hairline horizontal rules separate sections, not cards. Cards only for genuinely card-shaped things (vitals tiles); never nested.
 - Charts sit directly on paper (no card chrome): title, one-line reading, chart, source line.

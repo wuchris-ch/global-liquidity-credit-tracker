@@ -139,6 +139,32 @@ class TestRegimeConditionedPipeline:
         first_date = pd.Timestamp(metrics.rolling_sharpe_data[0]["date"])
         assert first_date >= price_df["date"].iloc[251]
 
+    def test_mixed_datetime_resolutions_still_merge(self):
+        """Regression: pandas >= 3 refuses merge_asof across datetime units.
+
+        In CI, the GLCI parquet roundtrip yields datetime64[us] dates while
+        yfinance yields datetime64[s]; this killed every non-FRED asset on
+        the published risk dashboard.
+        """
+        glci, price_df, rf_df = build_regime_world()
+        glci = glci.copy()
+        glci["date"] = glci["date"].astype("datetime64[us]")
+        price_df = price_df.copy()
+        price_df["date"] = price_df["date"].astype("datetime64[s]")
+        rf_df = rf_df.copy()
+        rf_df["date"] = rf_df["date"].astype("datetime64[s]")
+
+        fetcher = StubFetcher({"sp500_price": price_df, "treasury_3m": rf_df})
+        storage = StubStorage({("indices", "glci"): glci})
+        computer = RiskMetricsComputer(fetcher=fetcher, storage=storage)
+
+        glci_loaded = computer._load_glci_regimes()
+        rf_loaded = computer._load_risk_free_rate()
+        metrics = computer._compute_asset_metrics(
+            "sp500_price", ASSET_CONFIG["sp500_price"], glci_loaded, rf_loaded, None, None
+        )
+        assert metrics.return_by_regime["loose"] is not None
+
     def test_regime_matrix_shape(self):
         glci, price_df, rf_df = build_regime_world()
         frames = {asset_id: price_df for asset_id in ASSET_CONFIG}

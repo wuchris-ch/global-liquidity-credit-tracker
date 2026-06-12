@@ -126,8 +126,9 @@ produce astronomically large ratios
 (`tests/test_risk_metrics.py::test_zero_volatility_returns_zero`).
 
 Assets: S&P 500, Nasdaq 100, Semiconductors (SMH), Russell 2000 (IWM),
-Gold (GLD), Silver (SLV), Bitcoin, Ethereum, Long Bonds (TLT).
-Crypto prices come from FRED's Coinbase series (CBBTCUSD, CBETHUSD).
+Gold (GLD), Silver (SLV), Bitcoin, Ethereum, Zcash, Long Bonds (TLT).
+Bitcoin and Ethereum prices come from FRED's Coinbase series (CBBTCUSD,
+CBETHUSD); Zcash comes from Yahoo Finance (ZEC-USD).
 
 ## 5. Track Record backtest
 

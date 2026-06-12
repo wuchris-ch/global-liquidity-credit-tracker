@@ -132,6 +132,7 @@ again as a gate before anything is published to `gh-pages`
 - `silver_price` - Silver ETF (SLV)
 - `bitcoin_price` - Bitcoin (FRED, Coinbase CBBTCUSD)
 - `ethereum_price` - Ethereum (FRED, Coinbase CBETHUSD)
+- `zcash_price` - Zcash (Yahoo Finance, ZEC-USD)
 - `long_bond_price` - 20+ Year Treasury Bond ETF (TLT)
 
 ## Composite Indices
@@ -172,7 +173,7 @@ The Risk by Regime dashboard shows how different asset classes perform under var
 - AI Trade: Semiconductors (SMH)
 - Small Cap Equities: Russell 2000
 - Commodities: Gold, Silver
-- Crypto: Bitcoin, Ethereum
+- Crypto: Bitcoin, Ethereum, Zcash
 - Fixed Income: Long Bonds (TLT)
 
 ## Flows (Liquidity Destinations)

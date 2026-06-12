@@ -46,6 +46,7 @@ const PROSE_NAMES: Record<string, string> = {
   megacap_tech: "the Nasdaq 100",
   bitcoin: "bitcoin",
   ethereum: "ether",
+  zcash: "zcash",
   sp500: "the S&P 500",
   small_caps: "small caps (IWM)",
   gold: "gold",

@@ -1,578 +1,519 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { Header, TimeRange } from "@/components/header";
-import { DataLoadError } from "@/components/data-load-error";
-import { MetricCard } from "@/components/metric-card";
-import { LiquidityChart } from "@/components/liquidity-chart";
-import { MultiLineChart } from "@/components/multi-line-chart";
-import { WaterfallChart, ContributionBreakdown } from "@/components/waterfall-chart";
-import { RegimeTimeline } from "@/components/regime-timeline";
-import { DataFreshness, FreshnessSummary } from "@/components/data-freshness";
-import { PredictivePanel } from "@/components/predictive-panel";
-import { InfoTooltip } from "@/components/info-tooltip";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMemo, useState } from "react";
 import {
-  Activity,
-  ArrowDown,
-  ArrowUp,
-  Gauge,
-  Loader2,
-  TrendingDown,
-  TrendingUp,
-  Waves,
-  CreditCard,
-  AlertTriangle,
-  BarChart3,
-  Clock,
-} from "lucide-react";
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+  ResponsiveContainer,
+} from "recharts";
 import { useGLCIData } from "@/hooks/use-series-data";
-import api, { DataFreshnessItem, RegimeHistory } from "@/lib/api";
-import { glciDefinitions } from "@/lib/indicator-definitions";
-import { getFreshnessStatus } from "@/lib/data-status";
+import { useRegimeHistory } from "@/hooks/use-regime-history";
+import { GlciChart } from "@/components/glci-chart";
+import { ChartSection } from "@/components/chart-section";
+import { RangeTabs } from "@/components/range-tabs";
+import { RegimeStamp } from "@/components/regime-stamp";
+import { DataLoadError } from "@/components/data-load-error";
+import { getDateRange, type TimeRange } from "@/lib/utils";
+import { formatShortDate } from "@/lib/data-status";
+import {
+  attributionSentence,
+  currentRegimeStanding,
+  ordinal,
+  signed,
+  standingSentence,
+} from "@/lib/brief";
+import {
+  AXIS_TICK,
+  AXIS_LINE,
+  GRID_PROPS,
+  TOOLTIP_STYLE,
+  TOOLTIP_LABEL_STYLE,
+  PILLAR_COLOR,
+  formatTickDate,
+  formatTooltipDate,
+} from "@/lib/chart-theme";
+import type { RegimePeriod } from "@/lib/api";
 
-function getDateRange(range: TimeRange): { start: string; end: string } {
-  const end = new Date();
-  const start = new Date();
-  switch (range) {
-    case "1m": start.setMonth(end.getMonth() - 1); break;
-    case "3m": start.setMonth(end.getMonth() - 3); break;
-    case "6m": start.setMonth(end.getMonth() - 6); break;
-    case "1y": start.setFullYear(end.getFullYear() - 1); break;
-    case "2y": start.setFullYear(end.getFullYear() - 2); break;
-    case "5y": start.setFullYear(end.getFullYear() - 5); break;
-    case "10y": start.setFullYear(end.getFullYear() - 10); break;
-    case "15y": start.setFullYear(end.getFullYear() - 15); break;
-    case "all": start.setFullYear(2000); break;
-  }
-  return { start: start.toISOString().split("T")[0], end: end.toISOString().split("T")[0] };
+// ---------------------------------------------------------------------------
+// Pillar labels and ordering
+// ---------------------------------------------------------------------------
+
+const PILLAR_ORDER = ["liquidity", "credit", "stress"] as const;
+type PillarName = (typeof PILLAR_ORDER)[number];
+
+const PILLAR_LABELS: Record<PillarName, string> = {
+  liquidity: "Liquidity",
+  credit: "Credit",
+  stress: "Funding stress (inverted)",
+};
+
+function PillarDot({ name }: { name: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-block h-2 w-2 shrink-0 rounded-full"
+      style={{ backgroundColor: PILLAR_COLOR[name] ?? "var(--muted-foreground)" }}
+    />
+  );
 }
 
-const regimeConfig = {
-  tight: {
-    color: "text-regime-tight",
-    bgColor: "bg-regime-tight/10",
-    borderColor: "border-regime-tight/30",
-    label: "Tight",
-    description: "Restrictive liquidity conditions",
-    icon: TrendingDown,
-  },
-  neutral: {
-    color: "text-regime-neutral",
-    bgColor: "bg-regime-neutral/10",
-    borderColor: "border-regime-neutral/30",
-    label: "Neutral",
-    description: "Balanced liquidity conditions",
-    icon: Activity,
-  },
-  loose: {
-    color: "text-emerald-500",
-    bgColor: "bg-emerald-500/10",
-    borderColor: "border-emerald-500/30",
-    label: "Loose",
-    description: "Expansionary liquidity conditions",
-    icon: TrendingUp,
-  },
+// ---------------------------------------------------------------------------
+// Pillar contribution history chart
+// ---------------------------------------------------------------------------
+
+interface ContributionRow {
+  date: string;
+  liquidity?: number;
+  credit?: number;
+  stress?: number;
+}
+
+function formatSignedTick(v: number): string {
+  const fixed = Math.abs(v).toFixed(1);
+  return v < 0 ? `−${fixed}` : fixed;
+}
+
+function PillarContributionChart({ rows, height = 280 }: { rows: ContributionRow[]; height?: number }) {
+  return (
+    <div style={{ height }} className="w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+          <CartesianGrid {...GRID_PROPS} />
+          <XAxis
+            dataKey="date"
+            tick={AXIS_TICK}
+            tickLine={false}
+            axisLine={AXIS_LINE}
+            tickFormatter={formatTickDate}
+            minTickGap={48}
+          />
+          <YAxis
+            tick={AXIS_TICK}
+            tickLine={false}
+            axisLine={false}
+            width={44}
+            domain={["auto", "auto"]}
+            tickFormatter={formatSignedTick}
+          />
+          <Tooltip
+            contentStyle={TOOLTIP_STYLE}
+            labelStyle={TOOLTIP_LABEL_STYLE}
+            labelFormatter={(label) => formatTooltipDate(String(label))}
+            formatter={(value, name) => [signed(Number(value)), String(name)]}
+          />
+          <ReferenceLine y={0} stroke="var(--border)" />
+          {PILLAR_ORDER.map((name) => (
+            <Line
+              key={name}
+              type="monotone"
+              dataKey={name}
+              name={PILLAR_LABELS[name]}
+              stroke={PILLAR_COLOR[name]}
+              strokeWidth={1.25}
+              dot={false}
+              activeDot={{ r: 3, strokeWidth: 0, fill: PILLAR_COLOR[name] }}
+              isAnimationActive={false}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Regime timeline strip
+// ---------------------------------------------------------------------------
+
+const TIMELINE_FILL: Record<string, string> = {
+  loose: "color-mix(in oklch, var(--regime-loose) 35%, transparent)",
+  neutral: "color-mix(in oklch, var(--regime-neutral) 35%, transparent)",
+  tight: "color-mix(in oklch, var(--regime-tight) 35%, transparent)",
 };
 
-const pillarConfig = {
-  liquidity: {
-    label: "Liquidity",
-    description: "Central bank balance sheets & monetary aggregates",
-    icon: Waves,
-    color: "var(--pillar-liquidity)",
-    info: glciDefinitions.pillar_liquidity,
-  },
-  credit: {
-    label: "Credit",
-    description: "Private sector credit growth & credit/GDP",
-    icon: CreditCard,
-    color: "var(--pillar-credit)",
-    info: glciDefinitions.pillar_credit,
-  },
-  stress: {
-    label: "Funding Stress",
-    description: "Credit spreads & funding rates (inverted)",
-    icon: AlertTriangle,
-    color: "var(--pillar-stress)",
-    info: glciDefinitions.pillar_stress,
-  },
-};
+function RegimeTimelineStrip({ periods }: { periods: RegimePeriod[] }) {
+  const spans = useMemo(() => {
+    if (!periods.length) return [];
+    const t0 = new Date(periods[0].start).getTime();
+    const t1 = new Date(periods[periods.length - 1].end).getTime();
+    const total = Math.max(t1 - t0, 1);
+    return periods.map((p) => {
+      const span = Math.max(new Date(p.end).getTime() - new Date(p.start).getTime(), 0);
+      return { ...p, widthPct: (span / total) * 100 };
+    });
+  }, [periods]);
 
-export default function GLCIPage() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("5y");
-  const [activeTab, setActiveTab] = useState<string>("overview");
-  const [freshnessData, setFreshnessData] = useState<DataFreshnessItem[]>([]);
-  const [regimeHistory, setRegimeHistory] = useState<RegimeHistory | null>(null);
-  
-  const dateRange = useMemo(() => getDateRange(timeRange), [timeRange]);
-  const { data: glciData, isLoading, error, refetch } = useGLCIData({ ...dateRange });
+  if (!spans.length) return null;
 
-  // Fetch additional data
-  useEffect(() => {
-    api.getGLCIFreshness().then(setFreshnessData).catch(console.error);
-    api.getRegimeHistory(dateRange.start, dateRange.end).then(setRegimeHistory).catch(console.error);
-  }, [dateRange]);
-
-  const handleRefresh = useCallback(async () => {
-    await refetch();
-    api.getGLCIFreshness().then(setFreshnessData).catch(console.error);
-  }, [refetch]);
-
-  const handleTimeRangeChange = useCallback((range: TimeRange) => setTimeRange(range), []);
-
-  // Calculate change from period
-  const calcChange = (data: { date: string; value: number }[] | undefined, periods: number = 8) => {
-    if (!data || data.length < periods) return 0;
-    const latest = data[data.length - 1]?.value ?? 0;
-    const prev = data[data.length - periods]?.value ?? latest;
-    return latest - prev;
-  };
-
-  const regime = glciData?.regime || "neutral";
-  const regimeInfo = regimeConfig[regime as keyof typeof regimeConfig] || regimeConfig.neutral;
-  const RegimeIcon = regimeInfo.icon;
-  const pageStatus = getFreshnessStatus(glciData?.date ?? null);
-
-  // Prepare pillar chart data
-  const pillarChartData = useMemo(() => {
-    if (!glciData?.pillar_data) return [];
-    const liquidity = glciData.pillar_data.liquidity || [];
-    const credit = glciData.pillar_data.credit || [];
-    const stress = glciData.pillar_data.stress || [];
-    
-    return liquidity.map((d, i) => ({
-      date: d.date,
-      liquidity: d.value,
-      credit: credit[i]?.value ?? 0,
-      stress: stress[i]?.value ?? 0,
-    }));
-  }, [glciData]);
-
-  // Previous week's GLCI value for waterfall
-  const previousValue = useMemo(() => {
-    if (!glciData?.data || glciData.data.length < 2) return glciData?.value ?? 100;
-    return glciData.data[glciData.data.length - 2]?.value ?? glciData.value;
-  }, [glciData]);
-
-  if (error) {
-    return (
-      <div className="flex h-screen flex-col bg-background">
-        <Header
-          title="GLCI"
-          description="Global Liquidity & Credit Index"
-          timeRange={timeRange}
-          onTimeRangeChange={handleTimeRangeChange}
-          onRefresh={handleRefresh}
-          isRefreshing={isLoading}
-          status={pageStatus}
+  return (
+    <div
+      className="flex h-7 w-full overflow-hidden rounded-sm"
+      role="img"
+      aria-label="Timeline of liquidity regimes, loose, neutral and tight, with each period's width proportional to its duration"
+    >
+      {spans.map((p, i) => (
+        <div
+          key={`${p.start}-${i}`}
+          className="h-full"
+          style={{
+            width: `${p.widthPct}%`,
+            backgroundColor: TIMELINE_FILL[p.regime] ?? "transparent",
+          }}
+          title={`${p.regime}: ${formatShortDate(p.start)} to ${formatShortDate(p.end)}`}
         />
-        <DataLoadError title="Failed to Load GLCI" onRetry={handleRefresh} />
+      ))}
+    </div>
+  );
+}
+
+/** Years of regime history shown in the strip; the full history is too
+ * flip-heavy in the early decades to read as anything but noise. */
+const TIMELINE_YEARS = 15;
+
+function clipPeriods(periods: RegimePeriod[], years: number): RegimePeriod[] {
+  if (!periods.length) return [];
+  const end = periods[periods.length - 1].end;
+  const cut = new Date(end);
+  cut.setFullYear(cut.getFullYear() - years);
+  const cutoff = cut.toISOString().slice(0, 10);
+  return periods
+    .filter((p) => p.end > cutoff)
+    .map((p) => (p.start < cutoff ? { ...p, start: cutoff } : p));
+}
+
+function regimeWeeksCaption(periods: RegimePeriod[]): string {
+  const weeks: Record<string, number> = {};
+  for (const p of periods) {
+    const w = Math.round(
+      (new Date(p.end).getTime() - new Date(p.start).getTime()) / (7 * 864e5)
+    );
+    weeks[p.regime] = (weeks[p.regime] ?? 0) + w;
+  }
+  const fmt = (k: string) => (weeks[k] ?? 0).toLocaleString("en-US");
+  return `Past ${TIMELINE_YEARS} years: loose ${fmt("loose")} weeks · neutral ${fmt("neutral")} · tight ${fmt("tight")}`;
+}
+
+// ---------------------------------------------------------------------------
+// Loading skeleton
+// ---------------------------------------------------------------------------
+
+function IndexSkeleton() {
+  return (
+    <div className="animate-pulse space-y-6 pt-10 sm:pt-14" aria-label="Loading the index">
+      <div className="h-4 w-28 rounded bg-muted" />
+      <div className="h-10 w-3/4 max-w-2xl rounded bg-muted" />
+      <div className="space-y-2">
+        <div className="h-5 w-full max-w-2xl rounded bg-muted" />
+        <div className="h-5 w-2/3 max-w-xl rounded bg-muted" />
+      </div>
+      <div className="h-72 w-full rounded bg-muted" />
+      <div className="h-40 w-full max-w-2xl rounded bg-muted" />
+      <div className="h-56 w-full rounded bg-muted" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
+export default function GlciPage() {
+  const [chartRange, setChartRange] = useState<TimeRange>("5y");
+  const chartDates = useMemo(() => getDateRange(chartRange), [chartRange]);
+
+  const glci = useGLCIData({ start: chartDates.start, end: chartDates.end });
+  const history = useRegimeHistory();
+
+  const standing = useMemo(
+    () =>
+      glci.data
+        ? currentRegimeStanding(history.data, glci.data.regime, glci.data.date)
+        : null,
+    [history.data, glci.data]
+  );
+
+  const contributionRows = useMemo<ContributionRow[]>(() => {
+    if (!glci.data) return [];
+    const pillarData = glci.data.pillar_data ?? {};
+    const weights = new Map(glci.data.pillars.map((p) => [p.name, p.weight]));
+    const byDate = new Map<string, ContributionRow>();
+    for (const name of PILLAR_ORDER) {
+      const weight = weights.get(name);
+      if (weight == null) continue;
+      for (const point of pillarData[name] ?? []) {
+        const row = byDate.get(point.date) ?? { date: point.date };
+        row[name] = point.value * weight;
+        byDate.set(point.date, row);
+      }
+    }
+    return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+  }, [glci.data]);
+
+  if (glci.error) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+        <DataLoadError title="The Index could not be loaded" onRetry={glci.refetch} />
       </div>
     );
   }
 
+  if (glci.isLoading || !glci.data || !standing) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-8">
+        <IndexSkeleton />
+      </div>
+    );
+  }
+
+  const g = glci.data;
+  const orderedPillars = PILLAR_ORDER.map((name) =>
+    g.pillars.find((p) => p.name === name)
+  ).filter((p): p is NonNullable<typeof p> => p != null);
+
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <Header
-        title="GLCI"
-        description="Global Liquidity & Credit Index"
-        timeRange={timeRange}
-        onTimeRangeChange={handleTimeRangeChange}
-        onRefresh={handleRefresh}
-        isRefreshing={isLoading}
-        status={pageStatus}
-      />
+    <div className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-8">
+      {/* Header */}
+      <section className="pt-10 sm:pt-14">
+        <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+          The Index
+        </span>
+        <h1 className="mt-4 max-w-3xl font-serif text-3xl font-medium leading-[1.1] tracking-tight sm:text-4xl">
+          One number for global liquidity and credit.
+        </h1>
+        <p className="mt-5 max-w-[70ch] font-serif text-lg leading-relaxed text-muted-foreground">
+          The GLCI is a weekly composite of three latent factors: central-bank
+          liquidity (40%), private credit growth (35%) and funding stress (25%,
+          inverted so that calmer markets raise the index). The composite is
+          scaled to a mean of 100 and a standard deviation of 10, then
+          classified as Loose, Neutral or Tight where its two-year rolling
+          z-score crosses ±1σ.
+        </p>
+        <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-2">
+          <RegimeStamp regime={g.regime} detail={`${ordinal(standing.weeks)} week`} />
+          <p className="font-serif text-[1.0625rem] leading-relaxed">
+            {standingSentence(g, standing)}
+          </p>
+        </div>
+      </section>
 
-      <ScrollArea className="flex-1 w-full">
-        <div className="bg-dots min-h-full w-full overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1800px] space-y-3 p-2 min-[360px]:p-3 sm:space-y-6 sm:p-6 overflow-hidden">
-            {/* Hero Section */}
-            <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
-              {/* Main GLCI Value */}
-              <Card className="lg:col-span-2 border-primary/20 bg-gradient-to-br from-primary/5 via-card to-card overflow-hidden">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col gap-4 sm:gap-6">
-                    {/* Top row: GLCI value and regime on mobile */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-3 sm:space-y-4 flex-1 min-w-0">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-foreground shadow-lg shrink-0">
-                            <Gauge className="h-5 w-5 sm:h-6 sm:w-6 text-background" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground">
-                              Global Liquidity & Credit Index
-                              <InfoTooltip {...glciDefinitions.glci_index} size="sm" />
-                            </p>
-                            <p className="text-[10px] sm:text-xs text-muted-foreground/70">Tri-pillar composite indicator</p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-baseline gap-2 sm:gap-4 flex-wrap">
-                          {isLoading ? (
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                          ) : (
-                            <>
-                              <span className="font-mono text-3xl sm:text-5xl font-bold tracking-tight">
-                                {glciData?.value.toFixed(1) ?? "—"}
-                              </span>
-                              <div className="flex items-center gap-1">
-                                {calcChange(glciData?.data) >= 0 ? (
-                                  <ArrowUp className="h-4 w-4 text-positive" />
-                                ) : (
-                                  <ArrowDown className="h-4 w-4 text-negative" />
-                                )}
-                                <span className={`font-mono text-sm ${calcChange(glciData?.data) >= 0 ? "text-positive" : "text-negative"}`}>
-                                  {calcChange(glciData?.data) >= 0 ? "+" : ""}{calcChange(glciData?.data).toFixed(1)}
-                                </span>
-                                <span className="text-xs text-muted-foreground">vs last week</span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
+      {/* The index chart */}
+      <div className="rule mt-10" />
+      <ChartSection
+        className="mt-8"
+        title="Global Liquidity & Credit Index"
+        reading="Shaded bands mark the regime in force at the time; the index is scaled to mean 100, one band per 10 points."
+        source={`Composite of liquidity (40%), credit (35%) and inverted funding-stress (25%) factors. Weekly, through ${formatShortDate(g.date)}.`}
+        control={
+          <RangeTabs
+            value={chartRange}
+            onChange={setChartRange}
+            ranges={["1y", "2y", "5y", "10y", "all"]}
+          />
+        }
+      >
+        <GlciChart data={g.data} periods={history.data?.periods} height={320} />
+      </ChartSection>
 
-                      {/* Regime indicator - always visible, compact on mobile */}
-                      <div className="flex flex-col items-center gap-1.5 sm:gap-2 shrink-0">
-                        <div className={`rounded-xl sm:rounded-2xl border-2 ${regimeInfo.borderColor} ${regimeInfo.bgColor} p-3 sm:p-6`}>
-                          <RegimeIcon className={`h-6 w-6 sm:h-10 sm:w-10 ${regimeInfo.color}`} />
-                        </div>
-                        <Badge variant="outline" className={`${regimeInfo.borderColor} ${regimeInfo.color} text-[10px] sm:text-sm font-semibold px-1.5 sm:px-2`}>
-                          {regimeInfo.label} Regime
-                        </Badge>
-                        <p className="text-center text-[10px] sm:text-xs text-muted-foreground max-w-[100px] sm:max-w-[150px] hidden sm:block">
-                          {regimeInfo.description}
-                        </p>
-                      </div>
-                    </div>
+      {/* Pillar decomposition */}
+      <div className="rule mt-10" />
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold tracking-tight">
+          What is inside the number
+        </h2>
 
-                    {/* Stats row */}
-                    <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
-                          Z-Score:
-                          <InfoTooltip {...glciDefinitions.glci_zscore} size="xs" />
+        {orderedPillars.length === 0 ? (
+          <p className="mt-4 font-serif text-[0.9375rem] italic text-muted-foreground">
+            The pillar breakdown is unavailable right now.
+          </p>
+        ) : (
+          <>
+            <div className="mt-4 max-w-2xl overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="py-2 pr-4 text-left text-xs font-medium tracking-wide text-muted-foreground">
+                      Pillar
+                    </th>
+                    <th className="py-2 pl-4 text-right text-xs font-medium tracking-wide text-muted-foreground">
+                      Factor value
+                    </th>
+                    <th className="py-2 pl-4 text-right text-xs font-medium tracking-wide text-muted-foreground">
+                      Weight
+                    </th>
+                    <th className="py-2 pl-4 text-right text-xs font-medium tracking-wide text-muted-foreground">
+                      Contribution
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orderedPillars.map((pillar) => (
+                    <tr key={pillar.name} className="border-b border-border">
+                      <td className="py-2.5 pr-4">
+                        <span className="flex items-center gap-2">
+                          <PillarDot name={pillar.name} />
+                          {PILLAR_LABELS[pillar.name as PillarName] ?? pillar.name}
                         </span>
-                        <span className="font-mono text-xs sm:text-sm font-semibold">
-                          {glciData?.zscore?.toFixed(2) ?? "—"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground">
-                          Momentum:
-                          <InfoTooltip {...glciDefinitions.glci_momentum} size="xs" />
-                        </span>
-                        <span className={`font-mono text-xs sm:text-sm font-semibold ${(glciData?.momentum ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
-                          {(glciData?.momentum ?? 0) >= 0 ? "+" : ""}{(glciData?.momentum ?? 0).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Data freshness summary */}
-                    {freshnessData.length > 0 && (
-                      <FreshnessSummary items={freshnessData} />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Pillar Breakdown */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold">Pillar Contributions</CardTitle>
-                  <CardDescription className="text-xs">Weighted factor scores</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <div className="flex h-[200px] items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                    </div>
-                  ) : glciData?.pillars ? (
-                    <ContributionBreakdown pillars={glciData.pillars} />
-                  ) : null}
-                </CardContent>
-              </Card>
+                      </td>
+                      <td className="py-2.5 pl-4 text-right font-mono tabular-nums">
+                        {signed(pillar.value)}
+                      </td>
+                      <td className="py-2.5 pl-4 text-right font-mono tabular-nums">
+                        {Math.round(pillar.weight * 100)}%
+                      </td>
+                      <td className="py-2.5 pl-4 text-right font-mono tabular-nums">
+                        {signed(pillar.contribution)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+            <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground/80">
+              As of {formatShortDate(g.date)}. Factor values are post
+              sign-inversion (stress already enters inverted), so contribution
+              = value × weight and the three contributions are directly
+              additive; a negative contribution is a drag on the index.
+            </p>
+          </>
+        )}
 
-            {/* Tabs for different views */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-3 sm:space-y-4">
-              <TabsList className="grid w-full grid-cols-2 gap-1 sm:gap-2 h-auto p-1 md:max-w-lg md:grid-cols-4">
-                <TabsTrigger value="overview" className="gap-2 text-xs sm:text-sm">
-                  <BarChart3 className="h-3.5 w-3.5" />
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="pillars" className="gap-2 text-xs sm:text-sm">
-                  <Activity className="h-3.5 w-3.5" />
-                  Pillars
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="gap-2 text-xs sm:text-sm">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  Analytics
-                </TabsTrigger>
-                <TabsTrigger value="data" className="gap-2 text-xs sm:text-sm">
-                  <Clock className="h-3.5 w-3.5" />
-                  Data
-                </TabsTrigger>
-              </TabsList>
+        {contributionRows.length === 0 ? (
+          <p className="mt-8 font-serif text-[0.9375rem] italic text-muted-foreground">
+            Pillar history is unavailable for this period.
+          </p>
+        ) : (
+          <ChartSection
+            className="mt-8"
+            title="Weighted pillar contributions"
+            reading="Each line is a pillar's factor value times its weight; the lines sum to the index in standardized units."
+            source="Weighted latent factors, post sign-inversion. Weekly. Zero line marks no contribution."
+          >
+            <div className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-[0.6875rem] text-muted-foreground">
+              {PILLAR_ORDER.map((name) => (
+                <span key={name} className="flex items-center gap-1.5">
+                  <PillarDot name={name} />
+                  {PILLAR_LABELS[name]}
+                </span>
+              ))}
+            </div>
+            <PillarContributionChart rows={contributionRows} height={280} />
+          </ChartSection>
+        )}
 
-              {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-3 sm:space-y-6">
-                {/* Main GLCI Chart */}
-                {isLoading ? (
-                  <Card className="flex h-[400px] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </Card>
-                ) : (
-                  <LiquidityChart
-                    title="GLCI Time Series"
-                    description="Global Liquidity & Credit Index (normalized to mean 100, stdev 10)"
-                    data={glciData?.data || []}
-                    color="var(--primary)"
-                    height={400}
-                    valueFormatter={(v) => v.toFixed(1)}
-                    referenceLine={100}
-                    referenceLabel="Mean"
-                    info={glciDefinitions.glci_index}
-                  />
+        {orderedPillars.length > 0 && (
+          <p className="mt-6 max-w-[70ch] font-serif text-[1.0625rem] leading-relaxed">
+            {attributionSentence(g.pillars)}
+          </p>
+        )}
+      </section>
+
+      {/* Regime history */}
+      <div className="rule mt-10" />
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold tracking-tight">Regime history</h2>
+        {history.error ? (
+          <p className="mt-4 font-serif text-[0.9375rem] italic text-muted-foreground">
+            The regime history is unavailable right now.
+          </p>
+        ) : !history.data || history.data.periods.length === 0 ? (
+          <div className="mt-4 h-7 w-full animate-pulse rounded-sm bg-muted" />
+        ) : (
+          <>
+            <div className="mt-4">
+              <RegimeTimelineStrip periods={clipPeriods(history.data.periods, TIMELINE_YEARS)} />
+            </div>
+            <div className="mt-1.5 flex justify-between font-mono text-[0.6875rem] tabular-nums text-muted-foreground/80">
+              <span>
+                {formatShortDate(
+                  clipPeriods(history.data.periods, TIMELINE_YEARS)[0]?.start ?? null
                 )}
+              </span>
+              <span>
+                {formatShortDate(
+                  history.data.periods[history.data.periods.length - 1]?.end ?? null
+                )}
+              </span>
+            </div>
+            <p className="mt-2 font-mono text-[0.6875rem] tabular-nums text-muted-foreground/80">
+              {regimeWeeksCaption(clipPeriods(history.data.periods, TIMELINE_YEARS))}
+            </p>
+          </>
+        )}
+      </section>
 
-                {/* Statistics Row */}
-                <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 md:grid-cols-4">
-                  <MetricCard
-                    title="Current Value"
-                    value={isLoading ? "Loading..." : glciData?.value.toFixed(1) ?? "—"}
-                    change={calcChange(glciData?.data)}
-                    trend={calcChange(glciData?.data) >= 0 ? "up" : "down"}
-                    icon={<Gauge className="h-5 w-5" />}
-                    variant="highlight"
-                    info={glciDefinitions.glci_index}
-                  />
-                  <MetricCard
-                    title="Period High"
-                    value={isLoading || !glciData?.data ? "—" : Math.max(...glciData.data.map(d => d.value)).toFixed(1)}
-                    icon={<TrendingUp className="h-5 w-5" />}
-                  />
-                  <MetricCard
-                    title="Period Low"
-                    value={isLoading || !glciData?.data ? "—" : Math.min(...glciData.data.map(d => d.value)).toFixed(1)}
-                    icon={<TrendingDown className="h-5 w-5" />}
-                  />
-                  <MetricCard
-                    title="Z-Score"
-                    value={isLoading ? "Loading..." : glciData?.zscore?.toFixed(2) ?? "—"}
-                    trend="neutral"
-                    icon={<Activity className="h-5 w-5" />}
-                    info={glciDefinitions.glci_zscore}
-                  />
-                </div>
-
-                {/* Interpretation Guide */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm font-semibold">Index Interpretation</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-2 sm:gap-3 md:grid-cols-3">
-                      <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <TrendingUp className="h-4 w-4 text-emerald-500" />
-                          <span className="font-semibold text-emerald-500">Above 110</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Loose conditions. Ample liquidity, expanding credit, low stress. Historically favorable for risk assets.
-                        </p>
-                      </div>
-                      
-                      <div className="rounded-lg border border-regime-neutral/20 bg-regime-neutral/5 p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Activity className="h-4 w-4 text-regime-neutral" />
-                          <span className="font-semibold text-regime-neutral">90 - 110</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Neutral conditions. Balanced liquidity environment with normal credit growth.
-                        </p>
-                      </div>
-                      
-                      <div className="rounded-lg border border-regime-tight/20 bg-regime-tight/5 p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <TrendingDown className="h-4 w-4 text-regime-tight" />
-                          <span className="font-semibold text-regime-tight">Below 90</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Tight conditions. Contracting liquidity, credit stress. Associated with market corrections.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Pillars Tab */}
-              <TabsContent value="pillars" className="space-y-3 sm:space-y-6">
-                <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-                  {isLoading ? (
-                    <>
-                      <Card className="flex h-[350px] items-center justify-center">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      </Card>
-                      <Card className="flex h-[350px] items-center justify-center">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      </Card>
-                    </>
-                  ) : (
-                    <>
-                      <MultiLineChart
-                        title="Pillar Factors"
-                        description="Individual pillar contributions over time (standardized)"
-                        data={pillarChartData}
-                        series={[
-                          { key: "liquidity", label: "Liquidity", color: "var(--pillar-liquidity)" },
-                          { key: "credit", label: "Credit", color: "var(--pillar-credit)" },
-                          { key: "stress", label: "Stress (inverted)", color: "var(--pillar-stress)" },
-                        ]}
-                        height={350}
-                        info={{
-                          title: "GLCI Pillar Factors",
-                          description: "Time series of individual pillar contributions to the composite index",
-                          sections: [
-                            { label: "Liquidity", content: "Central bank balance sheets, reserve balances, money supply (40% weight)" },
-                            { label: "Credit", content: "Bank credit, consumer credit, BIS credit data (35% weight)" },
-                            { label: "Stress", content: "Credit spreads, funding rates, VIX — inverted so lower is worse (25% weight)" },
-                          ],
-                          interpretation: "When pillars diverge, identify which factor is driving GLCI movement.",
-                        }}
-                      />
-                      
-                      <WaterfallChart
-                        title="Weekly Change Breakdown"
-                        description="Contribution of each pillar to weekly change"
-                        previousValue={previousValue}
-                        currentValue={glciData?.value ?? 100}
-                        contributions={glciData?.pillars?.map(p => ({
-                          name: p.name,
-                          value: p.contribution,
-                        })) || []}
-                        height={350}
-                        info={glciDefinitions.waterfall_breakdown}
-                      />
-                    </>
-                  )}
-                </div>
-
-                {/* Individual pillar cards */}
-                <div className="grid gap-2 sm:gap-4 md:grid-cols-3">
-                  {glciData?.pillars?.map((pillar) => {
-                    const config = pillarConfig[pillar.name as keyof typeof pillarConfig];
-                    const Icon = config?.icon || Activity;
-                    
-                    return (
-                      <Card key={pillar.name} className={`pillar-${pillar.name}`}>
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className="flex h-8 w-8 items-center justify-center rounded-lg pillar-bg"
-                              style={{ backgroundColor: `color-mix(in srgb, ${config?.color || 'gray'} 20%, transparent)` }}
-                            >
-                              <Icon className="h-4 w-4" style={{ color: config?.color }} />
-                            </div>
-                            <CardTitle className="inline-flex items-center gap-1.5 text-sm">
-                              {config?.label || pillar.name}
-                              {config?.info && <InfoTooltip {...config.info} size="xs" />}
-                            </CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          <div className="flex items-baseline justify-between">
-                            <span className="font-mono text-2xl font-bold">
-                              {pillar.value >= 0 ? "+" : ""}{pillar.value.toFixed(2)}
-                            </span>
-                            <Badge variant="outline" className="text-xs">
-                              {(pillar.weight * 100).toFixed(0)}% weight
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            {config?.description}
-                          </p>
-                          <Progress 
-                            value={Math.min(Math.max((pillar.value + 3) / 6 * 100, 0), 100)} 
-                            className="h-1.5"
-                          />
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </TabsContent>
-
-              {/* Analytics Tab */}
-              <TabsContent value="analytics" className="space-y-3 sm:space-y-6">
-                <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-                  {/* Predictive Panel */}
-                  {!isLoading && glciData && (
-                    <PredictivePanel
-                      currentValue={glciData.value}
-                      zscore={glciData.zscore}
-                      momentum={glciData.momentum}
-                      regime={glciData.regime}
-                      probRegimeChange={glciData.prob_regime_change}
-                      historicalData={glciData.data}
-                    />
-                  )}
-
-                  {/* Regime Timeline */}
-                  {regimeHistory && (
-                    <RegimeTimeline
-                      periods={regimeHistory.periods}
-                      currentRegime={regimeHistory.current}
-                    />
-                  )}
-                </div>
-              </TabsContent>
-
-              {/* Data Tab */}
-              <TabsContent value="data" className="space-y-3 sm:space-y-6">
-                <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-                  {/* Data Freshness */}
-                  {freshnessData.length > 0 && (
-                    <DataFreshness items={freshnessData} />
-                  )}
-
-                  {/* Methodology */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-sm font-semibold">Methodology</CardTitle>
-                      <CardDescription className="text-xs">How the GLCI is computed</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4 text-sm text-muted-foreground">
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Factor Extraction</h4>
-                        <p>Each pillar uses PCA with shrinkage regularization to extract a single latent factor from its component series.</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Sign Normalization</h4>
-                        <p>Components with inverse relationships (e.g., RRP drains liquidity) are pre-flipped before extraction.</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Aggregation</h4>
-                        <p>Pillar factors are weighted (40% liquidity, 35% credit, 25% stress) and normalized to mean 100, stdev 10.</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-1">Regime Classification</h4>
-                        <p>Z-score thresholds: Tight (&lt;-1), Neutral (-1 to +1), Loose (&gt;+1).</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-            </Tabs>
+      {/* Methodology */}
+      <div className="rule mt-10" />
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold tracking-tight">How it&apos;s built</h2>
+        <div className="mt-5 max-w-[70ch] space-y-6">
+          <div>
+            <h3 className="text-sm font-semibold tracking-tight">The three pillars</h3>
+            <p className="mt-2 font-serif leading-relaxed">
+              The index blends three families of weekly data. The liquidity
+              pillar (40% weight) tracks central-bank balance sheets, reserve
+              balances and monetary aggregates. The credit pillar (35%) tracks
+              private-sector credit growth from bank lending and BIS credit
+              data. The funding-stress pillar (25%) tracks credit spreads and
+              funding rates, and enters the composite inverted: higher stress
+              lowers the index. Before extraction, every component series is
+              resampled to weekly, transformed (a 104-week rolling z-score, a
+              52-week growth rate, or both) and sign-flipped so that its
+              expected factor loading is positive.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold tracking-tight">Factor extraction</h3>
+            <p className="mt-2 font-serif leading-relaxed">
+              Each pillar is summarized by a single latent factor. When the
+              data panel is complete enough (at least half the rows complete,
+              no more than 30% missing), the factor comes from a dynamic
+              factor model estimated by EM. Otherwise the pipeline falls back
+              to the first principal component, with loadings re-estimated by
+              Ridge regression for stability when components are collinear.
+              The factor is oriented so that its average loading is positive:
+              factor up means components up. If a pillar cannot be computed at
+              all (a data outage), its weight is redistributed proportionally
+              across the remaining pillars rather than failing the run.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold tracking-tight">
+              Normalization and regimes
+            </h3>
+            <p className="mt-2 font-serif leading-relaxed">
+              The three factors are combined at fixed weights (liquidity 0.40,
+              credit 0.35, stress 0.25, with stress inverted) and the
+              composite is scaled to a mean of 100 and a standard deviation of
+              10, so one band on the chart is one standard deviation. Regimes
+              come from a rolling z-score of the composite over a 104-week
+              window: below −1σ is tight, above +1σ is loose, anything in
+              between is neutral. The dashboard also reports 4-week momentum
+              and a heuristic probability of regime change based on the
+              distance to the nearest threshold and the z-score trend.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold tracking-tight">What it is not</h3>
+            <p className="mt-2 font-serif leading-relaxed">
+              The regimes are statistical buckets, not economic declarations:
+              ±1σ is a convention, and a reading of 0.9σ is not meaningfully
+              different from 1.1σ. The sample, long as it is, overlaps a
+              limited number of macro cycles, so regime statistics partly
+              describe those specific episodes. The historical relationships
+              in the playbook are conditional averages, not causal claims. The
+              backtest avoids look-ahead by re-classifying regimes with an
+              expanding window (with a one-year burn-in), but the live index
+              itself uses a rolling window and is revised as source data
+              arrives, so the most recent readings are the least settled.
+            </p>
           </div>
         </div>
-      </ScrollArea>
+      </section>
     </div>
   );
 }

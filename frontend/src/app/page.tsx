@@ -1,521 +1,315 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
-import { Header, TimeRange } from "@/components/header";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useGLCIData, useIndexData, useSeriesData } from "@/hooks/use-series-data";
+import { useRegimeHistory } from "@/hooks/use-regime-history";
+import { useBacktestData } from "@/hooks/use-backtest-data";
+import { GlciChart } from "@/components/glci-chart";
+import { ChartSection } from "@/components/chart-section";
+import { RangeTabs } from "@/components/range-tabs";
+import { RegimeStamp } from "@/components/regime-stamp";
+import { Sparkline } from "@/components/sparkline";
 import { DataLoadError } from "@/components/data-load-error";
-import { MetricCard } from "@/components/metric-card";
-import { LiquidityChart } from "@/components/liquidity-chart";
-import { MultiLineChart } from "@/components/multi-line-chart";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InfoTooltip } from "@/components/info-tooltip";
+import { getDateRange, type TimeRange } from "@/lib/utils";
+import { formatShortDate, getFreshnessStatus } from "@/lib/data-status";
 import {
-  Activity,
-  Building2,
-  CircleDollarSign,
-  TrendingUp,
-  Loader2,
-} from "lucide-react";
-import { useSeriesData, useIndexData } from "@/hooks/use-series-data";
-import { formatCurrency, getDateRange, UNIT_SCALES } from "@/lib/utils";
-import { metricDefinitions, chartDefinitions } from "@/lib/indicator-definitions";
-import {
-  formatShortDate,
-  getFreshnessStatus,
-  getLatestDate,
-} from "@/lib/data-status";
+  attributionSentence,
+  buildChangeItems,
+  compactDollars,
+  currentRegimeStanding,
+  ordinal,
+  playbookSentence,
+  standingSentence,
+  verdictHeadline,
+  type ChangeItem,
+  type ChangeSpec,
+} from "@/lib/brief";
+import type { DataPoint } from "@/lib/api";
 
-export default function DashboardPage() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("3m");
+const VITALS_RANGE = getDateRange("6m");
 
-  const dateRange = useMemo(() => getDateRange(timeRange), [timeRange]);
+function latestOf(data: DataPoint[]): number | null {
+  return data.length ? data[data.length - 1].value : null;
+}
 
-  // Fetch real data
-  const fedAssets = useSeriesData("fed_total_assets", { ...dateRange });
-  const netLiquidity = useIndexData("fed_net_liquidity", { ...dateRange });
-  const sofr = useSeriesData("sofr", { ...dateRange });
-  const fedFunds = useSeriesData("fed_funds_rate", { ...dateRange });
-  const hySpread = useSeriesData("ice_bofa_us_high_yield_spread", { ...dateRange });
-  const igSpread = useSeriesData("ice_bofa_us_ig_spread", { ...dateRange });
-  const ecbAssets = useSeriesData("ecb_total_assets", { ...dateRange });
-  const bojAssets = useSeriesData("boj_total_assets", { ...dateRange });
+function deltaOverDays(data: DataPoint[], days: number): number | null {
+  if (data.length < 2) return null;
+  const latest = data[data.length - 1];
+  const cutoff = new Date(latest.date);
+  cutoff.setDate(cutoff.getDate() - days);
+  const target = cutoff.toISOString().slice(0, 10);
+  for (let i = data.length - 1; i >= 0; i--) {
+    if (data[i].date <= target) return latest.value - data[i].value;
+  }
+  return null;
+}
 
-  const isLoading = fedAssets.isLoading || netLiquidity.isLoading || sofr.isLoading || hySpread.isLoading;
-  const hasError = fedAssets.error || netLiquidity.error || sofr.error || hySpread.error;
+const DIRECTION_GLYPH: Record<ChangeItem["direction"], { glyph: string; className: string }> = {
+  supportive: { glyph: "▲", className: "text-positive" },
+  restrictive: { glyph: "▼", className: "text-negative" },
+  flat: { glyph: "—", className: "text-muted-foreground" },
+};
 
-  const handleRefresh = useCallback(async () => {
-    await Promise.all([
-      fedAssets.refetch(),
-      netLiquidity.refetch(),
-      sofr.refetch(),
-      fedFunds.refetch(),
-      hySpread.refetch(),
-      igSpread.refetch(),
-    ]);
-  }, [fedAssets, netLiquidity, sofr, fedFunds, hySpread, igSpread]);
+interface VitalProps {
+  label: string;
+  value: string | null;
+  delta: string | null;
+  deltaGood: boolean | null;
+  spark: number[];
+}
 
-  const handleTimeRangeChange = useCallback((range: TimeRange) => {
-    setTimeRange(range);
-  }, []);
+function Vital({ label, value, delta, deltaGood, spark }: VitalProps) {
+  return (
+    <div className="flex flex-col gap-1.5 border-t border-border pt-3">
+      <span className="text-xs font-medium tracking-wide text-muted-foreground">{label}</span>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="font-mono text-lg tabular-nums">{value ?? "–"}</span>
+        {delta && (
+          <span
+            className={`font-mono text-xs tabular-nums ${
+              deltaGood == null ? "text-muted-foreground" : deltaGood ? "text-positive" : "text-negative"
+            }`}
+          >
+            {delta}
+          </span>
+        )}
+      </div>
+      {spark.length > 1 && <Sparkline values={spark} width={120} height={22} stroke="var(--chart-3)" />}
+    </div>
+  );
+}
 
-  // Scale factors for different unit types
-  const scaleMillions = UNIT_SCALES.millions_usd;
+function BriefSkeleton() {
+  return (
+    <div className="animate-pulse space-y-6" aria-label="Loading the brief">
+      <div className="h-4 w-48 rounded bg-muted" />
+      <div className="h-12 w-3/4 rounded bg-muted" />
+      <div className="space-y-2">
+        <div className="h-5 w-full max-w-2xl rounded bg-muted" />
+        <div className="h-5 w-2/3 max-w-xl rounded bg-muted" />
+      </div>
+      <div className="h-72 w-full rounded bg-muted" />
+    </div>
+  );
+}
 
-  const getLatestValue = (data: { date: string; value: number }[]) =>
-    data.length > 0 ? data[data.length - 1]?.value ?? null : null;
+export default function TodayPage() {
+  const [chartRange, setChartRange] = useState<TimeRange>("2y");
+  const chartDates = useMemo(() => getDateRange(chartRange), [chartRange]);
 
-  // Get latest values (scaled to base currency)
-  const latestFedRaw = getLatestValue(fedAssets.data);
-  const latestNetRaw = getLatestValue(netLiquidity.data);
-  const latestSofr = getLatestValue(sofr.data);
-  const latestEffr = getLatestValue(fedFunds.data);
-  const latestHYRaw = getLatestValue(hySpread.data);
-  const latestIGRaw = getLatestValue(igSpread.data);
+  const glci = useGLCIData({ start: chartDates.start, end: chartDates.end });
+  const history = useRegimeHistory();
+  const backtest = useBacktestData();
 
-  const latestFed = latestFedRaw !== null ? latestFedRaw * scaleMillions : null;
-  const latestNet = latestNetRaw !== null ? latestNetRaw * scaleMillions : null;
-  const latestHY = latestHYRaw !== null ? latestHYRaw * 100 : null;
-  const latestIG = latestIGRaw !== null ? latestIGRaw * 100 : null;
+  const netLiquidity = useIndexData("fed_net_liquidity", VITALS_RANGE);
+  const rrp = useSeriesData("fed_reverse_repo", VITALS_RANGE);
+  const tga = useSeriesData("fed_treasury_general_account", VITALS_RANGE);
+  const hySpread = useSeriesData("ice_bofa_us_high_yield_spread", VITALS_RANGE);
+  const sofr = useSeriesData("sofr", VITALS_RANGE);
+  const stress = useIndexData("usd_funding_stress", VITALS_RANGE);
 
-  // Calculate changes
-  const calcChange = (data: { date: string; value: number }[], periods = 7) => {
-    if (data.length < periods + 1) return undefined;
-    const latest = data[data.length - 1]?.value ?? 0;
-    const prev = data[data.length - periods - 1]?.value ?? latest;
-    return prev !== 0 ? ((latest - prev) / prev) * 100 : undefined;
-  };
-
-  const pageStatus = getFreshnessStatus(
-    getLatestDate(
-      fedAssets.latestDate,
-      netLiquidity.latestDate,
-      sofr.latestDate,
-      fedFunds.latestDate,
-      hySpread.latestDate,
-      igSpread.latestDate,
-      ecbAssets.latestDate,
-      bojAssets.latestDate
-    )
+  const standing = useMemo(
+    () =>
+      glci.data
+        ? currentRegimeStanding(history.data, glci.data.regime, glci.data.date)
+        : null,
+    [history.data, glci.data]
   );
 
-  // Prepare multi-line chart data
-  const fundingRatesData = useMemo(() => {
-    if (sofr.data.length === 0) return [];
-    return sofr.data.map((d, i) => ({
-      date: d.date,
-      sofr: d.value,
-      effr: fedFunds.data[i]?.value ?? d.value,
-    }));
-  }, [sofr.data, fedFunds.data]);
+  const changes = useMemo(() => {
+    const specs: ChangeSpec[] = [
+      { label: "Net liquidity", data: netLiquidity.data, scale: 1e6, unit: "usd", goodWhen: "up", flatBelow: 2e9 },
+      { label: "The reverse-repo facility", data: rrp.data, scale: 1e9, unit: "usd", goodWhen: "down", flatBelow: 2e9 },
+      { label: "The Treasury General Account", data: tga.data, scale: 1e6, unit: "usd", goodWhen: "down", flatBelow: 2e9 },
+      { label: "High-yield spreads", data: hySpread.data, scale: 100, unit: "bps", goodWhen: "down", flatBelow: 4 },
+      { label: "SOFR", data: sofr.data, unit: "pct", goodWhen: "down", flatBelow: 0.02 },
+      { label: "The funding-stress index", data: stress.data, unit: "index", goodWhen: "down", flatBelow: 0.15 },
+    ];
+    return buildChangeItems(specs);
+  }, [netLiquidity.data, rrp.data, tga.data, hySpread.data, sofr.data, stress.data]);
 
-  const creditSpreadsData = useMemo(() => {
-    if (hySpread.data.length === 0) return [];
-    return hySpread.data.map((d, i) => ({
-      date: d.date,
-      highYield: d.value * 100, // Convert to bps
-      investmentGrade: (igSpread.data[i]?.value ?? 0) * 100,
-    }));
-  }, [hySpread.data, igSpread.data]);
+  const playbook = useMemo(
+    () => (glci.data ? playbookSentence(backtest.data, glci.data.regime) : null),
+    [backtest.data, glci.data]
+  );
+  const playbookGold = useMemo(
+    () =>
+      glci.data
+        ? playbookSentence(backtest.data, glci.data.regime, "gold_price", "gold")
+        : null,
+    [backtest.data, glci.data]
+  );
 
-  // Normalize central bank data to 100
-  const centralBankData = useMemo(() => {
-    if (fedAssets.data.length === 0) return [];
-    const fedBase = fedAssets.data[0]?.value || 1;
-    const ecbBase = ecbAssets.data[0]?.value || 1;
-    const bojBase = bojAssets.data[0]?.value || 1;
-    
-    return fedAssets.data.map((d, i) => ({
-      date: d.date,
-      fed: (d.value / fedBase) * 100,
-      ecb: ecbAssets.data[i] ? (ecbAssets.data[i].value / ecbBase) * 100 : 100,
-      boj: bojAssets.data[i] ? (bojAssets.data[i].value / bojBase) * 100 : 100,
-    }));
-  }, [fedAssets.data, ecbAssets.data, bojAssets.data]);
+  const freshness = glci.data ? getFreshnessStatus(glci.data.date) : null;
+  const isStale = freshness?.tone === "stale" || freshness?.tone === "old";
 
-  if (hasError) {
+  if (glci.error) {
     return (
-      <div className="flex h-screen flex-col bg-background">
-        <Header
-          title="Dashboard"
-          description="Scheduled global liquidity and credit metrics"
-          timeRange={timeRange}
-          onTimeRangeChange={handleTimeRangeChange}
-          onRefresh={handleRefresh}
-          isRefreshing={isLoading}
-          status={pageStatus}
-        />
-        <DataLoadError title="Failed to Load Data" onRetry={handleRefresh} />
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+        <DataLoadError title="The brief could not be loaded" onRetry={glci.refetch} />
       </div>
     );
   }
 
+  if (glci.isLoading || !glci.data || !standing) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+        <BriefSkeleton />
+      </div>
+    );
+  }
+
+  const g = glci.data;
+
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <Header
-        title="Dashboard"
-        description="Scheduled global liquidity and credit metrics"
-        timeRange={timeRange}
-        onTimeRangeChange={handleTimeRangeChange}
-        onRefresh={handleRefresh}
-        isRefreshing={isLoading}
-        status={pageStatus}
-      />
-
-      <ScrollArea className="flex-1 w-full">
-        <div className="bg-dots min-h-full w-full overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1600px] space-y-3 p-2 min-[360px]:p-3 sm:space-y-6 sm:p-6 overflow-hidden">
-            {/* Hero Metrics */}
-            <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-              <MetricCard
-                title="Fed Balance Sheet"
-                value={isLoading ? "Loading..." : latestFed !== null ? formatCurrency(latestFed) : "No data"}
-                change={calcChange(fedAssets.data)}
-                trend={(calcChange(fedAssets.data) ?? 0) >= 0 ? "up" : "down"}
-                icon={<Building2 className="h-5 w-5" />}
-                variant="highlight"
-                info={metricDefinitions.fed_balance_sheet}
-              />
-              <MetricCard
-                title="SOFR Rate"
-                value={isLoading ? "Loading..." : latestSofr !== null ? `${latestSofr.toFixed(2)}%` : "No data"}
-                change={
-                  sofr.data.length > 7
-                    ? (sofr.data[sofr.data.length - 1]?.value ?? 0) -
-                      (sofr.data[sofr.data.length - 8]?.value ?? 0)
-                    : undefined
-                }
-                changeLabel="vs last week"
-                trend="neutral"
-                icon={<CircleDollarSign className="h-5 w-5" />}
-                info={metricDefinitions.sofr_rate}
-              />
-              <MetricCard
-                title="HY Spread"
-                value={isLoading ? "Loading..." : latestHY !== null ? `${Math.round(latestHY)} bps` : "No data"}
-                change={calcChange(hySpread.data)}
-                changeLabel="bps"
-                trend={(calcChange(hySpread.data) ?? 0) <= 0 ? "up" : "down"}
-                icon={<TrendingUp className="h-5 w-5" />}
-                info={metricDefinitions.hy_spread}
-              />
-              <MetricCard
-                title="Net Liquidity"
-                value={isLoading ? "Loading..." : latestNet !== null ? formatCurrency(latestNet) : "No data"}
-                change={calcChange(netLiquidity.data)}
-                trend={(calcChange(netLiquidity.data) ?? 0) >= 0 ? "up" : "down"}
-                icon={<Activity className="h-5 w-5" />}
-                info={metricDefinitions.net_liquidity}
-              />
-            </div>
-
-            {/* Main Charts */}
-            <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-              {isLoading ? (
-                <>
-                  <Card className="flex h-[320px] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </Card>
-                  <Card className="flex h-[320px] items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </Card>
-                </>
-              ) : (
-                <>
-                  <LiquidityChart
-                    title="Federal Reserve Balance Sheet"
-                    description="Total assets held by the Federal Reserve"
-                    data={fedAssets.data.map(d => ({ ...d, value: d.value * scaleMillions }))}
-                    color="var(--chart-1)"
-                    height={320}
-                    valueFormatter={(v) => formatCurrency(v)}
-                    info={chartDefinitions.fed_balance_sheet_chart}
-                  />
-                  <LiquidityChart
-                    title="Fed Net Liquidity"
-                    description="Total Assets - TGA - Reverse Repo"
-                    data={netLiquidity.data.map(d => ({ ...d, value: d.value * scaleMillions }))}
-                    color="var(--chart-2)"
-                    height={320}
-                    valueFormatter={(v) => formatCurrency(v)}
-                    info={chartDefinitions.net_liquidity_chart}
-                  />
-                </>
-              )}
-            </div>
-
-            {/* Tabbed Section */}
-            <Tabs defaultValue="rates" className="space-y-3 sm:space-y-4">
-              <TabsList className="grid w-full max-w-full grid-cols-3 gap-1 h-auto p-1 sm:max-w-md">
-                <TabsTrigger value="rates" className="text-xs">
-                  Funding Rates
-                </TabsTrigger>
-                <TabsTrigger value="spreads" className="text-xs">
-                  Credit Spreads
-                </TabsTrigger>
-                <TabsTrigger value="central-banks" className="text-xs">
-                  Central Banks
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="rates" className="space-y-3 sm:space-y-4">
-                <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
-                  <div className="lg:col-span-2">
-                    {isLoading ? (
-                      <Card className="flex h-[350px] items-center justify-center">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      </Card>
-                    ) : (
-                      <MultiLineChart
-                        title="Funding Rates"
-                        description="Key overnight secured rates comparison"
-                        data={fundingRatesData}
-                        series={[
-                          { key: "sofr", label: "SOFR", color: "var(--chart-1)" },
-                          { key: "effr", label: "EFFR", color: "var(--chart-2)" },
-                        ]}
-                        height={350}
-                        info={chartDefinitions.funding_rates_chart}
-                      />
-                    )}
-                  </div>
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-semibold">Rate Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
-                          <div>
-                            <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                              SOFR
-                              <InfoTooltip {...metricDefinitions.sofr_rate} size="xs" />
-                            </p>
-                            <p className="font-mono text-lg font-bold">
-                              {isLoading ? "..." : latestSofr !== null ? `${latestSofr.toFixed(2)}%` : "No data"}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <span className="font-mono text-xs">
-                              {sofr.latestDate ? formatShortDate(sofr.latestDate) : "No data"}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
-                          <div>
-                            <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                              EFFR
-                              <InfoTooltip {...metricDefinitions.effr} size="xs" />
-                            </p>
-                            <p className="font-mono text-lg font-bold">
-                              {isLoading ? "..." : latestEffr !== null ? `${latestEffr.toFixed(2)}%` : "No data"}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1 text-muted-foreground">
-                            <span className="font-mono text-xs">
-                              {fedFunds.latestDate ? formatShortDate(fedFunds.latestDate) : "No data"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="spreads" className="space-y-3 sm:space-y-4">
-                <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
-                  <div className="lg:col-span-2">
-                    {isLoading ? (
-                      <Card className="flex h-[350px] items-center justify-center">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      </Card>
-                    ) : (
-                      <MultiLineChart
-                        title="Credit Spreads"
-                        description="Option-adjusted spreads vs Treasuries"
-                        data={creditSpreadsData}
-                        series={[
-                          { key: "highYield", label: "High Yield", color: "var(--chart-5)" },
-                          { key: "investmentGrade", label: "Investment Grade", color: "var(--chart-1)" },
-                        ]}
-                        height={350}
-                        valueFormatter={(v) => `${Math.round(v)} bps`}
-                        info={chartDefinitions.credit_spreads_chart}
-                      />
-                    )}
-                  </div>
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-semibold">Spread Analysis</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-3">
-                        <div className="rounded-lg border border-negative/20 bg-negative/5 p-3">
-                          <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                            High Yield OAS
-                            <InfoTooltip {...metricDefinitions.hy_spread} size="xs" />
-                          </p>
-                          <div className="flex items-baseline gap-2">
-                            <p className="font-mono text-2xl font-bold text-negative">
-                              {isLoading ? "..." : latestHY !== null ? Math.round(latestHY) : "No data"}
-                            </p>
-                            <span className="text-xs text-muted-foreground">bps</span>
-                          </div>
-                        </div>
-                        <div className="rounded-lg border border-positive/20 bg-positive/5 p-3">
-                          <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                            Investment Grade OAS
-                            <InfoTooltip {...metricDefinitions.ig_spread} size="xs" />
-                          </p>
-                          <div className="flex items-baseline gap-2">
-                            <p className="font-mono text-2xl font-bold text-positive">
-                              {isLoading ? "..." : latestIG !== null ? Math.round(latestIG) : "No data"}
-                            </p>
-                            <span className="text-xs text-muted-foreground">bps</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="central-banks" className="space-y-3 sm:space-y-4">
-                <div className="grid gap-3 sm:gap-6 lg:grid-cols-3">
-                  <div className="lg:col-span-2">
-                    {isLoading ? (
-                      <Card className="flex h-[350px] items-center justify-center">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      </Card>
-                    ) : (
-                      <MultiLineChart
-                        title="Central Bank Balance Sheets"
-                        description="Indexed to 100 at start of period"
-                        data={centralBankData}
-                        series={[
-                          { key: "fed", label: "Federal Reserve", color: "var(--chart-1)" },
-                          { key: "ecb", label: "ECB", color: "var(--chart-3)" },
-                          { key: "boj", label: "Bank of Japan", color: "var(--chart-4)" },
-                        ]}
-                        height={350}
-                        normalized
-                        info={chartDefinitions.central_banks_chart}
-                      />
-                    )}
-                  </div>
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-semibold">Balance Sheet Changes</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--chart-1)" }} />
-                            <div>
-                              <p className="text-xs font-medium">Federal Reserve</p>
-                              <p className="font-mono text-sm font-bold">
-                                {isLoading ? "..." : latestFed !== null ? formatCurrency(latestFed) : "No data"}
-                              </p>
-                            </div>
-                          </div>
-                          {calcChange(fedAssets.data) !== undefined ? (
-                            <span className={`font-mono text-xs ${(calcChange(fedAssets.data) ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
-                              {(calcChange(fedAssets.data) ?? 0) >= 0 ? "+" : ""}
-                              {(calcChange(fedAssets.data) ?? 0).toFixed(1)}%
-                            </span>
-                          ) : (
-                            <span className="font-mono text-xs text-muted-foreground">No range change</span>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--chart-3)" }} />
-                            <div>
-                              <p className="text-xs font-medium">ECB</p>
-                              <p className="font-mono text-sm font-bold">
-                                {isLoading || ecbAssets.data.length === 0 ? "..." : formatCurrency((ecbAssets.data[ecbAssets.data.length - 1]?.value ?? 0) * scaleMillions, 2, "€")}
-                              </p>
-                            </div>
-                          </div>
-                          {calcChange(ecbAssets.data) !== undefined ? (
-                            <span className={`font-mono text-xs ${(calcChange(ecbAssets.data) ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
-                              {(calcChange(ecbAssets.data) ?? 0) >= 0 ? "+" : ""}
-                              {(calcChange(ecbAssets.data) ?? 0).toFixed(1)}%
-                            </span>
-                          ) : (
-                            <span className="font-mono text-xs text-muted-foreground">
-                              {ecbAssets.latestDate ? `Last ${formatShortDate(ecbAssets.latestDate)}` : "Unavailable"}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
-                          <div className="flex items-center gap-3">
-                            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--chart-4)" }} />
-                            <div>
-                              <p className="text-xs font-medium">Bank of Japan</p>
-                              <p className="font-mono text-sm font-bold">
-                                {isLoading || bojAssets.data.length === 0 ? "..." : formatCurrency((bojAssets.data[bojAssets.data.length - 1]?.value ?? 0) * scaleMillions, 0, "¥")}
-                              </p>
-                            </div>
-                          </div>
-                          {calcChange(bojAssets.data) !== undefined ? (
-                            <span className={`font-mono text-xs ${(calcChange(bojAssets.data) ?? 0) >= 0 ? "text-positive" : "text-negative"}`}>
-                              {(calcChange(bojAssets.data) ?? 0) >= 0 ? "+" : ""}
-                              {(calcChange(bojAssets.data) ?? 0).toFixed(1)}%
-                            </span>
-                          ) : (
-                            <span className="font-mono text-xs text-muted-foreground">
-                              {bojAssets.latestDate ? `Last ${formatShortDate(bojAssets.latestDate)}` : "Unavailable"}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            {/* Bottom Charts */}
-            <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-              {isLoading ? (
-                <>
-                  <Card className="flex h-[250px] items-center justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  </Card>
-                  <Card className="flex h-[250px] items-center justify-center">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  </Card>
-                </>
-              ) : (
-                <>
-                  <LiquidityChart
-                    title="SOFR Rate"
-                    description="Secured Overnight Financing Rate"
-                    data={sofr.data}
-                    chartType="line"
-                    color="var(--chart-2)"
-                    height={250}
-                    valueFormatter={(v) => `${v.toFixed(2)}%`}
-                    info={chartDefinitions.sofr_rate_chart}
-                  />
-                  <LiquidityChart
-                    title="High Yield Spread"
-                    description="ICE BofA US High Yield Index OAS"
-                    data={hySpread.data.map(d => ({ ...d, value: d.value * 100 }))}
-                    color="var(--chart-5)"
-                    height={250}
-                    valueFormatter={(v) => `${Math.round(v)} bps`}
-                    info={chartDefinitions.hy_spread_chart}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-8">
+      {/* The verdict */}
+      <section className="pt-10 sm:pt-14">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            The Brief · Data through {formatShortDate(g.date)}
+          </span>
+          <RegimeStamp regime={g.regime} detail={`${ordinal(standing.weeks)} week`} />
         </div>
-      </ScrollArea>
+        <h1 className="mt-4 max-w-4xl font-serif text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl">
+          {verdictHeadline(g.regime, g.momentum)}
+        </h1>
+        <p className="mt-5 max-w-[70ch] font-serif text-lg leading-relaxed text-muted-foreground sm:text-xl">
+          {standingSentence(g, standing)} {attributionSentence(g.pillars)}
+        </p>
+        {isStale && (
+          <p className="mt-3 font-mono text-xs text-negative">
+            Note: the latest data point is {formatShortDate(g.date)}; the pipeline may be behind.
+          </p>
+        )}
+      </section>
+
+      {/* The index */}
+      <div className="rule mt-10" />
+      <ChartSection
+        className="mt-8"
+        title="Global Liquidity & Credit Index"
+        reading="Shaded bands mark the regime in force at the time; the index is scaled to mean 100, one band per 10 points."
+        source="Composite of liquidity (40%), credit (35%) and inverted funding-stress (25%) factors. Weekly."
+        control={<RangeTabs value={chartRange} onChange={setChartRange} ranges={["1y", "2y", "5y", "10y", "all"]} />}
+      >
+        <GlciChart data={g.data} periods={history.data?.periods} height={320} />
+      </ChartSection>
+
+      {/* What changed + playbook */}
+      <div className="rule mt-10" />
+      <div className="mt-8 grid gap-10 lg:grid-cols-12">
+        <section className="lg:col-span-7">
+          <h2 className="text-sm font-semibold tracking-tight">What changed</h2>
+          {changes.length === 0 ? (
+            <p className="mt-3 font-serif text-[0.9375rem] italic text-muted-foreground">
+              Not enough recent data to summarize the week.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-3">
+              {changes.map((item) => {
+                const mark = DIRECTION_GLYPH[item.direction];
+                return (
+                  <li key={item.label} className="flex items-baseline gap-3">
+                    <span aria-hidden="true" className={`font-mono text-[0.625rem] ${mark.className}`}>
+                      {mark.glyph}
+                    </span>
+                    <span className="font-serif text-[1.0625rem] leading-snug">{item.text}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <p className="mt-4 font-mono text-[0.6875rem] text-muted-foreground/80">
+            ▲ supportive of liquidity · ▼ restrictive · one-week moves
+          </p>
+        </section>
+
+        <aside className="lg:col-span-5">
+          <h2 className="text-sm font-semibold tracking-tight">
+            What {standing.regime} regimes have meant
+          </h2>
+          {playbook ? (
+            <div className="mt-4 space-y-4">
+              <p className="font-serif text-[1.0625rem] leading-relaxed">{playbook.text}</p>
+              {playbookGold && (
+                <p className="font-serif text-[1.0625rem] leading-relaxed text-muted-foreground">
+                  {playbookGold.text}
+                </p>
+              )}
+              <Link
+                href="/playbook"
+                className="inline-block font-mono text-xs text-primary underline-offset-4 hover:underline"
+              >
+                Full playbook, all assets and horizons →
+              </Link>
+            </div>
+          ) : (
+            <p className="mt-4 font-serif text-[0.9375rem] italic text-muted-foreground">
+              Backtest results are unavailable right now.
+            </p>
+          )}
+        </aside>
+      </div>
+
+      {/* Vitals */}
+      <div className="mt-12" />
+      <section aria-label="Plumbing vitals">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-sm font-semibold tracking-tight">The plumbing, at a glance</h2>
+          <Link
+            href="/plumbing"
+            className="font-mono text-xs text-primary underline-offset-4 hover:underline"
+          >
+            Detail →
+          </Link>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
+          <Vital
+            label="Net liquidity"
+            value={latestOf(netLiquidity.data) != null ? compactDollars(latestOf(netLiquidity.data)! * 1e6) : null}
+            delta={(() => { const d = deltaOverDays(netLiquidity.data, 7); return d != null ? `${d >= 0 ? "+" : "−"}${compactDollars(Math.abs(d) * 1e6)}` : null; })()}
+            deltaGood={(() => { const d = deltaOverDays(netLiquidity.data, 7); return d != null ? d >= 0 : null; })()}
+            spark={netLiquidity.data.map((d) => d.value)}
+          />
+          <Vital
+            label="Reverse repo"
+            value={latestOf(rrp.data) != null ? compactDollars(latestOf(rrp.data)! * 1e9) : null}
+            delta={(() => { const d = deltaOverDays(rrp.data, 7); return d != null ? `${d >= 0 ? "+" : "−"}${compactDollars(Math.abs(d) * 1e9)}` : null; })()}
+            deltaGood={(() => { const d = deltaOverDays(rrp.data, 7); return d != null ? d <= 0 : null; })()}
+            spark={rrp.data.map((d) => d.value)}
+          />
+          <Vital
+            label="Treasury account"
+            value={latestOf(tga.data) != null ? compactDollars(latestOf(tga.data)! * 1e6) : null}
+            delta={(() => { const d = deltaOverDays(tga.data, 7); return d != null ? `${d >= 0 ? "+" : "−"}${compactDollars(Math.abs(d) * 1e6)}` : null; })()}
+            deltaGood={(() => { const d = deltaOverDays(tga.data, 7); return d != null ? d <= 0 : null; })()}
+            spark={tga.data.map((d) => d.value)}
+          />
+          <Vital
+            label="HY spread"
+            value={latestOf(hySpread.data) != null ? `${Math.round(latestOf(hySpread.data)! * 100)}bp` : null}
+            delta={(() => { const d = deltaOverDays(hySpread.data, 7); return d != null ? `${d >= 0 ? "+" : "−"}${Math.abs(Math.round(d * 100))}bp` : null; })()}
+            deltaGood={(() => { const d = deltaOverDays(hySpread.data, 7); return d != null ? d <= 0 : null; })()}
+            spark={hySpread.data.map((d) => d.value)}
+          />
+          <Vital
+            label="SOFR"
+            value={latestOf(sofr.data) != null ? `${latestOf(sofr.data)!.toFixed(2)}%` : null}
+            delta={(() => { const d = deltaOverDays(sofr.data, 7); return d != null ? `${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(2)}pp` : null; })()}
+            deltaGood={null}
+            spark={sofr.data.map((d) => d.value)}
+          />
+          <Vital
+            label="Funding stress"
+            value={(() => { const v = latestOf(stress.data); return v != null ? `${v < 0 ? "−" : ""}${Math.abs(v).toFixed(2)}σ` : null; })()}
+            delta={(() => { const d = deltaOverDays(stress.data, 7); return d != null ? `${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(2)}` : null; })()}
+            deltaGood={(() => { const d = deltaOverDays(stress.data, 7); return d != null ? d <= 0 : null; })()}
+            spark={stress.data.map((d) => d.value)}
+          />
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,21 +1,12 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-serif: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -37,118 +28,75 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  
-  /* Custom colors for financial data */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
+
+  /* Financial semantics */
   --color-positive: var(--positive);
   --color-negative: var(--negative);
-  --color-glow: var(--glow);
-  
-  /* Pillar semantic colors */
+
+  /* Pillar semantics */
   --color-pillar-liquidity: var(--pillar-liquidity);
   --color-pillar-credit: var(--pillar-credit);
   --color-pillar-stress: var(--pillar-stress);
-  
-  /* Regime semantic colors */
+
+  /* Regime semantics */
   --color-regime-loose: var(--regime-loose);
   --color-regime-neutral: var(--regime-neutral);
   --color-regime-tight: var(--regime-tight);
 }
 
-/* Dual theme: light defaults, dark override for high contrast */
+/*
+ * Single committed theme: warm paper, ink content.
+ * Regime green/amber/red is the only color that carries meaning;
+ * everything else stays in the ink/paper neutrals.
+ */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.98 0.01 250);
-  --foreground: oklch(0.20 0.02 250);
-  --card: oklch(0.97 0.01 250);
-  --card-foreground: oklch(0.20 0.02 250);
-  --popover: oklch(0.99 0.01 250);
-  --popover-foreground: oklch(0.20 0.02 250);
-  --primary: oklch(0.32 0.05 250);
-  --primary-foreground: oklch(0.98 0.01 250);
-  --secondary: oklch(0.93 0.01 240);
-  --secondary-foreground: oklch(0.24 0.02 240);
-  --muted: oklch(0.94 0.01 240);
-  --muted-foreground: oklch(0.45 0.02 250);
-  --accent: oklch(0.92 0.02 240);
-  --accent-foreground: oklch(0.27 0.03 250);
-  --destructive: oklch(0.63 0.23 25);
-  --border: oklch(0.90 0.01 240);
-  --input: oklch(0.96 0.005 240);
-  --ring: oklch(0.58 0.10 250);
-  
-  /* Pillar colors - distinct semantic colors */
-  --pillar-liquidity: oklch(0.65 0.12 230);    /* Steel blue - money flow */
-  --pillar-credit: oklch(0.72 0.10 85);        /* Warm gold - value/credit */
-  --pillar-stress: oklch(0.60 0.20 20);        /* Crimson red - danger/stress */
-  
-  /* Chart colors tuned for light */
-  --chart-1: oklch(0.35 0 0);                   /* Dark gray */
-  --chart-2: oklch(0.50 0 0);                   /* Medium gray */
-  --chart-3: oklch(0.65 0 0);                   /* Neutral gray */
-  --chart-4: oklch(0.75 0 0);                   /* Soft gray */
-  --chart-5: var(--pillar-stress);
-  
-  /* Sidebar - light */
-  --sidebar: oklch(0.97 0.005 240);
-  --sidebar-foreground: oklch(0.20 0.02 250);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(0.92 0.02 240);
-  --sidebar-accent-foreground: oklch(0.24 0.02 240);
-  --sidebar-border: oklch(0.90 0.01 240);
-  --sidebar-ring: oklch(0.65 0.08 250);
-  
-  /* Financial indicators - keep green/red/amber */
-  --positive: oklch(0.72 0.19 150);
-  --negative: oklch(0.62 0.22 25);
-  --glow: oklch(0.22 0.02 250 / 0.08);
-  
-  /* Regime colors */
-  --regime-loose: oklch(0.72 0.19 150);        /* Green - expansionary */
-  --regime-neutral: oklch(0.70 0.04 250);      /* Cool blue-gray - balanced */
-  --regime-tight: oklch(0.60 0.20 20);         /* Crimson - restrictive */
-  
-  color-scheme: light;
-}
+  --radius: 0.375rem;
 
-.dark {
-  color-scheme: dark;
-  --background: oklch(0.09 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.12 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.09 0 0);
-  --secondary: oklch(0.18 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.18 0 0);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.55 0.2 25);
-  --border: oklch(0.22 0 0);
-  --input: oklch(0.18 0 0);
-  --ring: oklch(0.55 0 0);
-  --chart-1: oklch(0.85 0 0);
-  --chart-2: oklch(0.60 0 0);
-  --chart-3: oklch(0.45 0 0);
-  --chart-4: oklch(0.35 0 0);
+  --background: oklch(0.967 0.007 80);
+  --foreground: oklch(0.24 0.012 60);
+  --card: oklch(0.982 0.005 80);
+  --card-foreground: oklch(0.24 0.012 60);
+  --popover: oklch(0.99 0.004 80);
+  --popover-foreground: oklch(0.24 0.012 60);
+  --primary: oklch(0.38 0.08 255);
+  --primary-foreground: oklch(0.975 0.005 80);
+  --secondary: oklch(0.93 0.009 80);
+  --secondary-foreground: oklch(0.30 0.012 60);
+  --muted: oklch(0.935 0.009 80);
+  --muted-foreground: oklch(0.46 0.012 60);
+  --accent: oklch(0.925 0.01 80);
+  --accent-foreground: oklch(0.27 0.012 60);
+  --destructive: oklch(0.50 0.17 27);
+  --border: oklch(0.885 0.008 75);
+  --input: oklch(0.885 0.008 75);
+  --ring: oklch(0.38 0.08 255);
+
+  /* Pillars: ink-adjacent, text-grade on paper */
+  --pillar-liquidity: oklch(0.48 0.09 245);
+  --pillar-credit: oklch(0.55 0.08 75);
+  --pillar-stress: oklch(0.50 0.13 30);
+
+  /* Chart ink scale: darkest first, accent blue second */
+  --chart-1: oklch(0.30 0.012 60);
+  --chart-2: oklch(0.45 0.08 255);
+  --chart-3: oklch(0.55 0.012 60);
+  --chart-4: oklch(0.68 0.01 70);
   --chart-5: var(--pillar-stress);
-  --sidebar: oklch(0.07 0 0);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.98 0 0);
-  --sidebar-primary-foreground: oklch(0.09 0 0);
-  --sidebar-accent: oklch(0.15 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.18 0 0);
-  --sidebar-ring: oklch(0.45 0 0);
-  --glow: oklch(0.98 0 0 / 0.1);
+
+  /* Direction of change */
+  --positive: oklch(0.50 0.12 155);
+  --negative: oklch(0.50 0.17 27);
+
+  /* Regime: always paired with a text label, never color alone */
+  --regime-loose: oklch(0.52 0.12 155);
+  --regime-neutral: oklch(0.55 0.09 75);
+  --regime-tight: oklch(0.50 0.17 27);
+
+  color-scheme: light;
 }
 
 @layer base {
@@ -156,288 +104,82 @@
     @apply border-border outline-ring/50;
   }
   html {
-    /* Allow pinch-zoom on mobile */
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
-  /* Mobile-first responsive text */
-  @media (max-width: 640px) {
-    html {
-      font-size: 14px;
-    }
+
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 18%, transparent);
   }
-  
-  /* Custom scrollbar */
+
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
   ::-webkit-scrollbar-track {
-    background: var(--background);
+    background: transparent;
   }
-  
   ::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 4px;
   }
-  
   ::-webkit-scrollbar-thumb:hover {
     background: var(--muted-foreground);
   }
 }
 
 @layer utilities {
-  /* Pillar-specific styling */
-  .pillar-liquidity {
-    --pillar-color: var(--pillar-liquidity);
-  }
-  
-  .pillar-credit {
-    --pillar-color: var(--pillar-credit);
-  }
-  
-  .pillar-stress {
-    --pillar-color: var(--pillar-stress);
-  }
-  
-  .pillar-bg {
-    background-color: color-mix(in oklch, var(--pillar-color) 15%, transparent);
-  }
-  
-  .pillar-border {
-    border-color: color-mix(in oklch, var(--pillar-color) 40%, transparent);
-  }
-  
-  .pillar-text {
-    color: var(--pillar-color);
-  }
-  
-  /* Glow effects */
-  .glow-primary {
-    box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow);
-  }
-  
-  .glow-sm {
-    box-shadow: 0 0 10px var(--glow);
-  }
-  
-  .glow-pillar {
-    box-shadow: 0 0 15px color-mix(in oklch, var(--pillar-color) 30%, transparent);
-  }
-  
-  /* Gradient text */
-  .text-gradient {
-    background: linear-gradient(135deg, var(--foreground) 0%, var(--muted-foreground) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .text-gradient-pillar {
-    background: linear-gradient(135deg, var(--pillar-color) 0%, color-mix(in oklch, var(--pillar-color) 70%, white) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  /* Glass effect */
-  .glass {
-    background: color-mix(in oklch, var(--card) 90%, transparent);
-    backdrop-filter: blur(12px);
-    border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
-  }
-  
-  /* Animated gradient border */
-  .border-gradient {
-    position: relative;
-    background: var(--card);
-    border-radius: var(--radius);
-  }
-  
-  .border-gradient::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: calc(var(--radius) + 1px);
-    background: linear-gradient(135deg, oklch(0.4 0 0), oklch(0.3 0 0));
-    z-index: -1;
-    opacity: 0.3;
-  }
-  
-  /* Pulse animation for live indicators */
-  .pulse-live {
-    animation: pulse-live 2s ease-in-out infinite;
-  }
-  
-  @keyframes pulse-live {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-  
-  /* Number animation */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
-  
-  /* Grid pattern background */
-  .bg-grid {
-    background-image: 
-      linear-gradient(oklch(1 0 0 / 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(1 0 0 / 0.02) 1px, transparent 1px);
-    background-size: 40px 40px;
+
+  /* Regime tinting: 10% wash on paper, used only where it encodes regime */
+  .regime-wash-loose {
+    background-color: color-mix(in oklch, var(--regime-loose) 10%, transparent);
   }
-  
-  /* Dot pattern background */
-  .bg-dots {
-    background-image: radial-gradient(oklch(1 0 0 / 0.06) 1px, transparent 1px);
-    background-size: 20px 20px;
+  .regime-wash-neutral {
+    background-color: color-mix(in oklch, var(--regime-neutral) 10%, transparent);
   }
-  
-  /* Regime-specific backgrounds */
-  .regime-loose {
-    background: linear-gradient(135deg, oklch(0.72 0.19 150 / 0.1) 0%, transparent 100%);
+  .regime-wash-tight {
+    background-color: color-mix(in oklch, var(--regime-tight) 10%, transparent);
   }
-  
-  .regime-neutral {
-    background: linear-gradient(135deg, oklch(0.75 0.12 85 / 0.1) 0%, transparent 100%);
+  .regime-text-loose {
+    color: var(--regime-loose);
   }
-  
-  .regime-tight {
-    background: linear-gradient(135deg, oklch(0.62 0.22 25 / 0.1) 0%, transparent 100%);
+  .regime-text-neutral {
+    color: oklch(0.48 0.09 75);
   }
-  
-  /* Data freshness indicators */
-  .freshness-fresh {
-    color: var(--positive);
+  .regime-text-tight {
+    color: var(--regime-tight);
   }
-  
-  .freshness-stale {
-    color: var(--regime-neutral);
-  }
-  
-  .freshness-old {
-    color: var(--negative);
+
+  /* Hairline rule used between editorial sections */
+  .rule {
+    border-top: 1px solid var(--border);
   }
 }
 
-/* Chart tooltip styling */
+/* Recharts: keep tooltips quiet, axes in ink */
 .recharts-tooltip-wrapper {
   outline: none !important;
 }
-
-/* Smooth transitions for theme changes */
-* {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.1s ease;
-}
-
-/* Animation for value changes */
-@keyframes value-flash {
-  0% {
-    background-color: var(--primary);
-  }
-  100% {
-    background-color: transparent;
-  }
-}
-
-.value-changed {
-  animation: value-flash 0.5s ease-out;
-}
-
-/* Waterfall chart specific */
-.waterfall-increase {
-  fill: var(--positive);
-}
-
-.waterfall-decrease {
-  fill: var(--negative);
-}
-
-.waterfall-total {
-  fill: var(--primary);
-}
-
-/* Mobile-specific improvements */
-@media (max-width: 640px) {
-  /* Ensure touch-friendly tap targets */
-  button, a, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  /* Better scrolling on mobile */
-  .scroll-area, [data-radix-scroll-area-viewport] {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-  
-  /* Reduce padding on mobile for more content space */
-  .mobile-compact {
-    padding: 0.75rem;
-  }
-  
-  /* Cards should be full-width on mobile */
-  .card {
-    border-radius: var(--radius-md);
-  }
-}
-
-/* Mobile: zoom out page content to fit screen */
-@media (max-width: 500px) {
-  /* Target the background wrapper divs used in all pages */
-  .bg-dots,
-  .bg-grid {
-    zoom: 0.9;
-  }
-}
-
-@media (max-width: 430px) {
-  /* iPhone Pro Max (430px) and similar */
-  .bg-dots,
-  .bg-grid {
-    zoom: 0.8;
-  }
-}
-
-@media (max-width: 390px) {
-  /* iPhone 14/15 (390px) and smaller */
-  .bg-dots,
-  .bg-grid {
-    zoom: 0.75;
-  }
-}
-
-@media (max-width: 360px) {
-  /* Very small phones */
-  .bg-dots,
-  .bg-grid {
-    zoom: 0.7;
-  }
-}
-
-
-/* Ensure charts are visible and scrollable on small screens */
 .recharts-wrapper {
   touch-action: pan-x pan-y;
 }
 
-/* Improve chart tooltip visibility on mobile */
-@media (max-width: 640px) {
-  .recharts-tooltip-wrapper {
-    font-size: 11px !important;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

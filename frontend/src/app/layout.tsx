@@ -1,16 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Newsreader } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Masthead } from "@/components/masthead";
 import { QueryProvider } from "@/components/query-provider";
-import { ThemeProvider } from "@/components/theme-provider";
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+});
 
 export const metadata: Metadata = {
-  title: "Global Liquidity Tracker",
-  description: "Central bank liquidity, credit conditions & funding stress",
+  title: "Global Liquidity & Credit",
+  description:
+    "A daily read on global liquidity and credit conditions: regime, drivers, and what it has meant for assets.",
 };
 
 export const viewport: Viewport = {
@@ -27,20 +32,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <QueryProvider>
-            <TooltipProvider delayDuration={0}>
-              <SidebarProvider defaultOpen={true}>
-                <AppSidebar />
-                <main className="flex-1 overflow-y-auto">
-                  {children}
-                </main>
-              </SidebarProvider>
-            </TooltipProvider>
-          </QueryProvider>
-        </ThemeProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable} font-sans antialiased`}
+      >
+        <QueryProvider>
+          <div className="flex min-h-screen flex-col">
+            <Masthead />
+            <main className="flex-1">{children}</main>
+            <footer className="border-t border-border">
+              <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
+                <p className="font-mono text-xs text-muted-foreground">
+                  Sources: FRED, BIS, World Bank, NY Fed, Yahoo Finance. Updated twice daily.
+                  Not investment advice.
+                </p>
+              </div>
+            </footer>
+          </div>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
 import type { DataPoint } from "@/lib/api";
-import type { TimeRange } from "@/components/header";
+import type { TimeRange } from "@/lib/utils";
 import { getDateRange } from "@/lib/utils";
 
 export interface PeriodChange {

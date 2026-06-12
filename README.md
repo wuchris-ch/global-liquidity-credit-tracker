@@ -1,8 +1,11 @@
 # Global Liquidity Tracker
 
+[![CI](https://github.com/wuchris-ch/global-liquidity-credit-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/wuchris-ch/global-liquidity-credit-tracker/actions/workflows/ci.yml)
+[![Data pipeline](https://github.com/wuchris-ch/global-liquidity-credit-tracker/actions/workflows/update-data.yml/badge.svg)](https://github.com/wuchris-ch/global-liquidity-credit-tracker/actions/workflows/update-data.yml)
+
 Track global liquidity and credit metrics from central banks, BIS, World Bank, and market data sources.
 
-**Docs:** [Methodology & formulas](docs/METHODOLOGY.md) · [Data sources](docs/SOURCES.md) · [Sample output](docs/SAMPLE_OUTPUT.md) · [Claim → evidence map](docs/PROOF.md)
+**Docs:** [Methodology & formulas](docs/METHODOLOGY.md) · [Data sources](docs/SOURCES.md) · [Operations runbook](docs/OPERATIONS.md) · [Sample output](docs/SAMPLE_OUTPUT.md) · [Claim → evidence map](docs/PROOF.md)
 
 ## Live Demo
 

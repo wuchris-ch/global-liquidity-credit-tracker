@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { TimeRange } from "@/components/header"
+
+export type TimeRange = "1m" | "3m" | "6m" | "1y" | "2y" | "5y" | "10y" | "15y" | "all";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

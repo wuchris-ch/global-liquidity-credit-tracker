@@ -1,15 +1,24 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { InfoTooltip, InfoTooltipProps } from "@/components/info-tooltip";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis, Legend } from "recharts";
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { cn } from "@/lib/utils";
+import {
+  AXIS_TICK,
+  AXIS_LINE,
+  GRID_PROPS,
+  TOOLTIP_STYLE,
+  TOOLTIP_LABEL_STYLE,
+  formatTickDate,
+  formatTooltipDate,
+} from "@/lib/chart-theme";
 
 interface SeriesConfig {
   key: string;
@@ -17,48 +26,22 @@ interface SeriesConfig {
   color: string;
 }
 
-// Smart date formatter based on data range
-function getDateFormatter(data: Record<string, string | number>[]) {
-  if (data.length < 2) {
-    return (value: string) => {
-      const date = new Date(value);
-      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-    };
-  }
-
-  const firstDate = new Date(data[0].date as string);
-  const lastDate = new Date(data[data.length - 1].date as string);
-  const daysDiff = Math.abs(
-    (lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
-
-  // For ranges > 2 years, show "MMM 'YY" format
-  if (daysDiff > 730) {
-    return (value: string) => {
-      const date = new Date(value);
-      const month = date.toLocaleDateString("en-US", { month: "short" });
-      const year = date.getFullYear().toString().slice(-2);
-      return `${month} '${year}`;
-    };
-  }
-
-  // For ranges > 6 months, show "MMM YYYY" format
-  if (daysDiff > 180) {
-    return (value: string) => {
-      const date = new Date(value);
-      return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
-    };
-  }
-
-  // For shorter ranges, show "MMM D" format
-  return (value: string) => {
-    const date = new Date(value);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  };
+/** Compact tick label with a true minus sign for negatives. */
+function formatCompactTick(value: number): string {
+  const abs = Math.abs(value);
+  const sign = value < 0 ? "−" : "";
+  if (abs >= 1e12) return `${sign}${(abs / 1e12).toFixed(1)}T`;
+  if (abs >= 1e9) return `${sign}${(abs / 1e9).toFixed(0)}B`;
+  if (abs >= 1e6) return `${sign}${(abs / 1e6).toFixed(0)}M`;
+  if (abs >= 1e3) return `${sign}${(abs / 1e3).toFixed(0)}K`;
+  if (abs >= 100) return `${sign}${abs.toFixed(0)}`;
+  return `${sign}${abs % 1 === 0 ? abs.toFixed(0) : abs.toFixed(1)}`;
 }
 
 interface MultiLineChartProps {
-  title: string;
+  /** Retained for call-site compatibility; the editorial frame (ChartSection) owns visible titles now. */
+  title?: string;
+  /** Retained for call-site compatibility; not rendered. */
   description?: string;
   data: Record<string, string | number>[];
   series: SeriesConfig[];
@@ -66,121 +49,76 @@ interface MultiLineChartProps {
   showYAxis?: boolean;
   showLegend?: boolean;
   height?: number;
-  /** Minimum height on mobile screens */
+  /** Retained for call-site compatibility; height is fixed. */
   mobileHeight?: number;
   className?: string;
   valueFormatter?: (value: number) => string;
   normalized?: boolean;
-  /** Info tooltip content - displays (i) icon when provided */
-  info?: InfoTooltipProps;
+  /** Retained for call-site compatibility; not rendered. */
+  info?: unknown;
 }
 
+/**
+ * Multi-series line chart on paper: thin ink lines, hairline grid, mono axes,
+ * legend as small sans text. No card chrome — sits inside a ChartSection.
+ */
 export function MultiLineChart({
-  title,
-  description,
   data,
   series,
   showGrid = true,
   showYAxis = true,
   showLegend = true,
   height = 300,
-  mobileHeight,
   className,
+  valueFormatter,
   normalized = false,
-  info,
 }: MultiLineChartProps) {
-  // Use mobile height on smaller screens
-  const effectiveMobileHeight = mobileHeight ?? Math.max(200, height * 0.7);
-  const chartConfig = series.reduce((acc, s) => {
-    acc[s.key] = {
-      label: s.label,
-      color: s.color,
-    };
-    return acc;
-  }, {} as ChartConfig);
+  const format = valueFormatter ?? ((v: number) => (normalized ? v.toFixed(0) : formatCompactTick(v)));
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
-      <CardHeader className="pb-2 px-3 sm:px-6">
-        <CardTitle className="inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold">
-          <span className="truncate">{title}</span>
-          {info && <InfoTooltip {...info} size="sm" />}
-        </CardTitle>
-        {description && (
-          <CardDescription className="text-[10px] sm:text-xs truncate">{description}</CardDescription>
-        )}
-      </CardHeader>
-      <CardContent className="pb-3 px-2 sm:px-6 sm:pb-4">
-        <ChartContainer 
-          config={chartConfig} 
-          className="w-full" 
-          style={{ 
-            height: `clamp(${effectiveMobileHeight}px, 40vw, ${height}px)`,
-            minHeight: effectiveMobileHeight,
-          }}
-        >
-          <LineChart
-            data={data}
-            margin={{ top: 5, right: 5, left: showYAxis ? -10 : -25, bottom: 0 }}
-          >
-            {showGrid && (
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="var(--border)"
-                strokeOpacity={0.5}
+    <div className={cn("space-y-2", className)}>
+      {showLegend && series.length > 1 && (
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          {series.map((s) => (
+            <span key={s.key} className="inline-flex items-center gap-1.5">
+              <span
+                aria-hidden="true"
+                className="inline-block h-0.5 w-4"
+                style={{ backgroundColor: s.color }}
               />
-            )}
+              {s.label}
+            </span>
+          ))}
+        </div>
+      )}
+      <div style={{ height }} className="w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            {showGrid && <CartesianGrid {...GRID_PROPS} />}
             <XAxis
               dataKey="date"
+              tick={AXIS_TICK}
               tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={40}
-              tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
-              tickFormatter={getDateFormatter(data)}
+              axisLine={AXIS_LINE}
+              tickFormatter={formatTickDate}
+              minTickGap={48}
             />
             {showYAxis && (
               <YAxis
+                tick={AXIS_TICK}
                 tickLine={false}
                 axisLine={false}
-                tickMargin={4}
-                tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
-                tickFormatter={(value) => {
-                  if (normalized) return value.toFixed(0);
-                  if (value >= 1e12) return `${(value / 1e12).toFixed(1)}T`;
-                  if (value >= 1e9) return `${(value / 1e9).toFixed(0)}B`;
-                  if (value >= 1e6) return `${(value / 1e6).toFixed(0)}M`;
-                  if (value >= 1e3) return `${(value / 1e3).toFixed(0)}K`;
-                  return value.toFixed(1);
-                }}
-                width={40}
+                width={48}
+                domain={["auto", "auto"]}
+                tickFormatter={(v: number) => (normalized ? v.toFixed(0) : formatCompactTick(v))}
               />
             )}
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  className="border-border bg-popover/95 backdrop-blur-sm"
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    });
-                  }}
-                />
-              }
+            <Tooltip
+              contentStyle={TOOLTIP_STYLE}
+              labelStyle={TOOLTIP_LABEL_STYLE}
+              labelFormatter={(label) => formatTooltipDate(String(label))}
+              formatter={(value, name) => [format(Number(value)), String(name)]}
             />
-            {showLegend && (
-              <Legend
-                verticalAlign="top"
-                align="right"
-                wrapperStyle={{
-                  paddingBottom: "5px",
-                  fontSize: "9px",
-                }}
-              />
-            )}
             {series.map((s) => (
               <Line
                 key={s.key}
@@ -188,25 +126,15 @@ export function MultiLineChart({
                 dataKey={s.key}
                 name={s.label}
                 stroke={s.color}
-                strokeWidth={2}
+                strokeWidth={1.25}
                 dot={false}
-                activeDot={{
-                  r: 4,
-                  fill: s.color,
-                  stroke: "var(--background)",
-                  strokeWidth: 2,
-                }}
+                activeDot={{ r: 3, strokeWidth: 0, fill: s.color }}
+                isAnimationActive={false}
               />
             ))}
           </LineChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+        </ResponsiveContainer>
+      </div>
+    </div>
   );
 }
-
-
-
-
-
-

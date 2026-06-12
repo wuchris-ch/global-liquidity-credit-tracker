@@ -8,13 +8,15 @@ Track global liquidity and credit metrics from central banks, BIS, World Bank, a
 
 **[global-liquidity-credit-tracker.vercel.app](https://global-liquidity-credit-tracker.vercel.app)**
 
-- [Dashboard](https://global-liquidity-credit-tracker.vercel.app/), overview of key liquidity metrics
-- [GLCI Index](https://global-liquidity-credit-tracker.vercel.app/glci), Global Liquidity & Credit Index (tri-pillar composite)
-- [Risk by Regime](https://global-liquidity-credit-tracker.vercel.app/risk), Sharpe ratios and returns by GLCI regime
-- [Track Record](https://global-liquidity-credit-tracker.vercel.app/track-record), GLCI regime backtest vs forward returns
-- [Liquidity Monitor](https://global-liquidity-credit-tracker.vercel.app/liquidity), Fed balance sheet & net liquidity
-- [Credit Spreads](https://global-liquidity-credit-tracker.vercel.app/spreads), HY/IG spread analysis
-- [Data Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), compare multiple series
+The frontend is organized as a daily research note in five sections:
+
+- [Today](https://global-liquidity-credit-tracker.vercel.app/), the 30-second brief: regime verdict, what changed, what it has meant, plumbing vitals
+- [Index](https://global-liquidity-credit-tracker.vercel.app/glci), the GLCI deep dive: pillar decomposition, regime history, methodology
+- [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns by regime with no-look-ahead backtest and honest confidence intervals
+- [Plumbing](https://global-liquidity-credit-tracker.vercel.app/plumbing), net liquidity vs S&P 500, TGA/RRP components, credit spreads, central banks
+- [Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), chart any series against any other, with preset overlays
+
+(Old routes `/risk`, `/track-record`, `/liquidity`, `/spreads` redirect to the merged pages.)
 
 ## Architecture
 

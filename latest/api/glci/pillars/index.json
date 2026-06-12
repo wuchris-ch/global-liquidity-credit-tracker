@@ -1,0 +1,20 @@
+{
+  "date": "2026-06-12",
+  "pillars": {
+    "liquidity": {
+      "value": -1.6093680346538886,
+      "weight": 0.4,
+      "contribution": -0.6437472138615554
+    },
+    "credit": {
+      "value": 0.2207078424110655,
+      "weight": 0.35,
+      "contribution": 0.07724774484387292
+    },
+    "stress": {
+      "value": -2.06130254770267,
+      "weight": 0.25,
+      "contribution": -0.5153256369256675
+    }
+  }
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "fed_total_assets",
+    "name": "Federal Reserve Total Assets",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "weekly",
+    "unit": "millions_usd"
+  },
+  {
+    "id": "fed_treasury_general_account",
+    "name": "Treasury General Account at Fed",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "weekly",
+    "unit": "millions_usd"
+  },
+  {
+    "id": "fed_reverse_repo",
+    "name": "Overnight Reverse Repurchase Agreements",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "daily",
+    "unit": "billions_usd"
+  },
+  {
+    "id": "ecb_total_assets",
+    "name": "ECB Total Assets",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "weekly",
+    "unit": "millions_eur"
+  },
+  {
+    "id": "boj_total_assets",
+    "name": "Bank of Japan Total Assets",
+    "source": "FRED",
+    "category": "Central Banks",
+    "frequency": "monthly",
+    "unit": "millions_jpy"
+  },
+  {
+    "id": "sofr",
+    "name": "Secured Overnight Financing Rate",
+    "source": "FRED",
+    "category": "Funding Rates",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "fed_funds_rate",
+    "name": "Effective Federal Funds Rate",
+    "source": "FRED",
+    "category": "Funding Rates",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "ted_spread",
+    "name": "TED Spread (3M LIBOR - 3M T-Bill)",
+    "source": "FRED",
+    "category": "Credit Spreads",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "ice_bofa_us_high_yield_spread",
+    "name": "ICE BofA US High Yield Index Option-Adjusted Spread",
+    "source": "FRED",
+    "category": "Credit Spreads",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "ice_bofa_us_ig_spread",
+    "name": "ICE BofA US Corporate Index Option-Adjusted Spread",
+    "source": "FRED",
+    "category": "Credit Spreads",
+    "frequency": "daily",
+    "unit": "percent"
+  },
+  {
+    "id": "sp500_price",
+    "name": "S&P 500 Index",
+    "source": "FRED",
+    "category": "Equities",
+    "frequency": "daily",
+    "unit": "index"
+  },
+  {
+    "id": "gold_price",
+    "name": "Gold ETF (GLD)",
+    "source": "YFINANCE",
+    "category": "Commodities",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "russell2000_price",
+    "name": "Russell 2000 ETF (IWM)",
+    "source": "YFINANCE",
+    "category": "Equities",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "silver_price",
+    "name": "Silver ETF (SLV)",
+    "source": "YFINANCE",
+    "category": "Commodities",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "bitcoin_price",
+    "name": "Bitcoin Price (USD, Coinbase)",
+    "source": "FRED",
+    "category": "Crypto",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "ethereum_price",
+    "name": "Ethereum Price (USD, Coinbase)",
+    "source": "FRED",
+    "category": "Crypto",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "zcash_price",
+    "name": "Zcash Price (USD)",
+    "source": "YFINANCE",
+    "category": "Crypto",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "long_bond_price",
+    "name": "20+ Year Treasury Bond ETF (TLT)",
+    "source": "YFINANCE",
+    "category": "Fixed Income",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "semis_price",
+    "name": "Semiconductor ETF (SMH), AI-hardware proxy",
+    "source": "YFINANCE",
+    "category": "Equities",
+    "frequency": "daily",
+    "unit": "usd"
+  },
+  {
+    "id": "nasdaq100",
+    "name": "Nasdaq-100 Index",
+    "source": "FRED",
+    "category": "Equities",
+    "frequency": "daily",
+    "unit": "index"
+  }
+]

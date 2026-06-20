@@ -136,7 +136,9 @@ def main():
     for series_id in priority_series:
         latest = storage.get_latest_date("fred", series_id)
         if latest:
-            days_old = (datetime.now() - latest.to_pydatetime()).days
+            # Compare on calendar dates so tz-aware series don't break the
+            # subtraction against a tz-naive datetime.now().
+            days_old = (datetime.now().date() - latest.date()).days
             if days_old > 7:
                 errors.append(f"{series_id}: data is {days_old} days old")
 
@@ -149,7 +151,7 @@ def main():
             errors.append(f"{series_id}: fetch returned no data this run")
             continue
         latest = pd.to_datetime(df["date"]).max()
-        days_old = (datetime.now() - latest.to_pydatetime()).days
+        days_old = (datetime.now().date() - latest.date()).days
         if days_old > 7:
             errors.append(f"{series_id}: data is {days_old} days old")
     

@@ -110,6 +110,15 @@ class TestGrowthAndYoY:
         out = compute_growth_rate(df, periods=52, method="log")
         assert out["growth_rate"].iloc[-1] == pytest.approx(np.log(1.2) * 100)
 
+    def test_percentage_transforms_do_not_implicitly_fill_missing_values(self):
+        df = df_of([100.0, np.nan, 110.0])
+
+        growth = compute_growth_rate(df, periods=1, method="pct")
+        yoy = compute_yoy_change(df, periods=1)
+
+        assert growth["growth_rate"].iloc[1:].isna().all()
+        assert yoy["yoy_change"].iloc[1:].isna().all()
+
 
 class TestCreditImpulse:
     def test_linear_growth_has_constant_flow_and_zero_impulse(self):

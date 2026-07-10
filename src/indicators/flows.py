@@ -1,4 +1,4 @@
-"""Liquidity destinations: where the marginal dollar is going.
+"""Liquidity-sensitive price leadership across market destinations.
 
 Ranks liquidity-sensitive asset classes ("destinations") by how unusual
 their trailing bid is relative to their own history, so the frontend can
@@ -23,7 +23,6 @@ to /api/flows by the static export.
 import json
 from datetime import datetime
 
-import numpy as np
 import pandas as pd
 
 from ..config import CURATED_DATA_PATH
@@ -56,6 +55,14 @@ SPARK_WEEKS = 52
 PAIR_WEEKS = 156
 
 
+def _completed_weekly_closes(series: pd.Series) -> pd.Series:
+    """Return Friday-stamped closes without a partial current-week bucket."""
+    max_observation_date = series.index.max().normalize()
+    weekly = series.resample("W-FRI").last().dropna()
+    last_completed_friday = pd.offsets.Week(weekday=4).rollback(max_observation_date)
+    return weekly.loc[weekly.index <= last_completed_friday]
+
+
 class FlowsComputer:
     """Computes the liquidity-destinations payload."""
 
@@ -86,7 +93,7 @@ class FlowsComputer:
             df["value"].astype(float).values,
             index=dates.astype("datetime64[ns]"),
         ).sort_index()
-        weekly = prices.resample("W-FRI").last().dropna()
+        weekly = _completed_weekly_closes(prices)
         return weekly if len(weekly) >= FLOW_WINDOW + 1 else None
 
     def _load_glci_weekly(self) -> pd.Series | None:
@@ -95,7 +102,7 @@ class FlowsComputer:
             return None
         dates = pd.to_datetime(glci["date"]).astype("datetime64[ns]")
         series = pd.Series(glci["value"].astype(float).values, index=dates).sort_index()
-        return series.resample("W-FRI").last().dropna()
+        return _completed_weekly_closes(series)
 
     # -- metrics ------------------------------------------------------------
 

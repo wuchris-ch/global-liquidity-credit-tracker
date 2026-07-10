@@ -15,8 +15,8 @@ The frontend is organized as a daily research note in six sections:
 
 - [Today](https://global-liquidity-credit-tracker.vercel.app/), the 30-second brief: regime verdict, what changed, what it has meant, plumbing vitals
 - [Index](https://global-liquidity-credit-tracker.vercel.app/glci), the GLCI deep dive: pillar decomposition, regime history, methodology
-- [Flows](https://global-liquidity-credit-tracker.vercel.app/flows), where the marginal dollar is going: AI/semis vs crypto vs gold vs small caps vs duration, each scored against its own norm, plus bitcoin priced in semiconductors
-- [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns by regime with no-look-ahead backtest and honest confidence intervals
+- [Flows](https://global-liquidity-credit-tracker.vercel.app/flows), a price-leadership gauge for AI/semis vs crypto vs gold vs small caps vs duration, each scored against its own norm, plus bitcoin priced in semiconductors
+- [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns by reconstructed regime with expanding thresholds, explicit timing, and confidence intervals
 - [Plumbing](https://global-liquidity-credit-tracker.vercel.app/plumbing), net liquidity vs S&P 500, TGA/RRP components, credit spreads, central banks
 - [Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), chart any series against any other, with preset overlays
 
@@ -74,7 +74,7 @@ Everything below runs offline (no API keys, no network):
 
 ```bash
 make test    # 80+ unit tests: transforms, GLCI factor model, Sharpe/regime
-             # metrics, backtest look-ahead safety, export validation
+             # metrics, backtest timing controls, export validation
 make smoke   # config integrity + numerics + local artifact validation
 ```
 
@@ -158,7 +158,17 @@ Tri-pillar composite index combining:
 - **Credit** (35%): Bank credit, consumer credit, BIS credit data
 - **Stress** (25%, inverted): Credit spreads, VIX, funding rates
 
+All three pillars are required. If any pillar cannot be fitted, the update
+fails before saving or publishing instead of redistributing its weight. Pillar
+scores are standardized to a common unit-variance scale before the fixed
+40/35/25 weights are applied.
+
 Regime classification: Tight (z-score < -1), Neutral (-1 to +1), Loose (> +1)
+
+The displayed history is a reconstruction using the current source-data
+vintage and factor estimates. It is not a point-in-time vintage history.
+Append-only publication snapshots preserve what the model said on each run
+from the snapshot feature's introduction onward.
 
 ## Risk by Regime Dashboard
 
@@ -179,9 +189,9 @@ The Risk by Regime dashboard shows how different asset classes perform under var
 - Crypto: Bitcoin, Ethereum, Zcash
 - Fixed Income: Long Bonds (TLT)
 
-## Flows (Liquidity Destinations)
+## Flows (Price Leadership)
 
-The Flows page answers "where is the marginal liquidity dollar going?" by ranking
+The Flows page shows where liquidity-sensitive prices are leading by ranking
 destinations (AI/semis, megacap tech, crypto, gold, small caps, long Treasuries,
 broad equities) by how unusual their trailing 13-week return is against their own
 trailing three-year history.
@@ -205,16 +215,20 @@ says so explicitly.
 The Track Record dashboard backtests the GLCI regime classifier against forward asset returns to measure its predictive value.
 
 **Methodology:**
-- Expanding-window backtest with a 52-week burn-in period (no look-ahead bias)
-- Tests 4, 13, and 26-week forward return horizons
+- Expanding-window regime thresholds with a 52-week burn-in period
+- Friday-to-Friday data grid, next-week entry, and 4, 13, and 26-week forward return horizons
 - Compares GLCI regime classifier against an NFCI baseline
-- Bootstrap 95% confidence intervals for statistical rigor
+- Paired moving-block 95% confidence intervals over the full weekly row sequence
+
+The expanding classifier prevents future composite observations from changing
+past threshold labels. It does not make the upstream GLCI point-in-time: source
+revisions and factor re-estimation can still change reconstructed history.
 
 **Metrics shown:**
-- Hit rate: how often the regime correctly predicts the sign of forward returns
-- Mean return by regime: average forward return conditioned on Tight, Neutral, or Loose
-- Sharpe delta: difference in risk-adjusted returns between Loose and Tight regimes
-- Confidence intervals via bootstrap resampling
+- Hit rate and median forward return within each reconstructed regime
+- Edge: regime-subgroup hit rate minus the unconditional hit rate
+- Subgroup hit-rate CIs and paired edge CIs computed separately in each resample
+- An edge is highlighted only when its paired 95% CI excludes zero
 
 ## Project Structure
 
@@ -373,12 +387,11 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
    - `GITHUB_TOKEN` is provided automatically by GitHub Actions.
 
 2) GitHub Actions (`.github/workflows/update-data.yml`) runs every 12h:
-   - `python scripts/update_data.py` (fetch + indices)
-   - `python - <<'PY' ... compute_glci(save=True)` (GLCI)
+   - `python scripts/update_data.py` (fetch + indices + GLCI publication snapshot)
    - `python - <<'PY' ... compute_risk_metrics(save=True)` (Risk metrics)
    - `python - <<'PY' ... compute_backtest(save=True)` (Track record backtest)
    - `python scripts/export_to_json.py --output data/export/latest --snapshot` (API-shaped JSON)
-   - Force-publishes `latest/` and a few `snapshots/` to the `gh-pages` branch.
+   - Publishes `latest/`, a few daily snapshots, and the durable GLCI vintage ledger to `gh-pages` with recoverable commit history.
 
 3) Frontend configuration:
    - Point to static JSON: `NEXT_PUBLIC_DATA_BASE_URL=https://<user>.github.io/<repo>/latest`
@@ -387,7 +400,7 @@ branch and serve a static frontend (Vercel or GitHub Pages) without any external
 4) Artifacts structure (relative to the published root):
    - `latest/api/series/index.json`, `latest/api/series/{id}/index.json`, `latest/api/series/{id}/latest/index.json`
    - `latest/api/indices/index.json`, `latest/api/indices/{id}/index.json`
-   - `latest/api/glci/index.json`, `latest/api/glci/latest/index.json`, `latest/api/glci/pillars/index.json`, `latest/api/glci/freshness/index.json`, `latest/api/glci/regime-history/index.json`
+   - `latest/api/glci/index.json`, `latest/api/glci/latest/index.json`, `latest/api/glci/pillars/index.json`, `latest/api/glci/trust/index.json`, `latest/api/glci/freshness/index.json`, `latest/api/glci/regime-history/index.json`
    - `latest/api/risk/index.json`, `latest/api/risk/{asset_id}/index.json`
    - `latest/api/backtest/track_record/index.json`
    - Snapshots mirror the same layout under `snapshots/YYYY-MM-DD/`.

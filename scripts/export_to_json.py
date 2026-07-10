@@ -14,6 +14,7 @@ same paths as the FastAPI endpoints, so a static host can serve them directly:
   <base>/api/glci/latest
   <base>/api/glci/pillars
   <base>/api/glci/freshness
+  <base>/api/glci/trust
   <base>/api/glci/regime-history
 
 Optional snapshots can be copied to snapshots/YYYY-MM-DD for long-cache hosting.
@@ -25,7 +26,7 @@ import argparse
 import json
 import shutil
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -42,8 +43,8 @@ from src.config import (
     get_all_indices,
     get_all_series,
     get_index_config,
-    get_series_config,
 )
+from src.data_quality import build_glci_trust_payload, freshness_state
 from src.etl.storage import DataStorage
 
 # Mirrors CATEGORY_MAP in src/api/server.py; kept here to avoid FastAPI import.
@@ -119,6 +120,7 @@ REQUIRED_PRODUCTION_EXPORT_PATHS = (
     "api/glci/latest/index.json",
     "api/glci/pillars/index.json",
     "api/glci/freshness/index.json",
+    "api/glci/trust/index.json",
     "api/glci/regime-history/index.json",
     "api/risk/index.json",
     "api/backtest/track_record/index.json",
@@ -391,14 +393,17 @@ def export_glci_freshness(
             src = series_cfg.get(sid, {}).get("source", "unknown")
             last_date = storage.get_latest_date(src, sid)
             if last_date is not None:
-                days_old = (pd.Timestamp.now() - last_date).days
+                frequency = str(
+                    series_cfg.get(sid, {}).get("frequency", "")
+                ).lower()
+                days_old, is_stale = freshness_state(last_date, frequency)
                 freshness.append(
                     {
                         "series_id": sid,
                         "pillar": pillar_name,
                         "last_date": fmt_date(last_date),
                         "days_old": int(days_old),
-                        "is_stale": days_old > 14,
+                        "is_stale": is_stale,
                     }
                 )
             else:
@@ -412,6 +417,16 @@ def export_glci_freshness(
                     }
                 )
     write_json(output_dir / "api" / "glci" / "freshness" / "index.json", freshness)
+
+
+def export_glci_trust(
+    storage: DataStorage, series_cfg: Dict[str, dict], output_dir: Path
+) -> None:
+    """Export transparent GLCI provenance and current fitted-input coverage."""
+    write_json(
+        output_dir / "api" / "glci" / "trust" / "index.json",
+        build_glci_trust_payload(storage, series_cfg),
+    )
 
 
 def export_risk_metrics(storage: DataStorage, output_dir: Path) -> bool:
@@ -576,6 +591,24 @@ def validate_required_exports(output_dir: Path) -> list[str]:
             errors.append(f"empty data in {rel_path}")
         elif rel_path == "api/glci/index.json" and not payload.get("data"):
             errors.append(f"empty data in {rel_path}")
+        elif rel_path == "api/glci/trust/index.json":
+            required_keys = {
+                "as_of",
+                "historical_mode",
+                "point_in_time",
+                "frequency",
+                "snapshots",
+                "data_quality",
+                "pillar_stats",
+            }
+            missing_keys = sorted(required_keys - set(payload))
+            if missing_keys:
+                errors.append(
+                    f"incomplete trust payload in {rel_path}: "
+                    + ", ".join(missing_keys)
+                )
+            elif payload.get("point_in_time") is not False:
+                errors.append(f"incorrect point-in-time claim in {rel_path}")
         elif rel_path == "api/risk/index.json" and not payload.get("assets"):
             errors.append(f"empty assets in {rel_path}")
         elif rel_path == "api/backtest/track_record/index.json" and not payload.get("assets"):
@@ -623,6 +656,7 @@ def export_all(
         print("[export] Skipped GLCI (missing curated data)")
     else:
         export_glci_freshness(storage, series_cfg, output_dir)
+        export_glci_trust(storage, series_cfg, output_dir)
 
     # Risk metrics endpoints
     risk_ok = export_risk_metrics(storage, output_dir)

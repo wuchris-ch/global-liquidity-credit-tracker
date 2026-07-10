@@ -3,12 +3,11 @@ import pandas as pd
 import numpy as np
 from typing import Literal
 from dataclasses import dataclass
-import warnings
 
-from ..config import get_series_config, get_index_config, get_country_weights
+from ..config import get_series_config, get_index_config
+from ..data_quality import staleness_allowance_days
 from ..etl.fetcher import DataFetcher
 from .transforms import (
-    resample_to_frequency,
     compute_zscore,
     compute_growth_rate,
     compute_rolling_gap,
@@ -16,8 +15,41 @@ from .transforms import (
     compute_hp_filter_gap,
     standardize_series,
     align_series,
-    apply_sign_flip,
 )
+
+
+_TARGET_FREQUENCIES = {
+    "D": "D",
+    "W": "W-FRI",
+    "M": "ME",
+    "Q": "QE",
+    "A": "YE",
+}
+
+_SOURCE_FREQUENCY_DAYS = {
+    "daily": 1,
+    "weekly": 7,
+    "monthly": 31,
+    "quarterly": 92,
+    "annual": 366,
+}
+
+_TARGET_FREQUENCY_DAYS = {
+    "D": 1,
+    "W": 7,
+    "M": 31,
+    "Q": 92,
+    "A": 366,
+}
+
+
+def _finite_transform_frame(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Select one derived transform and convert non-finite values to missing."""
+    transformed = df[["date", column]].rename(columns={column: "value"}).copy()
+    transformed["value"] = pd.to_numeric(
+        transformed["value"], errors="coerce"
+    ).replace([np.inf, -np.inf], np.nan)
+    return transformed
 
 
 @dataclass
@@ -82,20 +114,19 @@ class FeatureMatrixBuilder:
             raise ValueError(f"Index '{index_id}' not found in configuration")
         
         pillars = config.get("pillars", {})
-        country_weights = get_country_weights()
-        
         all_features = {}
         all_metadata = []
         
         for pillar_name, pillar_config in pillars.items():
-            pillar_sign = pillar_config.get("sign", 1)
             pillar_transforms = pillar_config.get("transforms", transforms)
             components = pillar_config.get("components", [])
             
             for comp in components:
                 series_id = comp["series"]
-                # Series-level sign combined with pillar sign
-                series_sign = comp.get("sign", 1) * pillar_sign
+                # Component signs orient inputs within a pillar. Pillar signs are
+                # intentionally applied once, after factor extraction, when the
+                # pillar is aggregated into the GLCI.
+                series_sign = comp.get("sign", 1)
                 country = comp.get("country", "")
                 comp_transforms = comp.get("transform", pillar_transforms)
                 
@@ -121,17 +152,13 @@ class FeatureMatrixBuilder:
                 
                 # Calculate data quality metrics
                 last_date = df["date"].max()
-                days_since_update = (pd.Timestamp.now() - pd.Timestamp(last_date)).days
-                
-                # Resample to target frequency
-                df = resample_to_frequency(df, target_freq, agg_method="last")
-                
-                # Pre-flip negative-sign series so downstream factor loadings are positive.
-                if series_sign < 0:
-                    df = apply_sign_flip(df, "value", series_sign)
-                    effective_sign = 1
-                else:
-                    effective_sign = series_sign
+                # Put raw observations on the target clock before applying any
+                # row-based transform. This makes a 52-period growth transform
+                # mean 52 calendar weeks even for monthly or quarterly inputs.
+                df = self._regularize_series(df, source_freq, target_freq)
+                if df.empty:
+                    print(f"Warning: No completed {target_freq} periods for {series_id}")
+                    continue
                 
                 # Apply transforms and create features
                 for transform in comp_transforms:
@@ -154,7 +181,7 @@ class FeatureMatrixBuilder:
                         transformed = compute_growth_rate(df.copy(), periods=periods)
                         # Standardize the growth rate
                         transformed = standardize_series(
-                            transformed.rename(columns={"growth_rate": "value"}),
+                            _finite_transform_frame(transformed, "growth_rate"),
                             value_col="value",
                             method="zscore"
                         )
@@ -166,7 +193,7 @@ class FeatureMatrixBuilder:
                         transformed = compute_rolling_gap(df.copy(), window=window)
                         # Standardize the gap
                         transformed = standardize_series(
-                            transformed.rename(columns={"gap_pct": "value"}),
+                            _finite_transform_frame(transformed, "gap_pct"),
                             value_col="value",
                             method="zscore"
                         )
@@ -179,7 +206,10 @@ class FeatureMatrixBuilder:
                         # Standardize the impulse
                         if transformed["credit_impulse"].notna().sum() > 10:
                             transformed = standardize_series(
-                                transformed.rename(columns={"credit_impulse": "value"}),
+                                _finite_transform_frame(
+                                    transformed,
+                                    "credit_impulse",
+                                ),
                                 value_col="value",
                                 method="zscore"
                             )
@@ -193,7 +223,7 @@ class FeatureMatrixBuilder:
                         transformed = compute_hp_filter_gap(df.copy(), lamb=lamb)
                         if transformed["hp_gap"].notna().sum() > 10:
                             transformed = standardize_series(
-                                transformed.rename(columns={"hp_gap": "value"}),
+                                _finite_transform_frame(transformed, "hp_gap"),
                                 value_col="value",
                                 method="zscore"
                             )
@@ -203,9 +233,22 @@ class FeatureMatrixBuilder:
                             
                     else:
                         continue
+
+                    # Orient the transformed signal, not its raw level. Applying
+                    # a negative sign before a ratio transform such as pct_change
+                    # cancels out because (-new / -old) == (new / old).
+                    feature_values = (feature_values * series_sign).replace(
+                        [np.inf, -np.inf],
+                        np.nan,
+                    )
                     
                     # Calculate coverage for this feature
                     coverage = feature_values.notna().sum() / len(feature_values) if len(feature_values) > 0 else 0
+                    if coverage == 0:
+                        # A fetched series can still be unusable for a long-window
+                        # transform. Do not pass an all-missing feature to the
+                        # factor model or count it as fitted coverage.
+                        continue
                     
                     # Store feature with date index
                     feature_df = pd.DataFrame({
@@ -220,7 +263,7 @@ class FeatureMatrixBuilder:
                         country=country or series_config.get("country", ""),
                         transform=transform,
                         unit=unit,
-                        sign=effective_sign,  # positive after pre-flip
+                        sign=1,  # component orientation has already been consumed
                         source_frequency=source_freq,
                         data_quality=coverage,
                         last_updated=str(last_date)[:10] if pd.notna(last_date) else "unknown"
@@ -230,7 +273,10 @@ class FeatureMatrixBuilder:
             raise ValueError("No features could be built from configuration")
         
         # Align all features to common dates
-        aligned = self._align_features(all_features)
+        aligned = self._align_features(
+            all_features,
+            target_freq=target_freq,
+        )
         
         return aligned, all_metadata
     
@@ -279,20 +325,31 @@ class FeatureMatrixBuilder:
         missing_series = [s for s in expected_series if s not in loaded_series]
         
         # Check coverage
-        low_coverage = []
-        stale_series = []
+        low_coverage_by_series: dict[str, float] = {}
+        stale_by_series: dict[str, int] = {}
         
         for meta in metadata:
             if meta.data_quality < 0.5:
-                low_coverage.append((meta.series_id, meta.data_quality))
+                prior_coverage = low_coverage_by_series.get(meta.series_id, 1.0)
+                low_coverage_by_series[meta.series_id] = min(
+                    prior_coverage,
+                    meta.data_quality,
+                )
 
             # last_updated is "unknown" when source data had no valid dates; skip
             # the staleness check in that case instead of crashing.
             if meta.last_updated == "unknown":
                 continue
             days_old = (pd.Timestamp.now() - pd.Timestamp(meta.last_updated)).days
-            if days_old > 30:
-                stale_series.append((meta.series_id, days_old))
+            stale_after_days = staleness_allowance_days(meta.source_frequency)
+            if days_old > stale_after_days:
+                stale_by_series[meta.series_id] = max(
+                    stale_by_series.get(meta.series_id, 0),
+                    days_old,
+                )
+
+        low_coverage = sorted(low_coverage_by_series.items())
+        stale_series = sorted(stale_by_series.items())
         
         report = DataQualityReport(
             pillar=pillar_name,
@@ -329,29 +386,92 @@ class FeatureMatrixBuilder:
     
     def _align_features(
         self,
-        features: dict[str, pd.DataFrame]
+        features: dict[str, pd.DataFrame],
+        target_freq: str = "W",
     ) -> pd.DataFrame:
-        """Align all features to common dates using outer join with forward fill."""
+        """Outer-align already regularized features on an explicit clock.
+
+        Raw series are regularized before their transforms, so this final step
+        does not fill any missing feature values. Values before a series' first
+        observation remain missing.
+        """
         if not features:
             return pd.DataFrame()
-        
+
+        if target_freq not in _TARGET_FREQUENCIES:
+            raise ValueError(f"Unsupported target frequency: {target_freq}")
+
         # Convert to dict format expected by align_series
         series_dict = {}
         for name, df in features.items():
             series_dict[name] = df.rename(columns={name: "value"})
         
-        aligned = align_series(series_dict, method="outer", fill_method="ffill")
-        
-        # For low-frequency series that were forward-filled, apply a more
-        # aggressive fill to ensure we have enough observations
-        numeric_cols = aligned.select_dtypes(include=[np.number]).columns
-        for col in numeric_cols:
-            # Extended forward fill with limit of 13 weeks (one quarter)
-            aligned[col] = aligned[col].ffill(limit=13)
-            # Also backfill for initial observations
-            aligned[col] = aligned[col].bfill(limit=4)
-        
-        return aligned
+        aligned = align_series(series_dict, method="outer", fill_method=None)
+        aligned["date"] = pd.to_datetime(aligned["date"])
+        aligned = aligned.sort_values("date").set_index("date")
+
+        start = aligned.index.min()
+        end = aligned.index.max()
+        grid = pd.date_range(start=start, end=end, freq=_TARGET_FREQUENCIES[target_freq])
+        aligned = aligned.reindex(grid)
+        aligned.index.name = "date"
+
+        return aligned.reset_index()
+
+    def _regularize_series(
+        self,
+        df: pd.DataFrame,
+        source_frequency: str,
+        target_freq: str,
+    ) -> pd.DataFrame:
+        """Aggregate and bounded-fill raw values on the target period grid."""
+        if target_freq not in _TARGET_FREQUENCIES:
+            raise ValueError(f"Unsupported target frequency: {target_freq}")
+        if df.empty:
+            return pd.DataFrame(columns=["date", "value"])
+
+        values = df[["date", "value"]].copy()
+        values["date"] = pd.to_datetime(values["date"])
+        if values["date"].dt.tz is not None:
+            values["date"] = values["date"].dt.tz_localize(None)
+        values = values.dropna(subset=["date"]).sort_values("date")
+        if values.empty:
+            return pd.DataFrame(columns=["date", "value"])
+
+        max_observation_date = values["date"].max().normalize()
+        series = values.set_index("date")["value"]
+        regularized = series.resample(_TARGET_FREQUENCIES[target_freq]).last()
+
+        if target_freq == "W":
+            # A Monday through Thursday observation belongs to an incomplete
+            # week. Do not publish it under a future Friday signal date.
+            last_completed_friday = pd.offsets.Week(weekday=4).rollback(
+                max_observation_date
+            )
+            regularized = regularized.loc[regularized.index <= last_completed_friday]
+
+        if regularized.empty:
+            return pd.DataFrame(columns=["date", "value"])
+
+        grid = pd.date_range(
+            regularized.index.min(),
+            regularized.index.max(),
+            freq=_TARGET_FREQUENCIES[target_freq],
+        )
+        regularized = regularized.reindex(grid)
+        fill_limit = self._forward_fill_limit(source_frequency, target_freq)
+        regularized = regularized.ffill(limit=fill_limit)
+        regularized.index.name = "date"
+        return regularized.rename("value").reset_index()
+
+    @staticmethod
+    def _forward_fill_limit(source_frequency: str, target_freq: str) -> int:
+        """Return a bounded carry-forward window in target periods."""
+        source_days = _SOURCE_FREQUENCY_DAYS.get(source_frequency.lower(), 7)
+        target_days = _TARGET_FREQUENCY_DAYS[target_freq]
+        # One grace period accommodates release timing and holiday weeks while
+        # still allowing stale series to become missing rather than live forever.
+        return max(1, int(np.ceil(source_days / target_days)) + 1)
 
 
 def normalize_to_usd_dynamic(
@@ -440,22 +560,21 @@ def get_pillar_signs(index_id: str) -> dict[str, int]:
 
 
 def get_component_signs(index_id: str, pillar_name: str) -> dict[str, int]:
-    """Get expected signs for all components in a pillar.
+    """Get within-pillar signs for all components in a pillar.
     
-    Returns dict mapping series_id to expected sign.
+    Pillar-level orientation is deliberately excluded and is applied once when
+    pillar factors are combined into the composite.
     """
     config = get_index_config(index_id)
     if not config:
         return {}
     
     pillar = config.get("pillars", {}).get(pillar_name, {})
-    pillar_sign = pillar.get("sign", 1)
     
     signs = {}
     for comp in pillar.get("components", []):
         series_id = comp["series"]
         comp_sign = comp.get("sign", 1)
-        # Combined sign = pillar sign * component sign
-        signs[series_id] = pillar_sign * comp_sign
+        signs[series_id] = comp_sign
     
     return signs

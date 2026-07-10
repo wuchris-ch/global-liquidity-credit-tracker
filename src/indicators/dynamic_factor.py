@@ -1,6 +1,7 @@
 """Dynamic Factor Model implementation for latent factor extraction."""
 import pandas as pd
 import numpy as np
+from importlib.util import find_spec
 from typing import Literal
 from dataclasses import dataclass, field
 import warnings
@@ -12,12 +13,10 @@ try:
 except ImportError:
     HAS_STATSMODELS_DFM = False
 
-# Try to import mixed-frequency DFM
-try:
-    from statsmodels.tsa.statespace.dynamic_factor_mq import DynamicFactorMQ
-    HAS_MIXED_FREQ = True
-except ImportError:
-    HAS_MIXED_FREQ = False
+# Detect optional mixed-frequency DFM support without importing an unused class.
+HAS_MIXED_FREQ = (
+    find_spec("statsmodels.tsa.statespace.dynamic_factor_mq") is not None
+)
 
 # Try to import sklearn for PCA fallback
 try:
@@ -71,7 +70,7 @@ class DynamicFactorModel:
     
     Features:
     - Handles missing data via Kalman filter or imputation
-    - Sign constraints applied BEFORE extraction via pre-flipping
+    - Sign constraints applied to already oriented features before extraction
     - Shrinkage option for stable loadings
     - Falls back gracefully when packages unavailable
     """
@@ -95,8 +94,8 @@ class DynamicFactorModel:
             factor_order: AR order for factor dynamics (DFM only)
             error_order: AR order for idiosyncratic errors (DFM only)
             sign_constraints: Dict mapping column names to expected signs (+1/-1)
-                             Note: Series should be pre-flipped, so all should be +1
-            max_iter: Maximum iterations for EM algorithm
+                             Note: inputs are already oriented, so all should be +1
+            max_iter: Maximum iterations for dynamic-factor optimization
             method: Estimation method
             shrinkage_alpha: Ridge regularization parameter
             min_observations: Minimum required observations
@@ -270,7 +269,7 @@ class DynamicFactorModel:
         try:
             # Create and fit the model
             model = DynamicFactor(
-                data_scaled.dropna(),  # DFM needs complete data for EM init
+                data_scaled.dropna(),  # DFM initialization needs complete data
                 k_factors=self.n_factors,
                 factor_order=self.factor_order,
                 error_order=self.error_order
@@ -279,10 +278,13 @@ class DynamicFactorModel:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 results = model.fit(
-                    method="em",
+                    method="lbfgs",
                     maxiter=self.max_iter,
                     disp=False
                 )
+
+            if not results.mle_retvals.get("converged", False):
+                raise RuntimeError("DFM maximum-likelihood fit did not converge")
             
             self._model = model
             self._results = results
@@ -300,14 +302,7 @@ class DynamicFactorModel:
     
     def _fit_pca_shrunk(self, X: pd.DataFrame) -> None:
         """Fit using PCA with shrinkage on loadings."""
-        data = X.select_dtypes(include=[np.number]).copy()
-        
-        # Handle missing values with forward/backward fill then mean
-        data = data.ffill(limit=26).bfill(limit=26)
-        for col in data.columns:
-            if data[col].isna().any():
-                col_mean = data[col].mean()
-                data[col] = data[col].fillna(col_mean if not pd.isna(col_mean) else 0)
+        data = self._prepare_pca_data(X)
         
         # Check if we have enough data
         valid_mask = data.notna().all(axis=1)
@@ -352,14 +347,7 @@ class DynamicFactorModel:
     
     def _fit_pca(self, X: pd.DataFrame) -> None:
         """Fit using standard PCA (fallback method)."""
-        data = X.select_dtypes(include=[np.number]).copy()
-        
-        # Handle missing values
-        data = data.ffill(limit=26).bfill(limit=26)
-        for col in data.columns:
-            if data[col].isna().any():
-                col_mean = data[col].mean()
-                data[col] = data[col].fillna(col_mean if not pd.isna(col_mean) else 0)
+        data = self._prepare_pca_data(X)
         
         valid_mask = data.notna().all(axis=1)
         data_clean = data[valid_mask]
@@ -383,8 +371,10 @@ class DynamicFactorModel:
             else:
                 # Manual PCA using numpy SVD
                 self._scaler = None
-                data_centered = data_clean - data_clean.mean()
-                data_scaled = data_centered / data_centered.std()
+                self._manual_mean = data_clean.mean()
+                self._manual_std = data_clean.std().replace(0, 1)
+                data_centered = data_clean - self._manual_mean
+                data_scaled = data_centered / self._manual_std
                 
                 U, S, Vt = np.linalg.svd(data_scaled.values, full_matrices=False)
                 
@@ -395,6 +385,45 @@ class DynamicFactorModel:
         
         self._method_used = "pca"
         self._full_data = data
+
+    def _prepare_pca_data(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Prepare PCA inputs using only contemporaneous or past observations.
+
+        PCA requires a complete matrix. Training begins only once every input
+        series has produced at least one observation. Later gaps use a bounded
+        forward fill and then the expanding mean available at that row. No
+        future value is copied backward into leading history.
+        """
+        data = X.select_dtypes(include=[np.number]).copy()
+        if self._columns:
+            missing_columns = [col for col in self._columns if col not in data.columns]
+            if missing_columns:
+                raise ValueError(
+                    "PCA input is missing fitted columns: "
+                    + ", ".join(missing_columns)
+                )
+            data = data[self._columns]
+
+        first_valid_positions = []
+        for col in data.columns:
+            valid = np.flatnonzero(data[col].notna().to_numpy())
+            if not len(valid):
+                raise ValueError(f"PCA input column '{col}' has no observations")
+            first_valid_positions.append(int(valid[0]))
+
+        common_start = max(first_valid_positions)
+        past_means = data.expanding(min_periods=1).mean()
+        prepared = data.iloc[common_start:].copy()
+        prepared = prepared.ffill(limit=26)
+        prepared = prepared.fillna(past_means.iloc[common_start:])
+
+        if prepared.isna().any().any():
+            missing = prepared.columns[prepared.isna().any()].tolist()
+            raise ValueError(
+                "PCA input could not be imputed from past observations: "
+                + ", ".join(missing)
+            )
+        return prepared
     
     def transform(self, X: pd.DataFrame | None = None) -> pd.DataFrame:
         """Extract factor scores from data.
@@ -415,7 +444,9 @@ class DynamicFactorModel:
     
     def _transform_dfm(self, X: pd.DataFrame | None = None) -> pd.DataFrame:
         """Transform using DFM smoothed factors."""
-        factors = self._results.factors.smoothed
+        # statsmodels exposes (n_factors, n_observations); the shared model
+        # interface uses rows as observations.
+        factors = np.asarray(self._results.factors.smoothed).T
         
         # Apply sign adjustment based on average loading direction
         factors = self._adjust_factor_sign(factors)
@@ -432,12 +463,10 @@ class DynamicFactorModel:
     def _transform_pca(self, X: pd.DataFrame | None = None) -> pd.DataFrame:
         """Transform using PCA factors."""
         if X is None:
-            data = self._full_data
+            # Reuse the exact past-only frame prepared during fitting.
+            data = self._full_data.copy()
         else:
-            data = X.select_dtypes(include=[np.number]).copy()
-        
-        # Handle missing values
-        data = data.ffill().bfill()
+            data = self._prepare_pca_data(X)
         
         if HAS_SKLEARN and self._scaler is not None:
             data_scaled = self._scaler.transform(data)
@@ -455,8 +484,8 @@ class DynamicFactorModel:
             else:
                 factors = self._model.transform(data_scaled)
         else:
-            data_centered = data - data.mean()
-            data_scaled = data_centered / data_centered.std()
+            data_centered = data - self._manual_mean
+            data_scaled = data_centered / self._manual_std
             factors = data_scaled.values @ self._pca_components.T
         
         # Ensure factors is 2D
@@ -473,7 +502,8 @@ class DynamicFactorModel:
     def _adjust_factor_sign(self, factors: np.ndarray) -> np.ndarray:
         """Adjust factor sign to ensure positive average loading.
         
-        Since we pre-flip negative-sign series, all loadings should be positive.
+        Since input features are economically oriented before extraction, all
+        loadings should be positive.
         This method ensures the factor is oriented so that the average loading
         is positive (i.e., increases in the factor mean increases in components).
         """

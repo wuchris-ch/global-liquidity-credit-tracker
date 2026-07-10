@@ -77,6 +77,7 @@ function num(v: number | null | undefined, decimals = 1): string {
 }
 
 const REGIME_ORDER: Regime[] = ["loose", "neutral", "tight"];
+const PAIRED_BOOTSTRAP_METHOD = "paired_full_calendar_moving_block";
 
 const REGIME_WASH: Record<Regime, string> = {
   loose: "regime-wash-loose",
@@ -110,24 +111,21 @@ function baseRate(
   return asset.base_rates?.[horizon] ?? null;
 }
 
-/**
- * The edge is "real" only when the bootstrap CI on the regime hit rate
- * excludes the unconditional base rate. Null when we can't tell.
- */
+/** The edge is distinguishable from zero only when its paired CI excludes zero. */
 function edgeSignificant(
   stats: BacktestStats | null,
-  base: BacktestBaseRate | null
+  pairedInference: boolean
 ): boolean | null {
   if (
+    !pairedInference ||
     !stats ||
     stats.edge == null ||
-    stats.ci_hit_rate_low == null ||
-    stats.ci_hit_rate_high == null ||
-    base?.hit_rate == null
+    stats.ci_edge_low == null ||
+    stats.ci_edge_high == null
   ) {
     return null;
   }
-  return stats.ci_hit_rate_low > base.hit_rate || stats.ci_hit_rate_high < base.hit_rate;
+  return stats.ci_edge_low > 0 || stats.ci_edge_high < 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -135,13 +133,24 @@ function edgeSignificant(
 // ---------------------------------------------------------------------------
 
 /** Hit rate with sample size in small muted type underneath. */
-function HitCell({ stats }: { stats: BacktestStats | null }) {
+function HitCell({
+  stats,
+  pairedInference,
+}: {
+  stats: BacktestStats | null;
+  pairedInference: boolean;
+}) {
   return (
     <td className="py-3 pl-5 text-right align-top">
       <span className="font-mono text-sm tabular-nums">{hitPct(stats?.hit_rate)}</span>
       <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
         n {stats?.n ?? "–"}
       </span>
+      {pairedInference && stats?.ci_hit_rate_low != null && stats?.ci_hit_rate_high != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          subgroup CI {Math.round(stats.ci_hit_rate_low * 100)}–{Math.round(stats.ci_hit_rate_high * 100)}%
+        </span>
+      )}
     </td>
   );
 }
@@ -162,21 +171,21 @@ function MedianCell({
 }
 
 /**
- * Edge vs base rate: colored only when the bootstrap CI excludes the base
- * rate, otherwise muted with an "n.s." marker. CI shown underneath.
+ * Edge vs base rate: colored only when the paired edge CI excludes zero,
+ * otherwise muted with an "n.s." marker. Paired CI shown underneath.
  */
 function EdgeCell({
   stats,
-  base,
+  pairedInference,
 }: {
   stats: BacktestStats | null;
-  base: BacktestBaseRate | null;
+  pairedInference: boolean;
 }) {
-  const sig = edgeSignificant(stats, base);
+  const sig = edgeSignificant(stats, pairedInference);
   const edge = stats?.edge ?? null;
   const tone =
-    sig && edge != null
-      ? edge > 0
+    sig && edge != null && stats?.ci_edge_low != null
+      ? stats.ci_edge_low > 0
         ? "text-positive"
         : "text-negative"
       : "text-muted-foreground";
@@ -185,12 +194,20 @@ function EdgeCell({
       <span className={`font-mono text-sm tabular-nums ${tone}`}>
         {edgePp(edge)}
         {sig === false && (
-          <span className="ml-1 font-mono text-[0.625rem] text-muted-foreground">n.s.</span>
+          <>
+            {" "}
+            <span className="font-mono text-[0.625rem] text-muted-foreground">n.s.</span>
+          </>
         )}
       </span>
-      {stats?.ci_hit_rate_low != null && stats?.ci_hit_rate_high != null && (
+      {pairedInference && stats?.ci_edge_low != null && stats?.ci_edge_high != null && (
         <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
-          CI {Math.round(stats.ci_hit_rate_low * 100)}–{Math.round(stats.ci_hit_rate_high * 100)}%
+          paired CI {edgePp(stats.ci_edge_low)} to {edgePp(stats.ci_edge_high)}
+        </span>
+      )}
+      {pairedInference && sig == null && edge != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          CI unavailable
         </span>
       )}
     </td>
@@ -204,9 +221,11 @@ function EdgeCell({
 function ForwardReturnsTable({
   assets,
   regime,
+  pairedInference,
 }: {
   assets: BacktestAssetResult[];
   regime: Regime;
+  pairedInference: boolean;
 }) {
   const groupHead = "pb-1 pl-5 text-left font-sans text-[0.6875rem] font-semibold uppercase tracking-wider";
   const subHead =
@@ -259,17 +278,17 @@ function ForwardReturnsTable({
                     {asset.category}
                   </span>
                 </td>
-                <HitCell stats={s4} />
+                <HitCell stats={s4} pairedInference={pairedInference} />
                 <MedianCell stats={s4} />
-                <HitCell stats={s13} />
+                <HitCell stats={s13} pairedInference={pairedInference} />
                 <td className="py-3 pl-5 text-right align-top">
                   <span className="font-mono text-sm tabular-nums text-muted-foreground">
                     {hitPct(b13?.hit_rate)}
                   </span>
                 </td>
-                <EdgeCell stats={s13} base={b13} />
+                <EdgeCell stats={s13} pairedInference={pairedInference} />
                 <MedianCell stats={s13} className="pr-3" />
-                <HitCell stats={s26} />
+                <HitCell stats={s26} pairedInference={pairedInference} />
                 <MedianCell stats={s26} />
               </tr>
             );
@@ -352,18 +371,19 @@ function ClassifierEdgeCell({
   asset,
   classifier,
   regime,
+  pairedInference,
 }: {
   asset: BacktestAssetResult;
   classifier: string;
   regime: Regime;
+  pairedInference: boolean;
 }) {
   const stats = cellStats(asset, classifier, regime, "13");
-  const base = baseRate(asset, "13");
-  const sig = edgeSignificant(stats, base);
+  const sig = edgeSignificant(stats, pairedInference);
   const edge = stats?.edge ?? null;
   const tone =
-    sig && edge != null
-      ? edge > 0
+    sig && edge != null && stats?.ci_edge_low != null
+      ? stats.ci_edge_low > 0
         ? "text-positive"
         : "text-negative"
       : "text-muted-foreground";
@@ -372,12 +392,25 @@ function ClassifierEdgeCell({
       <span className={`font-mono text-sm tabular-nums ${tone}`}>
         {edgePp(edge)}
         {sig === false && (
-          <span className="ml-1 font-mono text-[0.625rem] text-muted-foreground">n.s.</span>
+          <>
+            {" "}
+            <span className="font-mono text-[0.625rem] text-muted-foreground">n.s.</span>
+          </>
         )}
       </span>
-      <span className="ml-2 font-mono text-[0.625rem] text-muted-foreground">
+      <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
         n {stats?.n ?? "–"}
       </span>
+      {pairedInference && stats?.ci_edge_low != null && stats?.ci_edge_high != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          paired CI {edgePp(stats.ci_edge_low)} to {edgePp(stats.ci_edge_high)}
+        </span>
+      )}
+      {pairedInference && sig == null && edge != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          CI unavailable
+        </span>
+      )}
     </td>
   );
 }
@@ -385,9 +418,11 @@ function ClassifierEdgeCell({
 function ClassifierComparisonTable({
   assets,
   regime,
+  pairedInference,
 }: {
   assets: BacktestAssetResult[];
   regime: Regime;
+  pairedInference: boolean;
 }) {
   const headline = HEADLINE_ASSETS.map((id) => assets.find((a) => a.id === id))
     .filter((a): a is BacktestAssetResult => a != null)
@@ -413,8 +448,18 @@ function ClassifierComparisonTable({
         {headline.map((asset) => (
           <tr key={asset.id} className="border-b border-border">
             <td className="py-2.5 pr-3 text-sm font-medium">{asset.name}</td>
-            <ClassifierEdgeCell asset={asset} classifier="glci" regime={regime} />
-            <ClassifierEdgeCell asset={asset} classifier="nfci" regime={regime} />
+            <ClassifierEdgeCell
+              asset={asset}
+              classifier="glci"
+              regime={regime}
+              pairedInference={pairedInference}
+            />
+            <ClassifierEdgeCell
+              asset={asset}
+              classifier="nfci"
+              regime={regime}
+              pairedInference={pairedInference}
+            />
           </tr>
         ))}
       </tbody>
@@ -532,6 +577,7 @@ export default function PlaybookPage() {
   }
 
   const data = backtest.data;
+  const pairedInference = data?.bootstrap_method === PAIRED_BOOTSTRAP_METHOD;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-8">
@@ -545,14 +591,34 @@ export default function PlaybookPage() {
           <RegimeStamp regime={regime} />
         </div>
         <h1 className="mt-4 max-w-4xl font-serif text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl">
-          What this regime has paid for.
+          What has followed this regime.
         </h1>
         <p className="mt-5 max-w-[70ch] font-serif text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          Forward returns conditioned on the regime in force, with no look-ahead: each week is
-          classified using only data available at the time.
-          {lead && ` ${lead.text}`}
+          {lead?.text ?? "Historical forward-return results are unavailable right now."}
+        </p>
+        <p className="mt-4 max-w-[80ch] font-serif text-[0.9375rem] leading-relaxed text-muted-foreground">
+          Forward returns conditioned on expanding-threshold regime labels. The threshold step
+          uses only composite observations through each week, but the upstream source data and
+          factor estimates use the current vintage. This is reconstructed history, not a
+          point-in-time record, and it can change.
         </p>
       </section>
+
+      {regimesDiverge && classifierRegime && (
+        <aside className="mt-8 border-y border-border py-4" aria-label="Classifier disagreement">
+          <p className="font-mono text-xs uppercase tracking-[0.12em] text-negative">
+            Classifier disagreement
+          </p>
+          <p className="mt-2 max-w-[80ch] font-serif text-[1.0625rem] leading-relaxed">
+            The published index reads {regime}, while the backtest&apos;s expanding-window
+            classifier reads {classifierRegime}
+            {data?.date_range?.end && ` through ${formatShortDate(data.date_range.end)}`}. Conditions
+            are close enough to a boundary that the {regime} and {classifierRegime} columns deserve
+            attention together; the first table uses the published {regime} label for the current
+            decision frame.
+          </p>
+        </aside>
+      )}
 
       {data ? (
         <>
@@ -563,26 +629,27 @@ export default function PlaybookPage() {
               Forward returns in {regime} regimes
             </h2>
             <p className="mt-0.5 max-w-[70ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
-              Hit rate is the share of windows that ended higher; the edge is the hit rate minus
-              the asset&apos;s unconditional base rate, colored only when the 95% bootstrap CI
-              excludes that base rate.
+              {pairedInference
+                ? "Hit-rate CIs describe the regime subgroup. Edge is that subgroup hit rate minus the unconditional rate over the same classifier-eligible weeks; it is colored only when its separate paired 95% CI excludes zero."
+                : "Hit rates and edges are descriptive. This published backtest predates the paired-inference schema, so confidence intervals and significance markers stay hidden until the data refreshes."}
             </p>
             <div className="mt-5">
-              <ForwardReturnsTable assets={data.assets} regime={regime} />
+              <ForwardReturnsTable
+                assets={data.assets}
+                regime={regime}
+                pairedInference={pairedInference}
+              />
             </div>
             <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground/80">
-              GLCI classifier · medians are forward returns over the horizon · n.s. = the CI
-              includes the base rate · cells condition on the regime at the start of each window
+              GLCI classifier · medians are forward returns over the horizon
+              {pairedInference ? " · n.s. = the paired edge CI includes zero" : ""} · cells
+              condition on the signal-date regime
+              {data.entry_lag_weeks === 1
+                ? " · returns enter on the next weekly bar"
+                : (data.entry_lag_weeks ?? 0) > 1
+                  ? ` · returns enter ${data.entry_lag_weeks} weekly bars after the signal`
+                  : ""}
             </p>
-            {regimesDiverge && classifierRegime && (
-              <p className="mt-2 max-w-[80ch] font-mono text-[0.6875rem] text-muted-foreground">
-                Note: the backtest&apos;s stricter expanding-window classifier reads{" "}
-                {classifierRegime}
-                {data?.date_range?.end && ` as of ${formatShortDate(data.date_range.end)}`}; the
-                published index regime is {regime}. Disagreement means conditions are near a regime
-                boundary: read the {regime} and {classifierRegime} columns together.
-              </p>
-            )}
           </section>
 
           {/* Regime comparison */}
@@ -592,8 +659,8 @@ export default function PlaybookPage() {
               The same assets across all three regimes
             </h2>
             <p className="mt-0.5 max-w-[70ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
-              13-week hit rates by regime: the contrast between columns is the signal, not any
-              single cell.
+              13-week subgroup hit rates by regime. Compare the columns descriptively; paired edge
+              inference is reported separately.
             </p>
             <div className="mt-5">
               <RegimeComparisonTable assets={data.assets} currentRegime={regime} />
@@ -603,44 +670,59 @@ export default function PlaybookPage() {
             </p>
           </section>
 
-          {/* Is the signal real? */}
+          {/* Method and limits */}
           <div className="rule mt-10" />
           <section className="mt-8">
-            <h2 className="text-sm font-semibold tracking-tight">Is the signal real?</h2>
+            <h2 className="text-sm font-semibold tracking-tight">
+              What the backtest does and does not prove
+            </h2>
             <div className="mt-4 max-w-[70ch] space-y-4 font-serif text-[1.0625rem] leading-relaxed">
               <p>
-                The backtest avoids the usual self-flattery. Each week is classified with an
-                expanding-window z-score: the mean and standard deviation use only data up to that
-                date, with a one-year burn-in before any label is emitted. Nothing the classifier
-                knew in 2015 depends on what happened in 2020. Tight is a z-score below −1, loose
-                above +1, neutral in between. Because this window differs from the published
-                index&apos;s two-year rolling window, the two labels can briefly disagree near a
-                boundary; when they do, this page says so under the table rather than papering over
-                it.
+                The regime-label step uses an expanding-window z-score: its mean and standard
+                deviation use only composite observations up to that week, with a one-year burn-in
+                before any label is emitted. Tight is below −1, loose above +1, and neutral in
+                between. This protects the threshold calculation from future composite
+                observations, but it does not make the full pipeline point-in-time. Source series
+                can be revised and the factor model is re-estimated on the current sample, so past
+                composite values and labels can change.
               </p>
               <p>
                 Because consecutive forward windows overlap (next week&apos;s 13-week return shares
                 12 weeks with this one), naive standard errors would overstate confidence. The
-                confidence intervals here come from a moving-block bootstrap (block length equal to
-                the horizon, 5,000 resamples), which preserves that overlap. Where a cell&apos;s CI
-                still includes the unconditional base rate, the table says so plainly: n.s., not
-                signal. Sample sizes are printed in every cell because a 100% hit rate on 20
-                observations is a curiosity, not a strategy.
+                paired bootstrap resamples contiguous blocks from the full weekly calendar,
+                keeping returns and regime labels together. Each draw recomputes both the regime
+                subgroup and unconditional hit rates over that classifier&apos;s labeled weeks; their
+                within-draw difference forms the edge CI. Sample sizes are printed in every cell
+                because a 100% hit rate on 20 observations is a curiosity, not a strategy.
               </p>
+              {!pairedInference && (
+                <p>
+                  The current payload does not identify that paired method, so this page
+                  deliberately withholds its older intervals and all significance markers. Paired
+                  inference will appear after the backtest is regenerated under the current
+                  schema.
+                </p>
+              )}
               <p>
                 The honest benchmark is the Chicago Fed&apos;s NFCI, a well-known financial
-                conditions index run through the same classifier with the same thresholds. If the
-                GLCI&apos;s edge does not beat what NFCI offers for free, the composite is not
-                adding information. The comparison at the 13-week horizon, in the current regime:
+                conditions index run through the same classifier with the same thresholds. The
+                comparison below shows each classifier&apos;s edge at 13 weeks
+                {pairedInference ? " with its own paired interval" : " descriptively"}. It does
+                not estimate an interval for the difference between GLCI and NFCI.
               </p>
             </div>
             <div className="mt-5">
-              <ClassifierComparisonTable assets={data.assets} regime={regime} />
+              <ClassifierComparisonTable
+                assets={data.assets}
+                regime={regime}
+                pairedInference={pairedInference}
+              />
             </div>
             <p className="mt-4 max-w-[70ch] font-serif text-[1.0625rem] leading-relaxed">
-              Read the n.s. markers literally: where they appear, the measured edge is
-              indistinguishable from noise at the 95% level, and the base rate is the better
-              estimate. This is a backtest on one historical sample; past regimes may not repeat.
+              {pairedInference
+                ? "Read the n.s. markers literally: where they appear, the paired interval does not establish a nonzero edge at the 95% level. "
+                : "No inferential claim is shown for this transitional payload. "}
+              This is a backtest on one historical sample; past regimes may not repeat.
             </p>
           </section>
 

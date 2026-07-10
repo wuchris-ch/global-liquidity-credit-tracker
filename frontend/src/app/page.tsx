@@ -6,6 +6,7 @@ import { useGLCIData, useIndexData, useSeriesData } from "@/hooks/use-series-dat
 import { useRegimeHistory } from "@/hooks/use-regime-history";
 import { useBacktestData } from "@/hooks/use-backtest-data";
 import { useFlowsData } from "@/hooks/use-flows-data";
+import { useGLCITrust } from "@/hooks/use-glci-trust";
 import { GlciChart } from "@/components/glci-chart";
 import { ChartSection } from "@/components/chart-section";
 import { RangeTabs } from "@/components/range-tabs";
@@ -19,14 +20,16 @@ import {
   buildChangeItems,
   compactDollars,
   currentRegimeStanding,
+  invalidationSentence,
   ordinal,
   playbookSentence,
   standingSentence,
+  transitionView,
   verdictHeadline,
   type ChangeItem,
   type ChangeSpec,
 } from "@/lib/brief";
-import { flowsHeadline, flowsTeaserSentence } from "@/lib/flows-brief";
+import { flowsTeaserSentence } from "@/lib/flows-brief";
 import type { DataPoint } from "@/lib/api";
 
 const VITALS_RANGE = getDateRange("6m");
@@ -52,6 +55,18 @@ const DIRECTION_GLYPH: Record<ChangeItem["direction"], { glyph: string; classNam
   restrictive: { glyph: "▼", className: "text-negative" },
   flat: { glyph: "—", className: "text-muted-foreground" },
 };
+
+const TRANSITION_TONE = {
+  building: "text-positive",
+  fading: "text-negative",
+  stable: "text-muted-foreground",
+} as const;
+
+function componentList(items: string[]): string {
+  const shown = items.slice(0, 3).map((item) => item.replaceAll("_", " "));
+  const remainder = items.length - shown.length;
+  return remainder > 0 ? `${shown.join(", ")} and ${remainder} more` : shown.join(", ");
+}
 
 interface VitalProps {
   label: string;
@@ -104,6 +119,7 @@ export default function TodayPage() {
   const history = useRegimeHistory();
   const backtest = useBacktestData();
   const flows = useFlowsData();
+  const trust = useGLCITrust();
 
   const netLiquidity = useIndexData("fed_net_liquidity", VITALS_RANGE);
   const rrp = useSeriesData("fed_reverse_repo", VITALS_RANGE);
@@ -169,6 +185,22 @@ export default function TodayPage() {
   }
 
   const g = glci.data;
+  const transition = transitionView(g.momentum);
+  const topChanges = changes.slice(0, 4);
+  const dataQuality = trust.data?.data_quality;
+  const missingComponents = dataQuality?.missing_components ?? [];
+  const staleComponents = dataQuality?.stale_components ?? [];
+  const excludedComponents = dataQuality?.excluded_components ?? [];
+  const failedPillars = dataQuality?.failed_pillars ?? [];
+  const integrityIssues = [
+    failedPillars.length > 0 ? `Failed pillars: ${componentList(failedPillars)}.` : null,
+    staleComponents.length > 0 ? `Stale: ${componentList(staleComponents)}.` : null,
+    missingComponents.length > 0 ? `Missing: ${componentList(missingComponents)}.` : null,
+    excludedComponents.length > 0 ? `Excluded from fit: ${componentList(excludedComponents)}.` : null,
+  ].filter((issue): issue is string => issue !== null);
+  const trustFrequency = trust.data?.frequency || "Weekly";
+  const snapshotCount = trust.data?.snapshots.count ?? 0;
+  const reconstructedHistory = trust.data?.point_in_time !== true;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-8">
@@ -193,92 +225,147 @@ export default function TodayPage() {
         )}
       </section>
 
+      {/* Decision frame */}
+      <div className="rule mt-10" />
+      <section className="mt-8" aria-labelledby="decision-frame-title">
+        <h2 id="decision-frame-title" className="sr-only">Decision frame</h2>
+        <div className="grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="text-sm font-semibold tracking-tight">Current transition</span>
+              <span
+                className={`font-mono text-xs uppercase tracking-[0.14em] ${TRANSITION_TONE[transition.state]}`}
+              >
+                {transition.state}
+              </span>
+            </div>
+            <p className="mt-2 font-serif text-[1.0625rem] leading-relaxed text-muted-foreground">
+              {transition.detail}
+            </p>
+
+            <h3 className="mt-7 text-sm font-semibold tracking-tight">What changed</h3>
+            {topChanges.length === 0 ? (
+              <p className="mt-3 font-serif text-[0.9375rem] italic text-muted-foreground">
+                Not enough recent data to summarize the week.
+              </p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {topChanges.map((item) => {
+                  const mark = DIRECTION_GLYPH[item.direction];
+                  return (
+                    <li key={item.label} className="flex items-baseline gap-3">
+                      <span aria-hidden="true" className={`font-mono text-[0.625rem] ${mark.className}`}>
+                        {mark.glyph}
+                      </span>
+                      <span className="font-serif text-[1.0625rem] leading-snug">{item.text}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <p className="mt-4 font-mono text-[0.6875rem] text-muted-foreground/80">
+              ▲ supportive of liquidity · ▼ restrictive · one-week moves
+            </p>
+          </div>
+
+          <aside className="border-t border-border pt-7 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+            <h3 className="text-sm font-semibold tracking-tight">
+              What has followed {standing.regime} regimes
+            </h3>
+            {playbook ? (
+              <div className="mt-4 space-y-4">
+                <p className="font-serif text-[1.0625rem] leading-relaxed">{playbook.text}</p>
+                {playbookGold && (
+                  <p className="font-serif text-[1.0625rem] leading-relaxed text-muted-foreground">
+                    {playbookGold.text}
+                  </p>
+                )}
+                <Link
+                  href="/playbook"
+                  className="inline-block font-mono text-xs text-primary underline-offset-4 hover:underline"
+                >
+                  Full playbook, all assets and horizons →
+                </Link>
+              </div>
+            ) : (
+              <p className="mt-4 font-serif text-[0.9375rem] italic text-muted-foreground">
+                Historical forward-return results are unavailable right now.
+              </p>
+            )}
+
+            <h3 className="mt-8 text-sm font-semibold tracking-tight">What would change this view</h3>
+            <p className="mt-3 font-serif text-[1.0625rem] leading-relaxed">
+              {invalidationSentence(g)}
+            </p>
+          </aside>
+        </div>
+
+        <div className="mt-8 border-y border-border py-4" aria-label="Signal integrity">
+          <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.12em]">Signal integrity</span>
+            {dataQuality && dataQuality.total_components > 0 ? (
+              <span className="font-mono text-xs text-muted-foreground">
+                Coverage {dataQuality.loaded_components}/{dataQuality.total_components}
+              </span>
+            ) : (
+              <span className="font-mono text-xs text-muted-foreground">
+                Component coverage unavailable
+              </span>
+            )}
+            <span className="font-mono text-xs text-muted-foreground">{trustFrequency} cadence</span>
+            {snapshotCount > 0 && (
+              <span className="font-mono text-xs text-muted-foreground">
+                {snapshotCount} recorded {snapshotCount === 1 ? "vintage" : "vintages"}
+              </span>
+            )}
+          </div>
+          {integrityIssues.length > 0 && (
+            <p className="mt-2 font-mono text-xs text-negative">
+              {integrityIssues.join(" ")}
+            </p>
+          )}
+          {reconstructedHistory && (
+            <p className="mt-2 max-w-[90ch] font-serif text-sm leading-relaxed">
+              <span className="font-medium">Reconstructed history.</span>{" "}
+              <span className="text-muted-foreground">
+                Historical readings use the current data vintage and are not point-in-time. Source
+                revisions and factor re-estimation can change past values and regime labels.
+              </span>
+            </p>
+          )}
+        </div>
+      </section>
+
       {/* The index */}
       <div className="rule mt-10" />
       <ChartSection
         className="mt-8"
         title="Global Liquidity & Credit Index"
-        reading="Shaded bands mark the regime in force at the time; the index is scaled to mean 100, one band per 10 points."
+        reading="Shaded bands mark the regime in force in the reconstructed series; the index is scaled to mean 100, one band per 10 points."
         source="Composite of liquidity (40%), credit (35%) and inverted funding-stress (25%) factors. Weekly."
         control={<RangeTabs value={chartRange} onChange={setChartRange} ranges={["1y", "2y", "5y", "10y", "all"]} />}
       >
         <GlciChart data={g.data} periods={history.data?.periods} height={320} />
       </ChartSection>
 
-      {/* What changed + playbook */}
-      <div className="rule mt-10" />
-      <div className="mt-8 grid gap-10 lg:grid-cols-12">
-        <section className="lg:col-span-7">
-          <h2 className="text-sm font-semibold tracking-tight">What changed</h2>
-          {changes.length === 0 ? (
-            <p className="mt-3 font-serif text-[0.9375rem] italic text-muted-foreground">
-              Not enough recent data to summarize the week.
-            </p>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {changes.map((item) => {
-                const mark = DIRECTION_GLYPH[item.direction];
-                return (
-                  <li key={item.label} className="flex items-baseline gap-3">
-                    <span aria-hidden="true" className={`font-mono text-[0.625rem] ${mark.className}`}>
-                      {mark.glyph}
-                    </span>
-                    <span className="font-serif text-[1.0625rem] leading-snug">{item.text}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          <p className="mt-4 font-mono text-[0.6875rem] text-muted-foreground/80">
-            ▲ supportive of liquidity · ▼ restrictive · one-week moves
-          </p>
-        </section>
-
-        <aside className="lg:col-span-5">
-          <h2 className="text-sm font-semibold tracking-tight">
-            What {standing.regime} regimes have meant
-          </h2>
-          {playbook ? (
-            <div className="mt-4 space-y-4">
-              <p className="font-serif text-[1.0625rem] leading-relaxed">{playbook.text}</p>
-              {playbookGold && (
-                <p className="font-serif text-[1.0625rem] leading-relaxed text-muted-foreground">
-                  {playbookGold.text}
-                </p>
-              )}
-              <Link
-                href="/playbook"
-                className="inline-block font-mono text-xs text-primary underline-offset-4 hover:underline"
-              >
-                Full playbook, all assets and horizons →
-              </Link>
-            </div>
-          ) : (
-            <p className="mt-4 font-serif text-[0.9375rem] italic text-muted-foreground">
-              Backtest results are unavailable right now.
-            </p>
-          )}
-        </aside>
-      </div>
-
-      {/* Where the marginal dollar is going */}
+      {/* Price leadership */}
       {flows.data && flowsTeaser && (
         <>
           <div className="rule mt-10" />
           <section className="mt-8">
             <div className="flex items-baseline justify-between">
               <h2 className="text-sm font-semibold tracking-tight">
-                Where the marginal dollar is going
+                Price leadership over 13 weeks
               </h2>
               <Link
                 href="/flows"
                 className="font-mono text-xs text-primary underline-offset-4 hover:underline"
               >
-                The flows →
+                Price leadership →
               </Link>
             </div>
             <p className="mt-4 max-w-[70ch] font-serif text-[1.0625rem] leading-relaxed">
-              {flowsHeadline(flows.data.destinations)} {flowsTeaser}
+              {flowsTeaser}
             </p>
           </section>
         </>

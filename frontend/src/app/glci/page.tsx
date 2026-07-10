@@ -462,8 +462,9 @@ export default function GlciPage() {
               funding rates, and enters the composite inverted: higher stress
               lowers the index. Before extraction, every component series is
               resampled to weekly, transformed (a 104-week rolling z-score, a
-              52-week growth rate, or both) and sign-flipped so that its
-              expected factor loading is positive.
+              52-week growth rate, or both). Its economic sign is applied to
+              the transformed feature so that its expected factor loading is
+              positive.
             </p>
           </div>
           <div>
@@ -472,13 +473,15 @@ export default function GlciPage() {
               Each pillar is summarized by a single latent factor. When the
               data panel is complete enough (at least half the rows complete,
               no more than 30% missing), the factor comes from a dynamic
-              factor model estimated by EM. Otherwise the pipeline falls back
-              to the first principal component, with loadings re-estimated by
-              Ridge regression for stability when components are collinear.
+              factor model estimated by maximum likelihood through the Kalman
+              filter. Otherwise the pipeline falls back to the first principal
+              component, with loadings re-estimated by Ridge regression for
+              stability when components are collinear.
               The factor is oriented so that its average loading is positive:
-              factor up means components up. If a pillar cannot be computed at
-              all (a data outage), its weight is redistributed proportionally
-              across the remaining pillars rather than failing the run.
+              factor up means components up. The three factors are then put on
+              the same unit-variance scale before the fixed weights are applied.
+              All three pillars are required; if one cannot be computed, the
+              update fails before a partial or reweighted index can be published.
             </p>
           </div>
           <div>
@@ -493,7 +496,7 @@ export default function GlciPage() {
               come from a rolling z-score of the composite over a 104-week
               window: below −1σ is tight, above +1σ is loose, anything in
               between is neutral. The dashboard also reports 4-week momentum
-              and a heuristic probability of regime change based on the
+              and an uncalibrated boundary-pressure score based on the
               distance to the nearest threshold and the z-score trend.
             </p>
           </div>
@@ -506,10 +509,13 @@ export default function GlciPage() {
               limited number of macro cycles, so regime statistics partly
               describe those specific episodes. The historical relationships
               in the playbook are conditional averages, not causal claims. The
-              backtest avoids look-ahead by re-classifying regimes with an
-              expanding window (with a one-year burn-in), but the live index
-              itself uses a rolling window and is revised as source data
-              arrives, so the most recent readings are the least settled.
+              backtest uses an expanding classifier with a one-year burn-in
+              and enters on the next weekly bar. That controls classification
+              and execution timing, but it does not turn the upstream index
+              into a point-in-time series. Source revisions and factor
+              re-estimation can rewrite the displayed history, which should be
+              read as a current-vintage reconstruction rather than a simulated
+              live record.
             </p>
           </div>
         </div>

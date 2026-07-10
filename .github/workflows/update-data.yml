@@ -5,6 +5,10 @@ on:
     - cron: "0 */12 * * *" # every 12 hours
   workflow_dispatch: {}
 
+concurrency:
+  group: update-data-publish
+  cancel-in-progress: false
+
 jobs:
   update-and-publish:
     runs-on: ubuntu-latest
@@ -33,18 +37,40 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
+      - name: Restore published GLCI snapshot ledger
+        run: |
+          mkdir -p data/curated/indices
+          if git cat-file -e origin/gh-pages:state/glci_vintages.parquet 2>/dev/null; then
+            git show origin/gh-pages:state/glci_vintages.parquet > data/curated/indices/glci_vintages.parquet
+            if git cat-file -e origin/gh-pages:latest/api/glci/trust/index.json 2>/dev/null; then
+              git show origin/gh-pages:latest/api/glci/trust/index.json > /tmp/prior_glci_trust.json
+              python - <<'PY'
+              import json
+              import pandas as pd
+
+              ledger = pd.read_parquet("data/curated/indices/glci_vintages.parquet")
+              with open("/tmp/prior_glci_trust.json") as handle:
+                  prior_count = int(json.load(handle)["snapshots"]["count"])
+              if len(ledger) < prior_count:
+                  raise SystemExit(
+                      f"Snapshot ledger regressed from {prior_count} to {len(ledger)} rows"
+                  )
+              PY
+            fi
+            echo "Restored prior GLCI publication snapshots"
+          elif git cat-file -e origin/gh-pages:state/glci_vintages.required 2>/dev/null || \
+               git cat-file -e origin/gh-pages:latest/api/glci/trust/index.json 2>/dev/null; then
+            echo "ERROR: The published GLCI snapshot ledger is missing. Refusing to reset its history."
+            exit 1
+          else
+            echo "No snapshot-ledger marker found; bootstrapping the first ledger"
+          fi
+
       - name: Run calculation tests (publish gate)
         run: python -m pytest tests/
 
       - name: Update data (fetch + indices)
         run: python scripts/update_data.py
-
-      - name: Compute GLCI and save
-        run: |
-          python - <<'PY'
-          from src.indicators.glci import compute_glci
-          compute_glci(save=True)
-          PY
 
       - name: Compute risk metrics and save
         run: |
@@ -79,6 +105,14 @@ jobs:
           mkdir -p /tmp/export
           rm -rf /tmp/export/*
           cp -r data/export/* /tmp/export/
+          mkdir -p /tmp/state
+          rm -rf /tmp/state/*
+          if [ ! -s data/curated/indices/glci_vintages.parquet ]; then
+            echo "ERROR: GLCI snapshot ledger was not produced"
+            exit 1
+          fi
+          cp data/curated/indices/glci_vintages.parquet /tmp/state/
+          touch /tmp/state/glci_vintages.required
           cp vercel.json /tmp/export/
 
       - name: Publish to gh-pages
@@ -90,8 +124,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if git show-ref --verify --quiet refs/heads/gh-pages; then
-            git checkout gh-pages
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git checkout -B gh-pages origin/gh-pages
           else
             git checkout --orphan gh-pages
           fi
@@ -111,6 +145,10 @@ jobs:
               echo "$SNAP_DIRS" | head -n $(($COUNT-3)) | xargs -r rm -rf
             fi
           fi
+
+          mkdir -p state
+          cp /tmp/state/glci_vintages.parquet state/
+          cp /tmp/state/glci_vintages.required state/
           
           # Restore vercel.json to disable Vercel builds for this branch
           cp /tmp/export/vercel.json .
@@ -122,5 +160,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Publish data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git push -f origin gh-pages
+            git push origin gh-pages
           fi

@@ -1,18 +1,19 @@
 """Track Record / Backtest of the GLCI regime classifier.
 
-Validates whether GLCI regime classification predicts forward returns using
-an expanding-window z-score that avoids look-ahead bias. Compares against
-NFCI-alone as a baseline and unconditional buy-and-hold as the base rate.
+Evaluates whether reconstructed GLCI regime classifications predict forward
+returns. Regime thresholds use only expanding history, but the upstream GLCI
+series is built from the current data vintage and is not point-in-time history.
+Compares against NFCI-alone and unconditional buy-and-hold base rates.
 
 Outputs:
   data/curated/backtest/track_record.parquet (long-format table)
   data/curated/backtest/track_record.json    (full structured payload)
   data/curated/backtest/track_record_meta.json
 """
+
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -23,7 +24,6 @@ from ..config import CURATED_DATA_PATH
 from ..etl.fetcher import DataFetcher
 from ..etl.storage import DataStorage
 from .risk_metrics import ASSET_CONFIG
-from .transforms import resample_to_frequency
 
 
 HORIZONS = [4, 13, 26]
@@ -32,7 +32,16 @@ BURN_IN_PERIODS = 52
 REGIME_THRESHOLDS = (-1.0, 1.0)
 MIN_OBS_PER_REGIME = 20
 BOOTSTRAP_ITERATIONS = 5000
+BOOTSTRAP_METHOD = "paired_full_calendar_moving_block"
+MIN_FINITE_BOOTSTRAP_DRAWS = 100
+MIN_FINITE_BOOTSTRAP_FRACTION = 0.80
 RNG_SEED = 42
+FREQUENCY = "W-FRI"
+ENTRY_LAG_WEEKS = 1
+HISTORICAL_MODE = "reconstructed_current_vintage"
+POINT_IN_TIME_HISTORY = False
+GLCI_CARRY_FORWARD_WEEKS = 0
+MARKET_CARRY_FORWARD_WEEKS = 1
 
 
 @dataclass
@@ -66,12 +75,25 @@ class BacktestResult:
     horizons: list[int]
     classifiers: dict[str, dict]
     assets: list[AssetBacktestResult]
+    frequency: str = FREQUENCY
+    entry_lag_weeks: int = ENTRY_LAG_WEEKS
+    historical_mode: str = HISTORICAL_MODE
+    point_in_time: bool = POINT_IN_TIME_HISTORY
+    bootstrap_method: str = BOOTSTRAP_METHOD
+    bootstrap_iterations: int = BOOTSTRAP_ITERATIONS
 
     def to_dict(self) -> dict:
         return {
             "computed_at": self.computed_at,
             "date_range": {"start": self.date_range[0], "end": self.date_range[1]},
             "horizons": self.horizons,
+            "frequency": self.frequency,
+            "entry_lag_weeks": self.entry_lag_weeks,
+            "historical_mode": self.historical_mode,
+            "point_in_time": self.point_in_time,
+            "regime_threshold_method": "expanding_zscore",
+            "bootstrap_method": self.bootstrap_method,
+            "bootstrap_iterations": self.bootstrap_iterations,
             "classifiers": self.classifiers,
             "assets": [a.to_dict() for a in self.assets],
         }
@@ -102,54 +124,99 @@ def expanding_zscore_regime(
     return pd.DataFrame({"zscore": zscore, "regime": regime})
 
 
-def compute_forward_returns(prices: pd.Series, horizons: list[int] = HORIZONS) -> pd.DataFrame:
-    """Compute r_{t,h} = prices_{t+h} / prices_t - 1 for each horizon in weeks."""
+def _validate_weekly_grid(index: pd.Index, name: str = "series") -> None:
+    """Reject row-based horizons unless dates form a complete W-FRI grid."""
+    if not isinstance(index, pd.DatetimeIndex):
+        raise ValueError(f"{name} must use a DatetimeIndex")
+    if index.empty:
+        return
+    if index.tz is not None:
+        raise ValueError(f"{name} dates must be timezone-naive")
+    if not index.is_monotonic_increasing or not index.is_unique:
+        raise ValueError(f"{name} dates must be ordered and unique")
+    expected = pd.date_range(index[0], index[-1], freq=FREQUENCY)
+    if not index.equals(expected):
+        raise ValueError(f"{name} must use a complete {FREQUENCY} grid")
+
+
+def _to_weekly_grid(
+    values: pd.Series,
+    *,
+    name: str,
+    carry_forward_weeks: int = 0,
+) -> pd.Series:
+    """Place observations on W-FRI without filling before the first release."""
+    if not isinstance(values.index, pd.DatetimeIndex):
+        raise ValueError(f"{name} must use a DatetimeIndex")
+    if values.index.has_duplicates:
+        raise ValueError(f"{name} contains duplicate dates")
+    if carry_forward_weeks < 0:
+        raise ValueError("carry_forward_weeks cannot be negative")
+    if values.empty:
+        return values.copy()
+
+    series = values.copy().sort_index()
+    if series.index.tz is not None:
+        series.index = series.index.tz_localize(None)
+
+    max_observation_date = series.index.max().normalize()
+    weekly = series.resample(FREQUENCY).last()
+    last_completed_friday = pd.offsets.Week(weekday=4).rollback(max_observation_date)
+    weekly = weekly.loc[weekly.index <= last_completed_friday]
+    if weekly.empty:
+        weekly.index.name = values.index.name
+        return weekly
+
+    grid = pd.date_range(weekly.index.min(), weekly.index.max(), freq=FREQUENCY)
+    weekly = weekly.reindex(grid)
+    if carry_forward_weeks:
+        weekly = weekly.ffill(limit=carry_forward_weeks)
+    weekly.index.name = values.index.name
+    _validate_weekly_grid(weekly.index, name)
+    return weekly
+
+
+def compute_forward_returns(
+    prices: pd.Series,
+    horizons: list[int] = HORIZONS,
+    entry_lag_weeks: int = ENTRY_LAG_WEEKS,
+) -> pd.DataFrame:
+    """Compute calendar-week returns from the next actionable weekly bar.
+
+    A signal observed at week t enters at t + ``entry_lag_weeks`` and exits
+    exactly ``h`` W-FRI bars after entry. Irregular indexes are rejected so a
+    requested 13-week horizon cannot silently mean 13 arbitrary source rows.
+    """
+    _validate_weekly_grid(prices.index, "prices")
+    if entry_lag_weeks < 0:
+        raise ValueError("entry_lag_weeks cannot be negative")
+    if any(h <= 0 for h in horizons):
+        raise ValueError("horizons must contain positive week counts")
+
     out = pd.DataFrame(index=prices.index)
     for h in horizons:
-        out[f"fwd_{h}w"] = prices.shift(-h) / prices - 1
+        entry = prices.shift(-entry_lag_weeks)
+        exit_price = prices.shift(-(entry_lag_weeks + h))
+        out[f"fwd_{h}w"] = exit_price / entry - 1
     return out
 
 
-def block_bootstrap_ci(
-    values: np.ndarray,
-    statistic: Callable[[np.ndarray], float],
+def _moving_block_indices(
+    n_observations: int,
     block_size: int,
-    n_iter: int = BOOTSTRAP_ITERATIONS,
-    ci_level: float = 0.95,
-    rng: np.random.Generator | None = None,
-) -> tuple[float, float]:
-    """Moving block bootstrap confidence interval for autocorrelated data."""
-    if rng is None:
-        rng = np.random.default_rng(RNG_SEED)
+    rng: np.random.Generator,
+) -> np.ndarray:
+    """Sample contiguous blocks of positions, then trim to the original length."""
+    if block_size <= 0:
+        raise ValueError("block_size must be positive")
+    if n_observations < block_size:
+        raise ValueError("block_size cannot exceed the observation count")
 
-    values = np.asarray(values, dtype=float)
-    n = len(values)
-    if n < block_size * 2:
-        return (float("nan"), float("nan"))
-
-    n_blocks = max(1, (n + block_size - 1) // block_size)
-    alpha = (1 - ci_level) / 2
-    max_start = n - block_size + 1
-
-    boot_stats = np.empty(n_iter)
-    for i in range(n_iter):
-        starts = rng.integers(0, max_start, size=n_blocks)
-        sample = np.concatenate([values[s:s + block_size] for s in starts])[:n]
-        boot_stats[i] = statistic(sample)
-
-    return (
-        float(np.quantile(boot_stats, alpha)),
-        float(np.quantile(boot_stats, 1 - alpha)),
-    )
-
-
-def _clean(value: float) -> float | None:
-    """Replace NaN/Inf with None so the payload is valid JSON downstream."""
-    if value is None:
-        return None
-    if not np.isfinite(value):
-        return None
-    return float(value)
+    n_blocks = max(1, (n_observations + block_size - 1) // block_size)
+    max_start = n_observations - block_size + 1
+    starts = rng.integers(0, max_start, size=n_blocks)
+    offsets = np.arange(block_size)
+    return (starts[:, None] + offsets).reshape(-1)[:n_observations]
 
 
 def _sanitize_json(obj):
@@ -165,48 +232,170 @@ def _sanitize_json(obj):
     return obj
 
 
-def _group_stats(
-    returns: np.ndarray,
-    block_size: int,
-    rng: np.random.Generator,
-) -> dict:
-    """Median, IQR, hit rate + block-bootstrap 95% CIs for a return series."""
-    clean = returns[~np.isnan(returns)]
-    n = len(clean)
-    if n < MIN_OBS_PER_REGIME:
-        return {
-            "median": None,
-            "p25": None,
-            "p75": None,
-            "hit_rate": None,
-            "n": int(n),
-            "ci_median_low": None,
-            "ci_median_high": None,
-            "ci_hit_rate_low": None,
-            "ci_hit_rate_high": None,
-        }
+def _empty_regime_stats(n: int) -> dict:
+    """Return the stable payload shape for an unreportable regime cell."""
+    return {
+        "median": None,
+        "p25": None,
+        "p75": None,
+        "hit_rate": None,
+        "n": int(n),
+        "ci_median_low": None,
+        "ci_median_high": None,
+        "ci_hit_rate_low": None,
+        "ci_hit_rate_high": None,
+        "edge": None,
+        "ci_edge_low": None,
+        "ci_edge_high": None,
+    }
 
-    median = _clean(float(np.median(clean)))
-    p25 = _clean(float(np.quantile(clean, 0.25)))
-    p75 = _clean(float(np.quantile(clean, 0.75)))
-    hit_rate = _clean(float(np.mean(clean > 0)))
 
-    ci_med_low, ci_med_high = block_bootstrap_ci(clean, np.median, block_size, rng=rng)
-    ci_hr_low, ci_hr_high = block_bootstrap_ci(
-        (clean > 0).astype(float), np.mean, block_size, rng=rng
+def _required_finite_draws(n_iter: int) -> int:
+    """Require broad bootstrap support while allowing reduced test iterations."""
+    return min(
+        n_iter,
+        max(
+            MIN_FINITE_BOOTSTRAP_DRAWS,
+            int(np.ceil(n_iter * MIN_FINITE_BOOTSTRAP_FRACTION)),
+        ),
     )
 
-    return {
-        "median": round(median, 6) if median is not None else None,
-        "p25": round(p25, 6) if p25 is not None else None,
-        "p75": round(p75, 6) if p75 is not None else None,
-        "hit_rate": round(hit_rate, 4) if hit_rate is not None else None,
-        "n": int(n),
-        "ci_median_low": round(v, 6) if (v := _clean(ci_med_low)) is not None else None,
-        "ci_median_high": round(v, 6) if (v := _clean(ci_med_high)) is not None else None,
-        "ci_hit_rate_low": round(v, 4) if (v := _clean(ci_hr_low)) is not None else None,
-        "ci_hit_rate_high": round(v, 4) if (v := _clean(ci_hr_high)) is not None else None,
+
+def _paired_regime_stats(
+    returns: np.ndarray,
+    regimes: np.ndarray,
+    block_size: int,
+    rng: np.random.Generator,
+    *,
+    base_hit_rate: float | None = None,
+    n_iter: int = BOOTSTRAP_ITERATIONS,
+    ci_level: float = 0.95,
+    min_subgroup_obs: int = MIN_OBS_PER_REGIME,
+    min_finite_draws: int | None = None,
+) -> dict[int, dict]:
+    """Compute regime statistics with a paired full-calendar block bootstrap.
+
+    Blocks are sampled from the weekly row sequence before any regime filter is
+    applied. Each accepted draw computes both the regime subgroup hit rate and
+    the unconditional hit rate, so the edge interval is paired within draw.
+    """
+    returns = np.asarray(returns, dtype=float)
+    regimes = np.asarray(regimes, dtype=float)
+    if returns.ndim != 1 or regimes.ndim != 1:
+        raise ValueError("returns and regimes must be one-dimensional")
+    if len(returns) != len(regimes):
+        raise ValueError("returns and regimes must have the same length")
+    if block_size <= 0:
+        raise ValueError("block_size must be positive")
+    if n_iter <= 0:
+        raise ValueError("n_iter must be positive")
+    if min_subgroup_obs <= 0:
+        raise ValueError("min_subgroup_obs must be positive")
+    if not 0 < ci_level < 1:
+        raise ValueError("ci_level must be between zero and one")
+
+    # Leading/trailing weeks without an asset return carry no information.
+    # Internal missing-return or unclassified weeks remain in place so blocks
+    # preserve calendar adjacency rather than compressing the subgroup.
+    finite_positions = np.flatnonzero(np.isfinite(returns))
+    if finite_positions.size:
+        first, last = int(finite_positions[0]), int(finite_positions[-1]) + 1
+        returns = returns[first:last]
+        regimes = regimes[first:last]
+
+    valid_returns = np.isfinite(returns)
+    classified_returns = valid_returns & np.isfinite(regimes)
+    all_clean = returns[classified_returns]
+    if base_hit_rate is None and len(all_clean) >= min_subgroup_obs:
+        base_hit_rate = round(float(np.mean(all_clean > 0)), 4)
+
+    stats_by_regime: dict[int, dict] = {}
+    eligible_codes: list[int] = []
+    for regime_code in REGIME_LABELS:
+        group_mask = classified_returns & (regimes == regime_code)
+        clean = returns[group_mask]
+        n = len(clean)
+        stats = _empty_regime_stats(n)
+        if n >= min_subgroup_obs:
+            median = float(np.median(clean))
+            hit_rate = round(float(np.mean(clean > 0)), 4)
+            stats.update(
+                {
+                    "median": round(median, 6),
+                    "p25": round(float(np.quantile(clean, 0.25)), 6),
+                    "p75": round(float(np.quantile(clean, 0.75)), 6),
+                    "hit_rate": hit_rate,
+                    "edge": (
+                        round(hit_rate - base_hit_rate, 4)
+                        if base_hit_rate is not None
+                        else None
+                    ),
+                }
+            )
+            eligible_codes.append(regime_code)
+        stats_by_regime[regime_code] = stats
+
+    if (
+        not eligible_codes
+        or len(returns) < block_size * 2
+        or len(all_clean) < min_subgroup_obs
+    ):
+        return stats_by_regime
+
+    required_draws = (
+        _required_finite_draws(n_iter) if min_finite_draws is None else min_finite_draws
+    )
+    if required_draws <= 0 or required_draws > n_iter:
+        raise ValueError("min_finite_draws must be between one and n_iter")
+
+    boot: dict[int, dict[str, list[float]]] = {
+        code: {"median": [], "hit_rate": [], "edge": []} for code in eligible_codes
     }
+    for _ in range(n_iter):
+        sample_idx = _moving_block_indices(len(returns), block_size, rng)
+        sample_returns = returns[sample_idx]
+        sample_regimes = regimes[sample_idx]
+        sample_valid = np.isfinite(sample_returns) & np.isfinite(sample_regimes)
+        unconditional = sample_returns[sample_valid]
+        if len(unconditional) < min_subgroup_obs:
+            continue
+        unconditional_hit_rate = float(np.mean(unconditional > 0))
+
+        for regime_code in eligible_codes:
+            subgroup = sample_returns[sample_valid & (sample_regimes == regime_code)]
+            if len(subgroup) < min_subgroup_obs:
+                continue
+            subgroup_hit_rate = float(np.mean(subgroup > 0))
+            boot[regime_code]["median"].append(float(np.median(subgroup)))
+            boot[regime_code]["hit_rate"].append(subgroup_hit_rate)
+            boot[regime_code]["edge"].append(subgroup_hit_rate - unconditional_hit_rate)
+
+    alpha = (1 - ci_level) / 2
+    for regime_code in eligible_codes:
+        draws = boot[regime_code]
+        if len(draws["edge"]) < required_draws:
+            continue
+
+        def interval(name: str, decimals: int) -> tuple[float, float]:
+            values = np.asarray(draws[name], dtype=float)
+            low, high = np.quantile(values, [alpha, 1 - alpha])
+            return round(float(low), decimals), round(float(high), decimals)
+
+        median_low, median_high = interval("median", 6)
+        hit_low, hit_high = interval("hit_rate", 4)
+        edge_low, edge_high = interval("edge", 4)
+        stats_by_regime[regime_code].update(
+            {
+                "ci_median_low": median_low,
+                "ci_median_high": median_high,
+                "ci_hit_rate_low": hit_low,
+                "ci_hit_rate_high": hit_high,
+                "ci_edge_low": edge_low,
+                "ci_edge_high": edge_high,
+            }
+        )
+
+    return stats_by_regime
 
 
 class BacktestComputer:
@@ -220,7 +409,9 @@ class BacktestComputer:
         self.fetcher = fetcher or DataFetcher()
         self.storage = storage or DataStorage()
 
-    def compute(self, save_output: bool = False, verbose: bool = True) -> BacktestResult:
+    def compute(
+        self, save_output: bool = False, verbose: bool = True
+    ) -> BacktestResult:
         if verbose:
             print("Computing backtest / track record...")
 
@@ -230,7 +421,18 @@ class BacktestComputer:
 
         glci_df["date"] = pd.to_datetime(glci_df["date"])
         glci_df = glci_df.sort_values("date").reset_index(drop=True)
-        glci_series = glci_df.set_index("date")["value"]
+        glci_series = _to_weekly_grid(
+            glci_df.set_index("date")["value"],
+            name="GLCI",
+            carry_forward_weeks=GLCI_CARRY_FORWARD_WEEKS,
+        )
+        if glci_series.isna().any():
+            missing_weeks = int(glci_series.isna().sum())
+            raise ValueError(
+                "GLCI history contains "
+                f"{missing_weeks} missing W-FRI observations; recompute it "
+                "instead of carrying synthetic values into the backtest"
+            )
 
         if verbose:
             print(
@@ -250,7 +452,9 @@ class BacktestComputer:
         if nfci_series is not None:
             nfci_regime = expanding_zscore_regime(nfci_series)
             if verbose:
-                print(f"  NFCI classified: {int(nfci_regime['regime'].notna().sum())} obs")
+                print(
+                    f"  NFCI classified: {int(nfci_regime['regime'].notna().sum())} obs"
+                )
 
         rng = np.random.default_rng(RNG_SEED)
         asset_results: list[AssetBacktestResult] = []
@@ -260,18 +464,27 @@ class BacktestComputer:
                 print(f"  Processing {cfg['name']}...")
             try:
                 result = self._compute_asset_backtest(
-                    asset_id, cfg, glci_series.index,
-                    glci_regime, nfci_regime, rng, verbose,
+                    asset_id,
+                    cfg,
+                    glci_series.index,
+                    glci_regime,
+                    nfci_regime,
+                    rng,
+                    verbose,
                 )
                 if result is not None:
                     asset_results.append(result)
             except Exception as e:
                 if verbose:
-                    print(f"    Warning: could not compute backtest for {asset_id}: {e}")
+                    print(
+                        f"    Warning: could not compute backtest for {asset_id}: {e}"
+                    )
 
         classifiers = {"glci": self._classifier_meta("glci", glci_regime, glci_series)}
         if nfci_regime is not None and nfci_series is not None:
-            classifiers["nfci"] = self._classifier_meta("nfci", nfci_regime, nfci_series)
+            classifiers["nfci"] = self._classifier_meta(
+                "nfci", nfci_regime, nfci_series
+            )
 
         first_classified = glci_regime["regime"].first_valid_index()
         last_obs = glci_series.index.max()
@@ -279,12 +492,18 @@ class BacktestComputer:
         result = BacktestResult(
             computed_at=datetime.utcnow().isoformat(),
             date_range=(
-                first_classified.strftime("%Y-%m-%d") if first_classified is not None else "",
+                first_classified.strftime("%Y-%m-%d")
+                if first_classified is not None
+                else "",
                 last_obs.strftime("%Y-%m-%d"),
             ),
             horizons=HORIZONS,
             classifiers=classifiers,
             assets=asset_results,
+            frequency=FREQUENCY,
+            entry_lag_weeks=ENTRY_LAG_WEEKS,
+            historical_mode=HISTORICAL_MODE,
+            point_in_time=POINT_IN_TIME_HISTORY,
         )
 
         if save_output:
@@ -313,13 +532,15 @@ class BacktestComputer:
         if nfci_df["date"].dt.tz is not None:
             nfci_df["date"] = nfci_df["date"].dt.tz_localize(None)
         nfci_df = nfci_df.sort_values("date")
-        nfci_df = resample_to_frequency(nfci_df, "W", agg_method="last")
-
-        series = nfci_df.set_index("date")["value"]
+        series = _to_weekly_grid(
+            nfci_df.set_index("date")["value"],
+            name="NFCI",
+            carry_forward_weeks=MARKET_CARRY_FORWARD_WEEKS,
+        )
         # FRED NFCI convention: higher = tighter. Invert so higher z → "loose"
         # bucket (same orientation as GLCI).
         series = -series
-        series = series.reindex(target_index, method="ffill")
+        series = series.reindex(target_index).ffill(limit=MARKET_CARRY_FORWARD_WEEKS)
         return series
 
     def _compute_asset_backtest(
@@ -341,12 +562,19 @@ class BacktestComputer:
         if price_df["date"].dt.tz is not None:
             price_df["date"] = price_df["date"].dt.tz_localize(None)
         price_df = price_df.sort_values("date")
-        price_df = resample_to_frequency(price_df, "W", agg_method="last")
+        prices = _to_weekly_grid(
+            price_df.set_index("date")["value"],
+            name=f"{asset_id} prices",
+            carry_forward_weeks=MARKET_CARRY_FORWARD_WEEKS,
+        )
+        prices = prices.reindex(target_index).ffill(limit=MARKET_CARRY_FORWARD_WEEKS)
+        _validate_weekly_grid(prices.index, f"{asset_id} prices")
 
-        prices = price_df.set_index("date")["value"]
-        prices = prices.reindex(target_index, method="ffill").dropna()
-
-        fwd = compute_forward_returns(prices, HORIZONS)
+        fwd = compute_forward_returns(
+            prices,
+            HORIZONS,
+            entry_lag_weeks=ENTRY_LAG_WEEKS,
+        )
         merged = fwd.join(
             glci_regime.rename(columns={"regime": "glci_regime"})[["glci_regime"]],
             how="inner",
@@ -356,10 +584,12 @@ class BacktestComputer:
                 nfci_regime.rename(columns={"regime": "nfci_regime"})[["nfci_regime"]],
                 how="left",
             )
+        _validate_weekly_grid(merged.index, f"{asset_id} backtest rows")
 
         base_rates: dict[int, dict] = {}
         for h in HORIZONS:
-            data = merged[f"fwd_{h}w"].dropna().values
+            eligible = merged[f"fwd_{h}w"].notna() & merged["glci_regime"].notna()
+            data = merged.loc[eligible, f"fwd_{h}w"].values
             if len(data) < MIN_OBS_PER_REGIME:
                 base_rates[h] = {
                     "median": None,
@@ -381,19 +611,24 @@ class BacktestComputer:
         for clf_name, regime_col in classifier_cols:
             if regime_col not in merged.columns:
                 continue
-            results[clf_name] = {}
-            for regime_code, regime_label in REGIME_LABELS.items():
-                subset = merged[merged[regime_col] == regime_code]
-                results[clf_name][regime_label] = {}
-                for h in HORIZONS:
-                    data = subset[f"fwd_{h}w"].dropna().values
-                    stats = _group_stats(data, block_size=h, rng=rng)
-                    base_hr = base_rates[h].get("hit_rate")
-                    if stats["hit_rate"] is not None and base_hr is not None:
-                        stats["edge"] = round(stats["hit_rate"] - base_hr, 4)
-                    else:
-                        stats["edge"] = None
-                    results[clf_name][regime_label][h] = stats
+            results[clf_name] = {
+                regime_label: {} for regime_label in REGIME_LABELS.values()
+            }
+            regimes = merged[regime_col].to_numpy(dtype=float)
+            for h in HORIZONS:
+                stats_by_code = _paired_regime_stats(
+                    merged[f"fwd_{h}w"].to_numpy(dtype=float),
+                    regimes,
+                    block_size=h,
+                    rng=rng,
+                    base_hit_rate=(
+                        base_rates[h].get("hit_rate")
+                        if clf_name == "glci"
+                        else None
+                    ),
+                )
+                for regime_code, regime_label in REGIME_LABELS.items():
+                    results[clf_name][regime_label][h] = stats_by_code[regime_code]
 
         return AssetBacktestResult(
             asset_id=asset_id,
@@ -422,12 +657,18 @@ class BacktestComputer:
         for date, row in regime_df.iterrows():
             if pd.notna(row["regime"]):
                 raw = values.loc[date] if date in values.index else None
-                timeline.append({
-                    "date": date.strftime("%Y-%m-%d"),
-                    "regime": REGIME_LABELS[int(row["regime"])],
-                    "zscore": round(float(row["zscore"]), 3) if pd.notna(row["zscore"]) else None,
-                    "value": round(float(raw), 4) if raw is not None and pd.notna(raw) else None,
-                })
+                timeline.append(
+                    {
+                        "date": date.strftime("%Y-%m-%d"),
+                        "regime": REGIME_LABELS[int(row["regime"])],
+                        "zscore": round(float(row["zscore"]), 3)
+                        if pd.notna(row["zscore"])
+                        else None,
+                        "value": round(float(raw), 4)
+                        if raw is not None and pd.notna(raw)
+                        else None,
+                    }
+                )
 
         return {
             "name": name,
@@ -442,25 +683,36 @@ class BacktestComputer:
             for clf, by_regime in asset.results.items():
                 for regime, by_horizon in by_regime.items():
                     for horizon, stats in by_horizon.items():
-                        rows.append({
-                            "asset_id": asset.asset_id,
-                            "name": asset.name,
-                            "category": asset.category,
-                            "classifier": clf,
-                            "regime": regime,
-                            "horizon": int(horizon),
-                            **stats,
-                        })
+                        rows.append(
+                            {
+                                "asset_id": asset.asset_id,
+                                "name": asset.name,
+                                "category": asset.category,
+                                "classifier": clf,
+                                "regime": regime,
+                                "horizon": int(horizon),
+                                **stats,
+                            }
+                        )
         df = pd.DataFrame(rows)
 
         self.storage.save_curated(
-            df, "backtest", "track_record",
+            df,
+            "backtest",
+            "track_record",
             metadata={
                 "computed_at": result.computed_at,
                 "date_range_start": result.date_range[0],
                 "date_range_end": result.date_range[1],
                 "horizons": result.horizons,
-                "bootstrap_iterations": BOOTSTRAP_ITERATIONS,
+                "frequency": result.frequency,
+                "entry_lag_weeks": result.entry_lag_weeks,
+                "historical_mode": result.historical_mode,
+                "point_in_time": result.point_in_time,
+                "regime_threshold_method": "expanding_zscore",
+                "bootstrap_iterations": result.bootstrap_iterations,
+                "bootstrap_method": result.bootstrap_method,
+                "bootstrap_min_finite_draw_fraction": MIN_FINITE_BOOTSTRAP_FRACTION,
                 "burn_in_periods": BURN_IN_PERIODS,
                 "min_obs_per_regime": MIN_OBS_PER_REGIME,
             },

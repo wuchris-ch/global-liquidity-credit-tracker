@@ -7,11 +7,14 @@ import pytest
 
 from scripts.export_to_json import (
     REQUIRED_PRODUCTION_EXPORT_PATHS,
+    export_glci_freshness,
+    export_glci_trust,
     fmt_date,
     validate_required_exports,
     write_json,
 )
-from src.config import get_all_series
+from src.config import get_all_series, get_index_config
+from src.etl.storage import DataStorage
 
 
 class TestFmtDate:
@@ -69,6 +72,23 @@ class TestValidateRequiredExports:
         errors = validate_required_exports(tmp_path)
         assert any("incomplete latest payload" in e for e in errors)
 
+    def test_trust_payload_cannot_claim_point_in_time_history(self, tmp_path):
+        path = tmp_path / "api" / "glci" / "trust" / "index.json"
+        write_json(
+            path,
+            {
+                "as_of": "2026-07-10",
+                "historical_mode": "reconstructed_current_vintage",
+                "point_in_time": True,
+                "frequency": "W-FRI",
+                "snapshots": {},
+                "data_quality": {},
+                "pillar_stats": {},
+            },
+        )
+        errors = validate_required_exports(tmp_path)
+        assert any("incorrect point-in-time claim" in error for error in errors)
+
     def test_empty_flows_destinations_reported(self, tmp_path):
         path = tmp_path / "api" / "flows" / "index.json"
         write_json(path, {"as_of": "2026-01-02", "destinations": []})
@@ -81,6 +101,186 @@ class TestValidateRequiredExports:
         Skipped when no local export has been generated (data/ is gitignored).
         """
         export_dir = Path(__file__).resolve().parent.parent / "data" / "export" / "latest"
-        if not (export_dir / "api" / "series" / "fed_total_assets" / "index.json").is_file():
-            pytest.skip("no full local export present (run the pipeline to generate one)")
+        if not all(
+            (export_dir / rel_path).is_file()
+            for rel_path in REQUIRED_PRODUCTION_EXPORT_PATHS
+        ):
+            pytest.skip("no current full local export (run the pipeline to generate one)")
         assert validate_required_exports(export_dir) == []
+
+
+class TestExportGlciTrust:
+    def test_default_payload_has_stable_honest_schema(self, tmp_path):
+        storage = DataStorage(
+            raw_path=tmp_path / "raw",
+            curated_path=tmp_path / "curated",
+        )
+        output_dir = tmp_path / "export"
+
+        export_glci_trust(storage, get_all_series(), output_dir)
+
+        path = output_dir / "api" / "glci" / "trust" / "index.json"
+        payload = json.loads(path.read_text())
+        assert set(payload) == {
+            "as_of",
+            "historical_mode",
+            "point_in_time",
+            "frequency",
+            "snapshots",
+            "data_quality",
+            "pillar_stats",
+        }
+        assert payload["as_of"] is None
+        assert payload["historical_mode"] == "reconstructed_current_vintage"
+        assert payload["point_in_time"] is False
+        assert payload["frequency"] == "W-FRI"
+        assert payload["snapshots"] == {
+            "count": 0,
+            "first_computed_at": None,
+            "last_computed_at": None,
+        }
+
+        configured_pillars = get_index_config(
+            "global_liquidity_credit_index"
+        )["pillars"]
+        expected_components = {
+            component["series"]
+            for pillar in configured_pillars.values()
+            for component in pillar["components"]
+        }
+        quality = payload["data_quality"]
+        assert quality["loaded_components"] == 0
+        assert quality["total_components"] == len(expected_components)
+        assert set(quality["missing_components"]) == expected_components
+        assert quality["stale_components"] == []
+        assert set(payload["pillar_stats"]) == set(configured_pillars)
+
+    def test_model_quality_is_authoritative_when_raw_cache_is_absent(self, tmp_path):
+        storage = DataStorage(
+            raw_path=tmp_path / "raw",
+            curated_path=tmp_path / "curated",
+        )
+        configured_pillars = get_index_config(
+            "global_liquidity_credit_index"
+        )["pillars"]
+        pillar_stats = {}
+        for pillar_name, pillar in configured_pillars.items():
+            component_count = len(pillar["components"])
+            pillar_stats[pillar_name] = {
+                "data_quality": {
+                    "total_series": component_count,
+                    "loaded_series": component_count,
+                    "missing_series": [],
+                    "stale_series": [],
+                }
+            }
+        storage.save_curated(
+            pd.DataFrame(
+                {"date": [pd.Timestamp("2026-07-10")], "value": [101.0]}
+            ),
+            "indices",
+            "glci",
+            metadata={"pillar_stats": pillar_stats},
+        )
+
+        output_dir = tmp_path / "export"
+        export_glci_trust(storage, get_all_series(), output_dir)
+        payload = json.loads(
+            (
+                output_dir / "api" / "glci" / "trust" / "index.json"
+            ).read_text()
+        )
+
+        quality = payload["data_quality"]
+        assert quality["loaded_components"] == quality["total_components"]
+        assert quality["missing_components"] == []
+
+    def test_staleness_allowance_respects_source_frequency(self, tmp_path):
+        storage = DataStorage(
+            raw_path=tmp_path / "raw",
+            curated_path=tmp_path / "curated",
+        )
+        today = pd.Timestamp.now(tz="UTC").normalize()
+        storage.save_raw(
+            pd.DataFrame(
+                {"date": [today - pd.Timedelta(days=11)], "value": [1.0]}
+            ),
+            "fred",
+            "fed_reverse_repo",
+        )
+        storage.save_raw(
+            pd.DataFrame(
+                {"date": [today - pd.Timedelta(days=40)], "value": [1.0]}
+            ),
+            "fred",
+            "boj_total_assets",
+        )
+
+        output_dir = tmp_path / "export"
+        export_glci_trust(storage, get_all_series(), output_dir)
+        export_glci_freshness(storage, get_all_series(), output_dir)
+        payload = json.loads(
+            (
+                output_dir / "api" / "glci" / "trust" / "index.json"
+            ).read_text()
+        )
+
+        stale = payload["data_quality"]["stale_components"]
+        assert "fed_reverse_repo" in stale
+        assert "boj_total_assets" not in stale
+        liquidity_quality = payload["pillar_stats"]["liquidity"]["data_quality"]
+        assert "fed_reverse_repo" in liquidity_quality["stale_series"]
+        assert "boj_total_assets" not in liquidity_quality["stale_series"]
+
+        freshness = json.loads(
+            (
+                output_dir / "api" / "glci" / "freshness" / "index.json"
+            ).read_text()
+        )
+        freshness_by_id = {item["series_id"]: item for item in freshness}
+        assert freshness_by_id["fed_reverse_repo"]["is_stale"] is True
+        assert freshness_by_id["boj_total_assets"]["is_stale"] is False
+
+    def test_snapshot_summary_and_as_of_are_exported(self, tmp_path):
+        storage = DataStorage(
+            raw_path=tmp_path / "raw",
+            curated_path=tmp_path / "curated",
+        )
+        storage.save_curated(
+            pd.DataFrame(
+                {
+                    "date": [pd.Timestamp("2026-07-10")],
+                    "value": [101.0],
+                }
+            ),
+            "indices",
+            "glci",
+        )
+        base_snapshot = {
+            "signal_date": "2026-07-10",
+            "historical_mode": "reconstructed_current_vintage",
+            "point_in_time": False,
+            "frequency": "W-FRI",
+            "glci": 101.0,
+        }
+        storage.append_signal_snapshot(
+            {**base_snapshot, "computed_at": "2026-07-10T12:00:00Z"}
+        )
+        storage.append_signal_snapshot(
+            {**base_snapshot, "computed_at": "2026-07-10T18:00:00Z"}
+        )
+
+        output_dir = tmp_path / "export"
+        export_glci_trust(storage, get_all_series(), output_dir)
+        payload = json.loads(
+            (
+                output_dir / "api" / "glci" / "trust" / "index.json"
+            ).read_text()
+        )
+
+        assert payload["as_of"] == "2026-07-10"
+        assert payload["snapshots"] == {
+            "count": 2,
+            "first_computed_at": "2026-07-10T12:00:00Z",
+            "last_computed_at": "2026-07-10T18:00:00Z",
+        }

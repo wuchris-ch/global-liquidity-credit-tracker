@@ -171,3 +171,34 @@ class TestComputePayload:
         sp = next(d for d in payload["destinations"] if d["id"] == "sp500")
         # 13 weeks of 7 daily steps at 5bp each
         assert sp["ret_13w"] == pytest.approx(1.0005 ** (13 * 7) - 1, rel=1e-3)
+
+
+class TestCompletedWeeklyClock:
+    def test_payload_through_thursday_reports_previous_friday(self):
+        days = pd.date_range("2024-01-01", "2024-06-20", freq="D")
+        frame = make_series(days, np.arange(len(days), dtype=float) + 100)
+        computer = FlowsComputer(
+            fetcher=StubFetcher({"sp500_price": frame, "bitcoin_price": frame}),
+            storage=StubStorage(),
+        )
+
+        payload = computer.compute(save_output=False, verbose=False)
+
+        assert payload["as_of"] == "2024-06-14"
+        assert all(d["last_date"] == "2024-06-14" for d in payload["destinations"])
+        assert all(d["spark"][-1]["date"] == "2024-06-14" for d in payload["destinations"])
+
+    def test_glci_data_through_thursday_drops_future_friday_bucket(self):
+        fridays = pd.date_range("2024-01-05", "2024-06-14", freq="W-FRI")
+        dates = fridays.append(pd.DatetimeIndex([pd.Timestamp("2024-06-20")]))
+        glci = pd.DataFrame({"date": dates, "value": np.arange(len(dates))})
+        computer = FlowsComputer(
+            fetcher=StubFetcher({}),
+            storage=StubStorage({("indices", "glci"): glci}),
+        )
+
+        weekly = computer._load_glci_weekly()
+
+        assert weekly is not None
+        assert weekly.index[-1] == pd.Timestamp("2024-06-14")
+        assert pd.Timestamp("2024-06-21") not in weekly.index

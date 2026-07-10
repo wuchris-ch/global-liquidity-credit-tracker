@@ -12,7 +12,7 @@ change to appear:
 1. **Code** (frontend and pipeline): merging to `main` triggers a Vercel deploy
    of the frontend. This does **not** recompute any data.
 2. **Data**: the `update-data.yml` workflow fetches sources, recomputes all
-   indices, and force-pushes static JSON to the `gh-pages` branch. It runs
+   indices, and publishes a normal commit with static JSON to the `gh-pages` branch. It runs
    every 12 hours on a schedule, or on demand.
 
 The practical consequence: after merging a PR that adds or changes a series,
@@ -44,7 +44,7 @@ with one directory per endpoint containing `index.json`:
 
 | Page | Endpoint |
 |------|----------|
-| Today / Index | `/api/glci/index.json`, `/api/glci/latest/index.json`, `/api/glci/pillars/index.json` |
+| Today / Index | `/api/glci/index.json`, `/api/glci/latest/index.json`, `/api/glci/pillars/index.json`, `/api/glci/trust/index.json` |
 | Flows | `/api/flows/index.json` |
 | Playbook (risk) | `/api/risk/index.json` |
 | Playbook (backtest) | `/api/backtest/track_record/index.json` |
@@ -81,6 +81,17 @@ The pipeline aborts before publishing if any production-critical series fails
 to fetch, so a bad upstream day leaves the last good publish intact. Asset
 prices (gold, crypto, ETFs) are best effort: a failed fetch skips that asset
 and prints a warning in the run log instead of blocking the publish.
+All three configured GLCI pillars are also required. A pillar-model failure
+aborts before save or publication; the pipeline never substitutes a partial,
+reweighted composite.
+
+`scripts/update_data.py` also computes the GLCI and appends its latest state to
+`data/curated/indices/glci_vintages.parquet`. Snapshot identity includes both
+the computation timestamp and signal date, so a later revision of the same
+signal date is retained rather than replacing the earlier publication. The
+workflow restores that ledger from `gh-pages/state/`, verifies its row count
+against the prior trust payload, and refuses to publish if established state is
+missing or regresses. The first publish is the only automatic bootstrap.
 
 ## Things that will break production
 

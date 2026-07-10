@@ -11,9 +11,9 @@ from datetime import datetime
 from typing import Literal
 from dataclasses import dataclass, field
 import json
-import warnings
 
-from ..config import get_index_config, CURATED_DATA_PATH
+from ..config import get_index_config, get_series_config, CURATED_DATA_PATH
+from ..data_quality import freshness_state
 from ..etl.fetcher import DataFetcher
 from ..etl.storage import DataStorage
 from .factors import (
@@ -32,6 +32,69 @@ from .transforms import (
     compute_momentum,
     compute_regime_probability,
 )
+
+
+HISTORICAL_MODE = "reconstructed_current_vintage"
+POINT_IN_TIME_HISTORY = False
+TARGET_FREQUENCIES = {
+    "D": "D",
+    "W": "W-FRI",
+    "M": "ME",
+    "Q": "QE",
+    "A": "YE",
+}
+
+
+def _apply_pillar_signs(
+    pillar_factors: dict[str, pd.Series],
+    pillar_signs: dict[str, int],
+) -> dict[str, pd.Series]:
+    """Orient pillar factors once for their relationship to the composite."""
+    return {
+        name: factor * pillar_signs.get(name, 1)
+        for name, factor in pillar_factors.items()
+    }
+
+
+def _require_complete_pillar_history(
+    pillar_factors: dict[str, pd.Series],
+) -> dict[str, pd.Series]:
+    """Keep only dates with an observation from every computed pillar."""
+    complete = pd.concat(pillar_factors, axis=1).dropna(how="any")
+    if complete.empty:
+        raise ValueError("Pillar factors have no complete overlapping history")
+    return {name: complete[name] for name in complete.columns}
+
+
+def _standardize_pillar_factors(
+    pillar_factors: dict[str, pd.Series],
+) -> dict[str, pd.Series]:
+    """Put every pillar on a common full-sample, unit-variance scale."""
+    standardized: dict[str, pd.Series] = {}
+    for name, factor in pillar_factors.items():
+        numeric = pd.to_numeric(factor, errors="coerce").replace(
+            [np.inf, -np.inf],
+            np.nan,
+        )
+        if numeric.isna().any():
+            raise ValueError(f"Pillar factor '{name}' contains non-finite values")
+        scale = float(numeric.std())
+        if not np.isfinite(scale) or scale <= 1e-12:
+            raise ValueError(f"Pillar factor '{name}' has no usable variation")
+        standardized[name] = (numeric - float(numeric.mean())) / scale
+    return standardized
+
+
+def _validate_weekly_friday_grid(index: pd.Index) -> None:
+    """Require a complete, ordered W-FRI clock for weekly GLCI output."""
+    dates = pd.DatetimeIndex(index)
+    if dates.empty:
+        raise ValueError("Weekly GLCI output cannot be empty")
+    if not dates.is_monotonic_increasing or not dates.is_unique:
+        raise ValueError("Weekly GLCI dates must be ordered and unique")
+    expected = pd.date_range(dates[0], dates[-1], freq="W-FRI")
+    if not dates.equals(expected):
+        raise ValueError("Weekly GLCI output must use a complete W-FRI grid")
 
 
 @dataclass
@@ -146,34 +209,29 @@ class GLCIComputer:
                 
             except Exception as e:
                 if verbose:
-                    print(f"  ✗ Warning: Could not compute {pillar_name} factor: {e}")
+                    print(f"  ✗ Could not compute {pillar_name} factor: {e}")
                     import traceback
                     traceback.print_exc()
-                continue
+                raise RuntimeError(
+                    "GLCI computation aborted because configured pillar "
+                    f"'{pillar_name}' failed"
+                ) from e
+
+        missing_pillars = set(pillar_names) - set(pillar_factors)
+        if missing_pillars:
+            raise RuntimeError(
+                "GLCI computation aborted because configured pillars are missing: "
+                + ", ".join(sorted(missing_pillars))
+            )
         
-        if not pillar_factors:
-            raise ValueError("No pillar factors could be computed")
-        
-        # Adjust weights if some pillars are missing
-        if len(pillar_factors) < len(pillar_names):
-            missing = set(pillar_names) - set(pillar_factors.keys())
-            if verbose:
-                print(f"\nNote: Redistributing weights from missing pillars: {missing}")
-            
-            available_weights = {k: v for k, v in pillar_weights.items() if k in pillar_factors}
-            total_available = sum(available_weights.values())
-            pillar_weights = {k: v / total_available for k, v in available_weights.items()}
-            
-            if verbose:
-                print(f"Adjusted weights: {pillar_weights}")
-        
-        # Step 2: Apply pillar-level sign adjustments
-        # The stress pillar should be inverted (higher stress = lower index)
-        for pillar_name, factor in pillar_factors.items():
-            pillar_sign = pillar_signs.get(pillar_name, 1)
-            if pillar_sign < 0:
-                pillar_factors[pillar_name] = -factor
-                if verbose:
+        # Step 2: Apply each pillar-level sign exactly once. Component signs
+        # have already oriented inputs within each pillar.
+        pillar_factors = _apply_pillar_signs(pillar_factors, pillar_signs)
+        pillar_factors = _require_complete_pillar_history(pillar_factors)
+        pillar_factors = _standardize_pillar_factors(pillar_factors)
+        if verbose:
+            for pillar_name in pillar_factors:
+                if pillar_signs.get(pillar_name, 1) < 0:
                     print(f"\nApplied sign inversion for {pillar_name} pillar")
         
         # Step 3: Combine pillar factors into composite GLCI
@@ -192,6 +250,9 @@ class GLCIComputer:
         target_mean = normalize_config.get("mean", 100)
         target_stdev = normalize_config.get("stdev", 10)
         glci_series = (glci_series - 100) / 10 * target_stdev + target_mean
+
+        if target_freq == "W":
+            _validate_weekly_friday_grid(glci_series.index)
         
         if verbose:
             print(f"GLCI range: {glci_series.min():.1f} to {glci_series.max():.1f}")
@@ -257,15 +318,21 @@ class GLCIComputer:
         # Build comprehensive metadata
         pillar_stats = {}
         for name, result in pillar_results.items():
+            used_series = result.metadata.get("used_series", [])
+            excluded_series = result.metadata.get("excluded_series", [])
             pillar_stats[name] = {
                 "method": result.method,
                 "explained_variance": result.explained_variance,
                 "n_variables": result.metadata.get("n_variables", 0),
                 "data_quality": {
                     "total_series": result.data_quality.total_series if result.data_quality else 0,
-                    "loaded_series": result.data_quality.loaded_series if result.data_quality else 0,
+                    "loaded_series": len(used_series),
+                    "available_series": result.data_quality.loaded_series if result.data_quality else len(used_series),
+                    "used_series": used_series,
+                    "excluded_series": excluded_series,
                     "missing_series": result.data_quality.missing_series if result.data_quality else [],
-                    "low_coverage": [s[0] for s in (result.data_quality.low_coverage_series or [])] if result.data_quality else []
+                    "low_coverage": [s[0] for s in (result.data_quality.low_coverage_series or [])] if result.data_quality else [],
+                    "stale_series": [s[0] for s in (result.data_quality.stale_series or [])] if result.data_quality else [],
                 }
             }
         
@@ -275,7 +342,16 @@ class GLCIComputer:
             "end_date": str(glci_df["date"].max()),
             "n_observations": len(glci_df),
             "target_frequency": target_freq,
+            "frequency": TARGET_FREQUENCIES.get(target_freq, target_freq),
+            "historical_mode": HISTORICAL_MODE,
+            "point_in_time": POINT_IN_TIME_HISTORY,
+            "regime_threshold_method": "rolling_104_period_zscore",
+            "historical_integrity_note": (
+                "History is reconstructed from the current upstream data vintage. "
+                "Rolling regime thresholds do not make upstream inputs point-in-time."
+            ),
             "factor_method": factor_method,
+            "pillar_scaling": "full_sample_zscore_on_common_history",
             "normalize": normalize_config,
             "pillar_stats": pillar_stats,
             "current_regime": {
@@ -339,9 +415,10 @@ class GLCIComputer:
         # Prepare data for factor model (drop date column)
         X = feature_matrix.drop(columns=["date"], errors="ignore")
         X = X.select_dtypes(include=[np.number])
+        X.index = pd.DatetimeIndex(feature_matrix["date"])
         
-        # Note: Sign constraints are already applied via pre-flipping in the feature builder
-        # All series should now have positive expected loadings
+        # Component orientation is already applied to each transformed feature,
+        # so all inputs should now have positive expected loadings.
         sign_constraints = {col: 1 for col in X.columns}
         
         # Fit factor model
@@ -368,10 +445,25 @@ class GLCIComputer:
             model.fit(X)
         
         factor_result = model.get_result()
+
+        used_features = [str(feature) for feature in factor_result.loadings.index]
+        feature_to_series = {
+            f"{item.series_id}_{item.transform}": item.series_id
+            for item in metadata
+        }
+        used_series = sorted({
+            feature_to_series[feature]
+            for feature in used_features
+            if feature in feature_to_series
+        })
+        available_series = sorted({item.series_id for item in metadata})
+        excluded_series = sorted(set(available_series) - set(used_series))
+        excluded_features = sorted(set(feature_to_series) - set(used_features))
         
-        # Get the factor series and align to dates
+        # PCA training may start later than the raw grid when a component has
+        # no early history. Keep that honest model index instead of assigning
+        # factor values to dates before every component existed.
         factor_series = factor_result.factors.iloc[:, 0]
-        factor_series.index = feature_matrix["date"]
         
         return GLCIPillarResult(
             name=pillar_name,
@@ -381,9 +473,13 @@ class GLCIComputer:
             method=factor_result.method,
             data_quality=quality_report,
             metadata={
-                "n_variables": len(X.columns),
-                "n_observations": len(X),
-                "converged": factor_result.converged
+                "n_variables": len(factor_result.loadings.index),
+                "n_observations": len(factor_series),
+                "converged": factor_result.converged,
+                "used_features": used_features,
+                "excluded_features": excluded_features,
+                "used_series": used_series,
+                "excluded_series": excluded_series,
             }
         )
     
@@ -519,12 +615,15 @@ class GLCIComputer:
                     continue
 
                 last_date = df["date"].max()
-                days_old = (pd.Timestamp.now() - pd.Timestamp(last_date)).days
+                days_old, is_stale = freshness_state(
+                    last_date,
+                    get_series_config(series_id).get("frequency"),
+                )
                 freshness[series_id] = {
                     "pillar": pillar_name,
                     "last_date": str(last_date)[:10],
                     "days_old": days_old,
-                    "is_stale": days_old > 14
+                    "is_stale": is_stale,
                 }
 
         return freshness

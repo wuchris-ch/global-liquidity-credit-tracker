@@ -104,6 +104,79 @@ export function verdictHeadline(regime: Regime, momentum: number): string {
   return HEADLINES[regime][momentumDirection(momentum)];
 }
 
+export type TransitionState = "building" | "fading" | "stable";
+
+export interface TransitionView {
+  state: TransitionState;
+  detail: string;
+}
+
+/** A compact, deterministic read of the composite's four-week direction. */
+export function transitionView(momentum: number): TransitionView {
+  const direction = momentumDirection(momentum);
+  const state: TransitionState = direction === "steady" ? "stable" : direction;
+  const magnitude = Math.abs(momentum).toFixed(1);
+
+  if (state === "building") {
+    return {
+      state,
+      detail: `The composite rose ${magnitude} points over four weeks.`,
+    };
+  }
+  if (state === "fading") {
+    return {
+      state,
+      detail: `The composite fell ${magnitude} points over four weeks.`,
+    };
+  }
+  return {
+    state,
+    detail:
+      Math.abs(momentum) < 0.05
+        ? "The composite was unchanged over four weeks."
+        : `The composite moved ${magnitude} points over four weeks, inside the stable range.`,
+  };
+}
+
+/**
+ * State the observable condition that would invalidate the current regime read.
+ * Regime boundaries are weekly z-scores of +1 (loose) and -1 (tight).
+ */
+export function invalidationSentence(
+  glci: Pick<GLCIResponse, "regime" | "zscore" | "momentum">
+): string {
+  const current = `${signed(glci.zscore, 1)}σ`;
+  const direction = momentumDirection(glci.momentum);
+
+  if (glci.regime === "loose") {
+    const momentumClause =
+      glci.momentum < 0
+        ? "Four-week momentum is already negative, so the regime boundary is the next confirmation."
+        : "A turn in four-week momentum below zero would be the earlier challenge.";
+    return `A weekly z-score below +1.0σ would move the signal back to neutral; it is now ${current}. ${momentumClause}`;
+  }
+
+  if (glci.regime === "tight") {
+    const momentumClause =
+      glci.momentum > 0
+        ? "Four-week momentum is already positive, so the regime boundary is the next confirmation."
+        : "A turn in four-week momentum above zero would be the earlier challenge.";
+    return `A weekly z-score above −1.0σ would move the signal back to neutral; it is now ${current}. ${momentumClause}`;
+  }
+
+  if (direction === "building") {
+    const gap = Math.max(0, 1 - glci.zscore).toFixed(1);
+    return `A further ${gap}σ rise through +1.0σ, with four-week momentum still positive, would confirm loose conditions. A momentum turn below zero would challenge the improvement.`;
+  }
+
+  if (direction === "fading") {
+    const gap = Math.max(0, glci.zscore + 1).toFixed(1);
+    return `A further ${gap}σ fall through −1.0σ, with four-week momentum still negative, would confirm tight conditions. A momentum turn above zero would challenge the softening.`;
+  }
+
+  return `The neutral read holds between −1.0σ and +1.0σ; the index is now ${current}. A weekly break beyond either boundary, confirmed by momentum in the same direction, would change the view.`;
+}
+
 /**
  * "The index stands at 84.0, 0.2σ above its two-year trend, in the neutral
  * band for a 7th week."

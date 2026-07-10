@@ -60,6 +60,62 @@ class DataStorage:
             df = combined
         
         return self.save_raw(df, source, series_id)
+
+    def append_signal_snapshot(
+        self,
+        snapshot: dict,
+        category: str = "indices",
+        name: str = "glci_vintages",
+        identity_columns: tuple[str, ...] = ("computed_at", "signal_date"),
+    ) -> Path:
+        """Append one published signal state without rewriting its history.
+
+        Signal dates are not unique: the same weekly signal can be recomputed
+        several times as upstream data are revised. A snapshot is therefore
+        identified by both its computation time and signal date. Re-appending
+        that exact identity is idempotent and preserves the first stored row.
+
+        Args:
+            snapshot: Scalar values describing one computed signal state.
+            category: Curated-data category in which to store the ledger.
+            name: Curated-data dataset name.
+            identity_columns: Columns that uniquely identify a computation.
+
+        Returns:
+            Path to the snapshot ledger parquet file.
+        """
+        missing_identity = [
+            column
+            for column in identity_columns
+            if column not in snapshot or pd.isna(snapshot[column])
+        ]
+        if missing_identity:
+            raise ValueError(
+                "Signal snapshot is missing identity values: "
+                + ", ".join(missing_identity)
+            )
+
+        incoming = pd.DataFrame([snapshot])
+        existing = self.load_curated(category, name)
+        if existing is not None and not existing.empty:
+            combined = pd.concat([existing, incoming], ignore_index=True, sort=False)
+        else:
+            combined = incoming
+
+        # Keep the original row for an already-seen computation identity. This
+        # makes retries safe and prevents a later run from mutating a vintage.
+        combined = combined.drop_duplicates(
+            subset=list(identity_columns), keep="first"
+        )
+        combined = combined.sort_values(list(identity_columns)).reset_index(drop=True)
+
+        category_path = self.curated_path / category
+        category_path.mkdir(parents=True, exist_ok=True)
+        file_path = category_path / f"{name}.parquet"
+        temporary_path = category_path / f".{name}.parquet.tmp"
+        combined.to_parquet(temporary_path, index=False)
+        temporary_path.replace(file_path)
+        return file_path
     
     def list_raw_series(self, source: str | None = None) -> list[dict]:
         """List all available raw series."""

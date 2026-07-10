@@ -1,7 +1,6 @@
 """FastAPI server exposing liquidity data."""
 import os
 from datetime import datetime, timedelta
-from typing import Literal
 import warnings
 
 from fastapi import FastAPI, HTTPException, Query
@@ -9,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from ..config import get_all_series, get_all_indices, get_series_config, get_index_config
+from ..data_quality import build_glci_trust_payload
 from ..etl import DataFetcher, DataStorage
 from ..indicators import Aggregator, GLCIComputer, GLCIResult
 
@@ -538,6 +538,15 @@ async def get_glci_freshness():
             )
             for series_id, info in freshness.items()
         ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/glci/trust")
+async def get_glci_trust():
+    """Get the same GLCI provenance and fitted-input coverage as static export."""
+    try:
+        return build_glci_trust_payload(storage, get_all_series())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

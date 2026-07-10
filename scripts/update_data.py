@@ -10,9 +10,9 @@ Example GitHub Actions workflow:
   schedule:
     - cron: '0 6 * * *'
 """
-import sys
 import os
-from datetime import datetime, timedelta
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -20,9 +20,81 @@ import pandas as pd
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.config import FRED_API_KEY
+from src.config import FRED_API_KEY, get_series_config
+from src.data_quality import freshness_state
 from src.etl import DataFetcher, DataStorage
-from src.indicators import Aggregator
+from src.indicators import Aggregator, GLCIComputer
+
+
+HISTORICAL_MODE = "reconstructed_current_vintage"
+
+
+def _as_utc_iso(value=None) -> str:
+    """Return an ISO-8601 UTC timestamp with an explicit zone."""
+    timestamp = pd.Timestamp(value if value is not None else datetime.now(timezone.utc))
+    if timestamp.tzinfo is None:
+        timestamp = timestamp.tz_localize("UTC")
+    else:
+        timestamp = timestamp.tz_convert("UTC")
+    return timestamp.isoformat().replace("+00:00", "Z")
+
+
+def _snapshot_number(value):
+    """Convert a pandas scalar to a JSON/parquet-safe number or null."""
+    if value is None or pd.isna(value):
+        return None
+    return float(value)
+
+
+def build_glci_snapshot(result) -> dict:
+    """Build the append-only record of the latest published GLCI state."""
+    if result.glci is None or result.glci.empty:
+        raise ValueError("Cannot snapshot an empty GLCI result")
+
+    glci = result.glci.sort_values("date")
+    latest = glci.iloc[-1]
+    signal_date = pd.Timestamp(latest["date"]).strftime("%Y-%m-%d")
+    computed_at = _as_utc_iso(result.metadata.get("computed_at"))
+
+    snapshot = {
+        "computed_at": computed_at,
+        "signal_date": signal_date,
+        "historical_mode": HISTORICAL_MODE,
+        "point_in_time": False,
+        "frequency": "W-FRI",
+        "model_revision": os.getenv("GITHUB_SHA") or "local",
+        "factor_method": result.metadata.get("factor_method"),
+        "glci": _snapshot_number(latest.get("value")),
+        "zscore": _snapshot_number(latest.get("zscore")),
+        "regime": (
+            int(latest["regime"])
+            if "regime" in latest and pd.notna(latest["regime"])
+            else None
+        ),
+        "momentum": _snapshot_number(latest.get("momentum")),
+        "prob_regime_change": _snapshot_number(
+            latest.get("prob_regime_change")
+        ),
+    }
+
+    pillar_weights = result.weights.get("pillar_weights", {})
+    if isinstance(pillar_weights, dict):
+        for pillar_name, weight in sorted(pillar_weights.items()):
+            snapshot[f"weight_{pillar_name}"] = _snapshot_number(weight)
+
+    if result.pillars is not None and not result.pillars.empty:
+        pillars = result.pillars.sort_values("date")
+        eligible = pillars[pd.to_datetime(pillars["date"]) <= pd.Timestamp(latest["date"])]
+        if not eligible.empty:
+            latest_pillars = eligible.iloc[-1]
+            for pillar_name in pillars.columns:
+                if pillar_name == "date":
+                    continue
+                snapshot[f"pillar_{pillar_name}"] = _snapshot_number(
+                    latest_pillars[pillar_name]
+                )
+
+    return snapshot
 
 
 def main():
@@ -41,7 +113,7 @@ def main():
     end_date = None
     
     # 1. Fetch all series
-    print("\n[1/3] Fetching raw data...")
+    print("\n[1/4] Fetching raw data...")
     
     # Series that production pages depend on directly. If any of these fail on
     # a clean CI runner, publishing would replace the last good static export
@@ -95,7 +167,7 @@ def main():
         "nasdaq100",
     ]
 
-    print("\n[1b/3] Fetching asset prices (best effort)...")
+    print("\n[1b/4] Fetching asset prices (best effort)...")
     asset_results = fetcher.fetch_multiple(asset_series, start_date, end_date)
     for series_id in asset_series:
         df = asset_results.get(series_id)
@@ -107,7 +179,7 @@ def main():
         print(f"  ✓ {series_id}: {len(df)} obs")
 
     # 2. Compute indices
-    print("\n[2/3] Computing indices...")
+    print("\n[2/4] Computing indices...")
     
     indices_to_compute = ["fed_net_liquidity", "usd_funding_stress"]
     
@@ -127,8 +199,33 @@ def main():
         except Exception as e:
             print(f"  ✗ {index_id}: {e}")
     
-    # 3. Health check
-    print("\n[3/3] Health check...")
+    # 3. Compute the GLCI and preserve exactly what this run will publish.
+    print("\n[3/4] Computing GLCI and preserving signal snapshot...")
+    try:
+        glci_result = GLCIComputer(fetcher=fetcher, storage=storage).compute(
+            start_date,
+            end_date,
+            target_freq="W",
+            save_output=True,
+            verbose=True,
+        )
+        snapshot_path = storage.append_signal_snapshot(
+            build_glci_snapshot(glci_result)
+        )
+        latest_glci = glci_result.glci.sort_values("date").iloc[-1]
+        print(
+            "  ✓ GLCI: "
+            f"{latest_glci['value']:.2f} as of "
+            f"{pd.Timestamp(latest_glci['date']).strftime('%Y-%m-%d')}"
+        )
+        print(f"  ✓ Preserved signal vintage in {snapshot_path}")
+    except Exception as exc:
+        print(f"\nERROR: GLCI computation or snapshot failed: {exc}")
+        print("Aborting before export so the existing published data stays intact.")
+        raise SystemExit(1) from exc
+
+    # 4. Health check
+    print("\n[4/4] Health check...")
     
     errors = []
     
@@ -136,10 +233,11 @@ def main():
     for series_id in priority_series:
         latest = storage.get_latest_date("fred", series_id)
         if latest:
-            # Compare on calendar dates so tz-aware series don't break the
-            # subtraction against a tz-naive datetime.now().
-            days_old = (datetime.now().date() - latest.date()).days
-            if days_old > 7:
+            days_old, is_stale = freshness_state(
+                latest,
+                get_series_config(series_id).get("frequency"),
+            )
+            if is_stale:
                 errors.append(f"{series_id}: data is {days_old} days old")
 
     # Asset prices are best effort, so a throttled or broken source never
@@ -151,8 +249,11 @@ def main():
             errors.append(f"{series_id}: fetch returned no data this run")
             continue
         latest = pd.to_datetime(df["date"]).max()
-        days_old = (datetime.now().date() - latest.date()).days
-        if days_old > 7:
+        days_old, is_stale = freshness_state(
+            latest,
+            get_series_config(series_id).get("frequency"),
+        )
+        if is_stale:
             errors.append(f"{series_id}: data is {days_old} days old")
     
     if errors:

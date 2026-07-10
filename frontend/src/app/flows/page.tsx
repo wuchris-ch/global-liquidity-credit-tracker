@@ -101,7 +101,7 @@ function Scoreboard({ destinations }: { destinations: FlowDestination[] }) {
 
 function FlowsSkeleton() {
   return (
-    <div className="animate-pulse space-y-6 pt-10 sm:pt-14" aria-label="Loading the flows">
+    <div className="animate-pulse space-y-6 pt-10 sm:pt-14" aria-label="Loading price leadership">
       <div className="h-4 w-56 rounded bg-muted" />
       <div className="h-12 w-3/4 rounded bg-muted" />
       <div className="space-y-2">
@@ -130,7 +130,7 @@ export default function FlowsPage() {
   if (flows.error) {
     return (
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
-        <DataLoadError title="The flows could not be loaded" onRetry={flows.refetch} />
+        <DataLoadError title="Price leadership could not be loaded" onRetry={flows.refetch} />
       </div>
     );
   }
@@ -152,7 +152,7 @@ export default function FlowsPage() {
       {/* Header */}
       <section className="pt-10 sm:pt-14">
         <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-          The Flows · Data through {formatShortDate(data.as_of)}
+          Price Leadership · Data through {formatShortDate(data.as_of)}
         </span>
         <h1 className="mt-4 max-w-4xl font-serif text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl">
           {flowsHeadline(data.destinations)}
@@ -169,8 +169,8 @@ export default function FlowsPage() {
       <section className="mt-8">
         <h2 className="text-sm font-semibold tracking-tight">The scoreboard</h2>
         <p className="mt-0.5 max-w-[70ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
-          Strongest bid first. The score compares each asset with itself, so it reads as
-          where the marginal dollar is showing up, not which asset returned the most.
+          Strongest relative bid first. The score compares each asset with itself, so it
+          measures unusual price leadership rather than raw cross-asset return.
         </p>
         <div className="mt-5">
           <Scoreboard destinations={ranked} />
@@ -217,11 +217,10 @@ export default function FlowsPage() {
         <h2 className="text-sm font-semibold tracking-tight">How to read this</h2>
         <div className="mt-4 max-w-[70ch] space-y-4 font-serif text-[1.0625rem] leading-relaxed">
           <p>
-            This page is a bid gauge, not fund-flow accounting. True flow-of-funds data
-            arrives quarterly and with a long lag; daily prices are the cleanest live proxy
-            for where the marginal dollar lands. When one destination outruns its own norm
-            while another undershoots, the page reads that spread as liquidity choosing
-            sides.
+            This page is a price-leadership gauge, not fund-flow accounting. True
+            flow-of-funds data arrives quarterly and with a long lag. When one destination
+            outruns its own norm while another undershoots, the page reports relative price
+            leadership. It does not establish that measured capital flowed between them.
           </p>
           <p>
             The score normalizes each asset against itself: bitcoin&apos;s norm is bitcoin&apos;s

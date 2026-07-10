@@ -23,6 +23,51 @@ def make_factor_data(n=200, n_vars=5, seed=0):
 
 
 class TestFactorExtraction:
+    def test_dfm_uses_supported_optimizer_and_row_oriented_factors(self, monkeypatch):
+        calls = {}
+        dates = pd.date_range("2024-01-05", periods=40, freq="W-FRI")
+
+        class FakeResults:
+            def __init__(self, data):
+                self.mle_retvals = {"converged": True}
+                self.params = pd.Series(
+                    {f"loading.f1.{column}": 1.0 for column in data.columns}
+                )
+                self.factors = type(
+                    "Factors",
+                    (),
+                    {"smoothed": np.arange(len(data), dtype=float).reshape(1, -1)},
+                )()
+                self.data = type("Data", (), {"row_labels": data.index})()
+
+        class FakeDynamicFactor:
+            def __init__(self, data, **_kwargs):
+                self.data = data
+
+            def fit(self, *, method, maxiter, disp):
+                calls.update(method=method, maxiter=maxiter, disp=disp)
+                return FakeResults(self.data)
+
+        monkeypatch.setattr(
+            "src.indicators.dynamic_factor.DynamicFactor",
+            FakeDynamicFactor,
+        )
+        X = pd.DataFrame(
+            {
+                "x0": np.linspace(0.0, 1.0, len(dates)),
+                "x1": np.linspace(1.0, 2.0, len(dates)),
+            },
+            index=dates,
+        )
+        model = DynamicFactorModel(n_factors=1, method="dfm")
+
+        model.fit(X)
+        factors = model.transform()
+
+        assert calls["method"] == "lbfgs"
+        assert factors.index.equals(dates)
+        assert factors.shape == (len(dates), 1)
+
     @pytest.mark.parametrize("method", ["pca", "pca_shrunk"])
     def test_recovers_common_factor(self, method):
         X, true_factor = make_factor_data()
@@ -34,7 +79,7 @@ class TestFactorExtraction:
         assert corr > 0.95
 
     def test_positive_average_loading_orientation(self):
-        # Series are pre-flipped upstream, so the factor must be oriented
+        # Features are economically oriented upstream, so the factor must be oriented
         # with positive average loading: factor up = components up.
         X, _ = make_factor_data(seed=3)
         model = DynamicFactorModel(n_factors=1, method="pca")
@@ -68,6 +113,19 @@ class TestFactorExtraction:
         extracted = model.transform().iloc[:, 0]
         corr = abs(np.corrcoef(extracted.values, true_factor.values)[0, 1])
         assert corr > 0.9
+
+    @pytest.mark.parametrize("method", ["pca", "pca_shrunk"])
+    def test_late_series_does_not_prepopulate_earlier_factor_rows(self, method):
+        X, _ = make_factor_data(seed=9)
+        first_late_observation = X.index[40]
+        X.loc[X.index < first_late_observation, "x4"] = np.nan
+
+        model = DynamicFactorModel(n_factors=1, method=method)
+        model.fit(X)
+        extracted = model.transform()
+
+        assert extracted.index.min() == first_late_observation
+        assert not extracted.index.isin(X.index[:40]).any()
 
 
 class TestCombineFactors:

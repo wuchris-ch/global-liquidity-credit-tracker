@@ -57,19 +57,24 @@ For each pillar *p* ∈ {liquidity, credit, stress}:
 
 1. **Feature matrix.** Each component series is resampled to weekly,
    transformed per the pillar config (z-score with 104-week window and/or
-   52-week growth rate), and sign-flipped so its expected loading is
-   positive (e.g. reverse repo enters the liquidity pillar with sign −1
-   because it drains liquidity).
+   52-week growth rate), and component-sign-adjusted so its expected loading
+   is positive (e.g. reverse repo enters the liquidity pillar with sign -1
+   because it drains liquidity). A pillar-level economic sign is applied only
+   after factor extraction.
 2. **Factor extraction.** A single latent factor is extracted with, in
    order of preference (`method="auto"`):
-   - **DFM** — statsmodels `DynamicFactor`, EM estimation, when ≥50% of
+   - **DFM** — statsmodels `DynamicFactor`, maximum-likelihood estimation via
+     the Kalman filter, when ≥50% of
      rows are complete and missingness ≤ 30%;
    - **PCA with shrinkage** — first principal component, loadings
      re-estimated by Ridge regression (`α = 0.1`) for stability under
      collinearity;
    - **plain PCA** (numpy SVD fallback if scikit-learn is unavailable).
-3. **Orientation.** The factor is flipped, if necessary, so its average
-   loading is positive (factor up = components up). Asserted by
+3. **Orientation and scale.** The factor is flipped, if necessary, so its
+   average loading is positive (factor up = components up). After the three
+   factors are restricted to their common history, each is standardized to
+   mean zero and unit variance before the 40/35/25 weights are applied. This
+   keeps estimator scale from changing the effective pillar weights. Asserted by
    `tests/test_dynamic_factor.py::test_positive_average_loading_orientation`.
 
 ### 3.2 Composite
@@ -78,15 +83,16 @@ For each pillar *p* ∈ {liquidity, credit, stress}:
 GLCI_raw,t = Σ_p w_p · f_p,t        w = {liquidity: 0.40, credit: 0.35, stress: 0.25}
 ```
 
-The stress factor enters **inverted** (pillar sign −1: higher stress lowers
+The stress factor enters **inverted** (pillar sign -1: higher stress lowers
 the index). The composite is then normalized to mean 100, stdev 10:
 
 ```
 GLCI_t = 100 + 10 · (GLCI_raw,t − μ) / σ
 ```
 
-If a pillar cannot be computed (data outage), its weight is redistributed
-proportionally across the remaining pillars rather than failing the run.
+All three configured pillars are required. If any pillar cannot be computed,
+the run fails before a partial or reweighted composite can be saved or
+published.
 
 ### 3.3 Regime classification
 
@@ -98,10 +104,25 @@ z_t < −1   →  tight  (−1)
 z_t > +1   →  loose  (+1)
 ```
 
-The dashboard also reports 4-week momentum and a heuristic
-probability-of-regime-change based on distance to the nearest threshold and
-the z-score trend (`compute_regime_probability` in
-[`src/indicators/transforms.py`](../src/indicators/transforms.py)).
+The dashboard also reports 4-week momentum and a heuristic boundary-pressure
+score based on distance to the nearest threshold and the z-score trend
+(`compute_regime_probability` in
+[`src/indicators/transforms.py`](../src/indicators/transforms.py)). Despite the
+legacy field name `prob_regime_change`, this is not a calibrated probability.
+
+### 3.4 Historical reconstruction and publication snapshots
+
+The displayed GLCI history is recomputed using the latest available source
+values and the current factor estimate. The project does not retain historical
+FRED, BIS, or World Bank release vintages for the period before publication
+snapshots were introduced. Consequently, the historical series is a
+**current-vintage reconstruction**, not a point-in-time record of signals that
+were available to an investor on each date.
+
+Each scheduled computation now appends the latest published state to a signal
+snapshot ledger, keyed by both computation time and signal date. Those records
+preserve future revisions and live decisions without rewriting earlier
+snapshots. They do not retroactively create missing source vintages.
 
 ## 4. Risk by Regime
 
@@ -138,50 +159,72 @@ Tests whether the GLCI regime has predictive value for forward returns,
 against an NFCI-based classifier (inverted to match orientation) and the
 unconditional base rate.
 
-### 5.1 No look-ahead
+### 5.1 Expanding classifier and vintage limitation
 
-The live GLCI z-score uses a rolling window, which is fine for *describing*
-conditions but would leak future information into a backtest. The backtest
-therefore re-classifies regimes with an **expanding window**:
+The backtest re-classifies the reconstructed GLCI with an **expanding window**:
 
 ```
 z_t = (x_t − μ_{[0,t]}) / σ_{[0,t]}
 ```
 
-with a 52-week burn-in (first year unclassified). The property "changing
-future observations never changes past classifications" is asserted directly
-by `tests/test_backtest.py::test_no_lookahead_bias`.
+with a 52-week burn-in (first year unclassified). Conditional on a fixed GLCI
+input series, changing later composite observations does not change earlier
+classifications. This is asserted directly by the backtest tests.
+
+That invariant is narrower than a fully point-in-time backtest. Upstream source
+revisions and full-sample factor estimation can change the reconstructed GLCI
+history supplied to the classifier. Results must therefore be read as a
+historical conditional study of the current model, not a simulated live track
+record.
 
 ### 5.2 Forward returns and statistics
 
-For horizons h ∈ {4, 13, 26} weeks:
+GLCI observations and asset prices are placed on a Friday weekly grid. Every
+GLCI Friday must be present; missing index weeks fail the backtest rather than
+being filled with synthetic carried values. A regime observed at week `t` is
+entered on the next weekly bar, then held for horizons `h` in {4, 13, 26}
+calendar weeks:
 
 ```
-fwd_{t,h} = P_{t+h} / P_t − 1
+fwd_{t,h} = P_{t+1+h} / P_{t+1} - 1
 ```
+
+The one-week execution lag prevents using the same weekly close both to form a
+signal and to enter the hypothetical position.
 
 Per asset × classifier × regime × horizon (min 20 observations):
 
 - **median**, **p25/p75** of forward returns
 - **hit rate** = share of positive forward returns
-- **edge** = hit rate − unconditional base rate at the same horizon
+- **edge** = hit rate − unconditional base rate at the same horizon, over the
+  same weeks for which that classifier emits a regime
 
 ### 5.3 Confidence intervals
 
 Forward returns at overlapping horizons are strongly autocorrelated, so a
-plain bootstrap would understate uncertainty. CIs use a **moving block
-bootstrap** (block size = horizon, 5,000 iterations, seeded RNG for
+plain row bootstrap would understate uncertainty. CIs use a **paired moving
+block bootstrap** (block size = horizon, 5,000 iterations, seeded RNG for
 reproducibility):
 
-1. Resample blocks of `h` consecutive observations with replacement,
-2. concatenate to original length, compute the statistic,
-3. report the 2.5th and 97.5th percentiles.
+1. Keep the full Friday row sequence between the first and last finite forward
+   return. Internal missing-return and unclassified weeks remain in place.
+2. Resample blocks of `h` contiguous calendar rows with replacement and
+   concatenate them to the original sequence length.
+3. Within each draw, compute the regime-subgroup median and hit rate. Compute
+   the unconditional hit rate from the same sampled rows that have a finite
+   label for that classifier, then compute the paired edge as subgroup hit
+   rate minus unconditional hit rate.
+4. Discard a cell's draw when it contains fewer than 20 finite subgroup
+   observations. Report a CI only when at least 4,000 of 5,000 draws are
+   finite, using their 2.5th and 97.5th percentiles.
 
-Implementation: `block_bootstrap_ci` in
-[`src/indicators/backtest.py`](../src/indicators/backtest.py); determinism is
-asserted by `tests/test_backtest.py::test_deterministic_with_seeded_rng`.
+This preserves weekly adjacency before regime filtering. The hit-rate CI is a
+subgroup interval; the edge CI is a separate paired interval and is significant
+only when it excludes zero. Implementation and deterministic null/effect tests
+are in [`src/indicators/backtest.py`](../src/indicators/backtest.py) and
+[`tests/test_backtest.py`](../tests/test_backtest.py).
 
-## 6. Flows (liquidity destinations)
+## 6. Price leadership (liquidity-sensitive destinations)
 
 **Code:** [`src/indicators/flows.py`](../src/indicators/flows.py)
 
@@ -200,8 +243,8 @@ corr_52w = corr(weekly returns, ΔGLCI) over the trailing 52 weeks
 ```
 
 `flow_z` normalizes each asset against itself, so a volatile asset must rally
-harder to score: it reads as "where is the marginal dollar showing up," not
-"which asset returned the most." A z-score is only emitted with ≥ 52 weeks of
+harder to score. It is a relative price-leadership measure, not evidence of
+capital flows or simply a ranking of raw returns. A z-score is only emitted with ≥ 52 weeks of
 13-week-return history; degenerate dispersion (σ < 1e-12) yields none.
 Because consecutive 13-week windows overlap, the score is slow-moving by
 construction and readings beyond ±2σ are rare.

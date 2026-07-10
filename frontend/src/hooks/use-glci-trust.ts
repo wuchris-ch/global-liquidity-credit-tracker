@@ -1,18 +1,19 @@
 /**
- * Hook to fetch the liquidity-sensitive price-leadership payload.
+ * Optional trust metadata for the GLCI. The Today page remains usable while
+ * older static deployments catch up with this endpoint.
  */
 import { useCallback, useEffect, useState } from "react";
-import api, { FlowsResponse } from "@/lib/api";
+import api, { type GLCITrustResponse } from "@/lib/api";
 
-export interface UseFlowsDataResult {
-  data: FlowsResponse | null;
+export interface UseGLCITrustResult {
+  data: GLCITrustResponse | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
 }
 
-export function useFlowsData(): UseFlowsDataResult {
-  const [data, setData] = useState<FlowsResponse | null>(null);
+export function useGLCITrust(): UseGLCITrustResult {
+  const [data, setData] = useState<GLCITrustResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -20,8 +21,7 @@ export function useFlowsData(): UseFlowsDataResult {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await api.getFlows();
-      setData(response);
+      setData(await api.getGLCITrust());
     } catch (e) {
       setError(e instanceof Error ? e : new Error(String(e)));
       setData(null);

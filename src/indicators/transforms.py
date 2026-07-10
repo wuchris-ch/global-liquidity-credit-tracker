@@ -109,7 +109,10 @@ def compute_yoy_change(
         else:
             periods = 1
     
-    df["yoy_change"] = df[value_col].pct_change(periods=periods) * 100
+    df["yoy_change"] = df[value_col].pct_change(
+        periods=periods,
+        fill_method=None,
+    ) * 100
     
     return df
 
@@ -276,7 +279,7 @@ def compute_growth_rate(
         # Log returns for more stable estimation
         growth = np.log(values / values.shift(periods))
     else:
-        growth = values.pct_change(periods=periods)
+        growth = values.pct_change(periods=periods, fill_method=None)
 
     growth = _as_series(growth) * 100
     df["growth_rate"] = growth.values if hasattr(growth, "values") else growth
@@ -526,7 +529,11 @@ def compute_momentum(
     _assign_col(df, "momentum_macd", short_ma - long_ma)
 
     # Rate of change
-    _assign_col(df, "roc", values.pct_change(periods=short_window) * 100)
+    _assign_col(
+        df,
+        "roc",
+        values.pct_change(periods=short_window, fill_method=None) * 100,
+    )
 
     return df
 
@@ -537,7 +544,7 @@ def compute_regime_probability(
     window: int = 52,
     transition_smoothing: int = 4
 ) -> pd.DataFrame:
-    """Compute probability of regime change.
+    """Compute an uncalibrated boundary-pressure score.
     
     Args:
         df: DataFrame with value column (should be zscore or similar)
@@ -546,7 +553,7 @@ def compute_regime_probability(
         transition_smoothing: Smoothing for transition detection
         
     Returns:
-        DataFrame with regime probability columns
+        DataFrame with boundary-distance and legacy ``prob_regime_change`` columns
     """
     df = df.copy()
     
@@ -560,8 +567,9 @@ def compute_regime_probability(
     # Trend of zscore (momentum toward regime change)
     df["zscore_trend"] = df["zscore"].diff(transition_smoothing)
     
-    # Smoothed probability based on distance and trend
-    # Higher probability when closer to threshold and moving toward it
+    # Smoothed heuristic based on distance and trend. This is deliberately not
+    # a calibrated transition probability; the legacy output name is retained
+    # for API compatibility.
     df["prob_regime_change"] = np.where(
         df["zscore_trend"] < 0,  # Moving toward tight
         np.maximum(0, 1 - df["dist_to_tight"].abs()),

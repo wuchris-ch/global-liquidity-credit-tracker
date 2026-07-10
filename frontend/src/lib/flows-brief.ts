@@ -1,7 +1,7 @@
 /**
  * Deterministic prose for the Flows page: same data in, same words out.
  *
- * The flow score compares an asset's trailing 13-week return with its own
+ * The leadership score compares an asset's trailing 13-week return with its own
  * three-year history, so the words rank destinations by how unusual the
  * bid is for each asset, not by raw return.
  */
@@ -18,7 +18,7 @@ export function signedPct(value: number | null | undefined, decimals = 1): strin
   return value >= 0 ? `+${fixed}%` : `−${fixed}%`;
 }
 
-/** "+2.8σ" / "−0.8σ" — flow scores. */
+/** "+2.8σ" / "−0.8σ" — price-leadership scores. */
 export function signedSigma(value: number | null | undefined): string {
   if (value == null) return "–";
   const fixed = Math.abs(value).toFixed(1);
@@ -57,7 +57,7 @@ function proseName(dest: FlowDestination): string {
   return PROSE_NAMES[dest.id] ?? dest.name;
 }
 
-/** Destinations with a flow score, strongest bid first. */
+/** Destinations with a leadership score, strongest relative bid first. */
 export function rankedByFlow(destinations: FlowDestination[]): FlowDestination[] {
   return destinations
     .filter((d) => d.flow_z != null)
@@ -87,12 +87,12 @@ export function flowsHeadline(destinations: FlowDestination[]): string {
 
   if (aiZ != null && cryptoZ != null) {
     const gap = aiZ - cryptoZ;
-    if (gap >= 0.75 && aiZ > 0) return "The marginal dollar is chasing the AI trade, not crypto.";
-    if (gap <= -0.75 && cryptoZ > 0) return "Crypto is out-bidding the AI trade for the marginal dollar.";
-    if (aiZ >= 0.75 && cryptoZ >= 0.75) return "Liquidity is bidding for everything, AI and crypto alike.";
-    if (aiZ <= -0.75 && cryptoZ <= -0.75) return "The marginal dollar is hiding, not chasing risk.";
+    if (gap >= 0.75 && aiZ > 0) return "The AI trade has stronger price leadership than crypto.";
+    if (gap <= -0.75 && cryptoZ > 0) return "Crypto has stronger price leadership than the AI trade.";
+    if (aiZ >= 0.75 && cryptoZ >= 0.75) return "AI and crypto are both trading well above their own norms.";
+    if (aiZ <= -0.75 && cryptoZ <= -0.75) return "Risk-sensitive prices are weak across AI and crypto.";
   }
-  return "No destination owns the marginal dollar right now.";
+  return "No destination has decisive price leadership right now.";
 }
 
 // ---------------------------------------------------------------------------
@@ -140,7 +140,7 @@ export function flowsTeaserSentence(destinations: FlowDestination[]): string | n
 
 /**
  * "One bitcoin buys 51% less of the semiconductor trade than three years
- * ago; a falling line means the AI trade is winning the marginal dollar."
+ * ago; a falling line means the AI trade is outperforming bitcoin."
  */
 export function ratioReading(pair: FlowsPair): string | null {
   if (!pair.ratio.length) return null;
@@ -155,9 +155,9 @@ export function ratioReading(pair: FlowsPair): string | null {
   const span = years === 1 ? "a year" : `${spelled} years`;
 
   if (pct < 3) {
-    return `The ratio is roughly where it was ${span} ago; neither side is winning the marginal dollar.`;
+    return `The ratio is roughly where it was ${span} ago; neither side has sustained price leadership.`;
   }
   return change < 0
-    ? `One bitcoin buys ${pct}% less of the semiconductor trade than ${span} ago; a falling line means the AI trade is winning the marginal dollar.`
-    : `One bitcoin buys ${pct}% more of the semiconductor trade than ${span} ago; a rising line means crypto is winning the marginal dollar.`;
+    ? `One bitcoin buys ${pct}% less of the semiconductor trade than ${span} ago; a falling line means the AI trade is outperforming bitcoin.`
+    : `One bitcoin buys ${pct}% more of the semiconductor trade than ${span} ago; a rising line means bitcoin is outperforming the AI trade.`;
 }

@@ -121,6 +121,27 @@ export interface DataFreshnessItem {
   is_stale: boolean;
 }
 
+export interface GLCITrustResponse {
+  as_of: string | null;
+  historical_mode: string;
+  point_in_time: boolean;
+  frequency: string;
+  snapshots: {
+    count: number;
+    first_computed_at: string | null;
+    last_computed_at: string | null;
+  };
+  data_quality: {
+    loaded_components: number;
+    total_components: number;
+    missing_components: string[];
+    stale_components: string[];
+    excluded_components?: string[];
+    failed_pillars?: string[];
+  };
+  pillar_stats: Record<string, unknown>;
+}
+
 export interface RegimePeriod {
   regime: string;
   start: string;
@@ -182,6 +203,8 @@ export interface BacktestStats {
   ci_hit_rate_low: number | null;
   ci_hit_rate_high: number | null;
   edge: number | null;
+  ci_edge_low: number | null;
+  ci_edge_high: number | null;
 }
 
 export interface BacktestBaseRate {
@@ -224,11 +247,19 @@ export interface BacktestResponse {
   computed_at: string;
   date_range: { start: string; end: string };
   horizons: number[];
+  /** Newer payloads publish these fields; optional while static deployments roll forward. */
+  frequency?: string;
+  entry_lag_weeks?: number;
+  historical_mode?: string;
+  point_in_time?: boolean;
+  regime_threshold_method?: string;
+  bootstrap_method?: string;
+  bootstrap_iterations?: number;
   classifiers: Record<string, BacktestClassifierMeta>;
   assets: BacktestAssetResult[];
 }
 
-// Liquidity flows (where the marginal dollar is going)
+// Price leadership (trailing returns relative to each asset's own history)
 export interface FlowDestination {
   id: string;
   series_id: string;
@@ -389,6 +420,10 @@ class ApiClient {
 
   async getGLCIFreshness(): Promise<DataFreshnessItem[]> {
     return this.fetch<DataFreshnessItem[]>("/api/glci/freshness");
+  }
+
+  async getGLCITrust(): Promise<GLCITrustResponse> {
+    return this.fetch<GLCITrustResponse>("/api/glci/trust");
   }
 
   async getRegimeHistory(start?: string, end?: string): Promise<RegimeHistory> {

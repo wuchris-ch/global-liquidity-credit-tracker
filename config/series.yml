@@ -233,7 +233,7 @@ series:
     frequency: daily
     type: spread
     unit: percent
-    description: "TED Spread (3M LIBOR - 3M T-Bill)"
+    description: "TED Spread (3M LIBOR - 3M T-Bill; discontinued, historical only)"
 
   ice_bofa_us_high_yield_spread:
     source: fred
@@ -538,12 +538,11 @@ indices:
         weight: 1000.0  # Convert billions to millions
 
   usd_funding_stress:
-    description: "USD Funding Stress Index (z-score average of spreads)"
+    name: "USD Credit Stress"
+    description: "USD Credit Stress Index (weighted z-score average of HY and IG OAS)"
     frequency: daily
     method: zscore_average
     components:
-      - series: ted_spread
-        weight: 1.0
       - series: ice_bofa_us_high_yield_spread
         weight: 1.0
       - series: ice_bofa_us_ig_spread
@@ -568,7 +567,7 @@ indices:
     normalize:
       mean: 100
       stdev: 10
-    # Pillar weights calibrated for predictive power
+    # Fixed policy weights; these are not fitted or optimized from returns.
     pillar_weights:
       liquidity: 0.40
       credit: 0.35
@@ -653,8 +652,6 @@ indices:
           - series: ice_bofa_us_high_yield_spread
             sign: 1  # Higher spread = more stress
           - series: ice_bofa_us_ig_spread
-            sign: 1
-          - series: ted_spread
             sign: 1
           # Funding Rates (level indicates tightness)
           - series: sofr

@@ -52,7 +52,7 @@ def main():
     # Backtest command
     backtest_parser = subparsers.add_parser(
         "backtest",
-        help="Compute expanding-window backtest / track record of GLCI regime",
+        help="Backtest the production GLCI regime classifier",
     )
     backtest_parser.add_argument("--save", action="store_true", help="Save to storage")
     backtest_parser.add_argument("--quiet", action="store_true", help="Suppress progress output")
@@ -281,7 +281,7 @@ def cmd_show(args):
 
 
 def cmd_backtest(args):
-    """Compute expanding-window backtest / track record."""
+    """Compute the GLCI regime track record."""
     from src.indicators.backtest import compute_backtest
 
     result = compute_backtest(save=args.save, verbose=not args.quiet)

@@ -28,20 +28,25 @@ source mapping is [`config/series.yml`](../config/series.yml).
 | `boj_total_assets` | JPNASSETS | monthly | millions JPY |
 | `boe_total_assets` | BOGZ1FL714090005Q | quarterly | millions GBP |
 
-### Funding rates & stress (FRED, stress pillar)
+### Funding rates & stress (FRED)
 
 | Series ID | FRED ID | Frequency |
 |-----------|---------|-----------|
 | `sofr` | SOFR | daily |
 | `fed_funds_rate` | DFF | daily |
 | `euro_short_term_rate` | ECBESTRVOLWGTTRMDMNRT | daily |
-| `ted_spread` | TEDRATE | daily (discontinued by FRED in 2022; retained for history) |
+| `ted_spread` | TEDRATE | daily (discontinued in 2022; historical context only, not a live model component) |
 | `ice_bofa_us_high_yield_spread` | BAMLH0A0HYM2 | daily |
 | `ice_bofa_us_ig_spread` | BAMLC0A0CM | daily |
 | `vix` | VIXCLS | daily |
 | `nfci` | NFCI | weekly (also the backtest baseline classifier) |
 | `treasury_3m` | DGS3MO | daily (risk-free rate for Sharpe ratios) |
 | `treasury_2y` / `treasury_10y` | DGS2 / DGS10 | daily |
+
+The live GLCI stress pillar uses SOFR, the effective federal funds rate, HY OAS,
+IG OAS, VIX, and NFCI. The separate USD Credit Stress composite uses HY OAS
+(weight 1.0) and IG OAS (weight 0.5); its API ID remains
+`usd_funding_stress` for compatibility.
 
 ### Money & credit (FRED + BIS + World Bank, liquidity/credit pillars)
 

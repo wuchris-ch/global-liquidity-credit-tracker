@@ -5,15 +5,18 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+import scripts.export_to_json as export_module
 from scripts.export_to_json import (
     REQUIRED_PRODUCTION_EXPORT_PATHS,
+    export_glci,
     export_glci_freshness,
     export_glci_trust,
+    export_indices_list,
     fmt_date,
     validate_required_exports,
     write_json,
 )
-from src.config import get_all_series, get_index_config
+from src.config import get_all_indices, get_all_series, get_index_config
 from src.etl.storage import DataStorage
 
 
@@ -33,6 +36,84 @@ class TestWriteJson:
         target = tmp_path / "a" / "b" / "index.json"
         write_json(target, {"x": 1})
         assert json.loads(target.read_text()) == {"x": 1}
+
+    def test_compatibility_index_id_uses_current_display_name(self, tmp_path):
+        export_indices_list(get_all_indices(), tmp_path)
+        payload = json.loads((tmp_path / "api" / "indices" / "index.json").read_text())
+        credit_stress = next(
+            item for item in payload if item["id"] == "usd_funding_stress"
+        )
+        assert credit_stress["name"] == "USD Credit Stress"
+
+
+class TestExportGlciRegimeHistory:
+    def test_warmup_is_omitted_from_regime_periods(
+        self,
+        tmp_path,
+        monkeypatch,
+    ):
+        curated = tmp_path / "curated"
+        storage = DataStorage(
+            raw_path=tmp_path / "raw",
+            curated_path=curated,
+        )
+        dates = pd.date_range("2026-01-02", periods=5, freq="W-FRI")
+        storage.save_curated(
+            pd.DataFrame(
+                {
+                    "date": dates,
+                    "value": [98.0, 97.0, 96.0, 101.0, 102.0],
+                    "zscore": [float("nan"), -1.2, -1.1, 1.2, 1.1],
+                    "regime": [float("nan"), -1.0, -1.0, 1.0, 1.0],
+                    "momentum": [float("nan"), -1.0, -1.0, 1.0, 1.0],
+                }
+            ),
+            "indices",
+            "glci",
+        )
+        storage.save_curated(
+            pd.DataFrame(
+                {
+                    "date": dates,
+                    "liquidity": range(5),
+                    "credit": range(5),
+                    "stress": range(5),
+                }
+            ),
+            "indices",
+            "glci_pillars",
+        )
+        weights_path = curated / "indices" / "glci_weights.json"
+        weights_path.write_text(
+            json.dumps(
+                {
+                    "pillar_weights": {
+                        "liquidity": 0.40,
+                        "credit": 0.35,
+                        "stress": 0.25,
+                    }
+                }
+            )
+        )
+        monkeypatch.setattr(export_module, "CURATED_DATA_PATH", curated)
+
+        assert export_glci(storage, tmp_path / "export") is True
+
+        payload = json.loads(
+            (
+                tmp_path
+                / "export"
+                / "api"
+                / "glci"
+                / "regime-history"
+                / "index.json"
+            ).read_text()
+        )
+        assert len(payload["periods"]) == 2
+        assert payload["periods"][0]["regime"] == "tight"
+        assert payload["periods"][0]["start"] == "2026-01-09"
+        assert payload["periods"][1]["regime"] == "loose"
+        assert payload["current"] == "loose"
 
 
 class TestValidateRequiredExports:

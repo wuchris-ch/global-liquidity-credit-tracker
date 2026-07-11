@@ -3,7 +3,6 @@
 import numpy as np
 import pandas as pd
 import pytest
-
 from src.indicators.factors import (
     DataQualityReport,
     FeatureMetadata,
@@ -15,6 +14,7 @@ from src.indicators.glci import (
     GLCIComputer,
     GLCIPillarResult,
     _standardize_pillar_factors,
+    _validate_factor_coverage,
 )
 from src.indicators.transforms import compute_growth_rate
 
@@ -63,6 +63,84 @@ def _build_single_component_feature(
         fetcher=_StaticFetcher(raw)
     ).build_feature_matrix("test_index", target_freq=target_freq)
     return matrix[f"test_series_{transform}"], metadata
+
+
+class TestFactorCoverageGates:
+    def test_rejects_two_transforms_from_only_one_active_series(self):
+        loadings = pd.Series(
+            {
+                "source_a_zscore": 0.7,
+                "source_a_growth": 0.6,
+                "source_b_zscore": 0.0,
+                "source_c_zscore": 0.0,
+            }
+        )
+        mapping = {
+            "source_a_zscore": "source_a",
+            "source_a_growth": "source_a",
+            "source_b_zscore": "source_b",
+            "source_c_zscore": "source_c",
+        }
+
+        with pytest.raises(ValueError, match="distinct active source series"):
+            _validate_factor_coverage(
+                loadings,
+                {feature: 1 for feature in loadings.index},
+                mapping,
+            )
+
+    def test_rejects_majority_constraint_exclusion(self):
+        loadings = pd.Series(
+            {
+                "source_a_zscore": 0.7,
+                "source_b_zscore": 0.6,
+                "source_c_zscore": 0.0,
+                "source_d_zscore": 0.0,
+                "source_e_zscore": 0.0,
+            }
+        )
+        mapping = {
+            feature: feature.removesuffix("_zscore")
+            for feature in loadings.index
+        }
+
+        with pytest.raises(ValueError, match="excluded 60%"):
+            _validate_factor_coverage(
+                loadings,
+                {feature: 1 for feature in loadings.index},
+                mapping,
+            )
+
+    def test_rejects_single_series_loading_dominance(self):
+        loadings = pd.Series(
+            {
+                "source_a_zscore": 0.90,
+                "source_b_zscore": 0.08,
+                "source_c_zscore": 0.02,
+            }
+        )
+        mapping = {
+            feature: feature.removesuffix("_zscore")
+            for feature in loadings.index
+        }
+
+        with pytest.raises(ValueError, match="loading concentration is 90%"):
+            _validate_factor_coverage(
+                loadings,
+                {feature: 1 for feature in loadings.index},
+                mapping,
+            )
+
+
+class TestWeightPolicy:
+    def test_unsupported_weight_optimization_is_rejected(self):
+        computer = GLCIComputer(fetcher=object(), storage=object())
+
+        with pytest.raises(NotImplementedError, match="fixed configured policy weights"):
+            computer.compute(
+                optimize_weights=True,
+                verbose=False,
+            )
 
 
 class TestFactorAlignment:
@@ -409,6 +487,7 @@ class TestStressDirection:
         assert result.metadata["frequency"] == "W-FRI"
         assert result.metadata["historical_mode"] == "reconstructed_current_vintage"
         assert result.metadata["point_in_time"] is False
+        assert result.metadata["pillar_weight_policy"] == "fixed_configured"
         stress_quality = result.metadata["pillar_stats"]["stress"]["data_quality"]
         assert stress_quality["loaded_series"] == 1
         assert stress_quality["used_series"] == ["stress"]
@@ -474,10 +553,24 @@ class TestStressDirection:
             stale_series=[],
             sign_violations=[],
         )
+        metadata = [
+            FeatureMetadata(
+                series_id=series_id,
+                pillar="stress",
+                country="US",
+                transform="zscore",
+                unit="index",
+                sign=1,
+                source_frequency="weekly",
+                data_quality=1.0,
+                last_updated="2026-07-03",
+            )
+            for series_id in ("early", "late")
+        ]
         monkeypatch.setattr(
             computer.feature_builder,
             "build_pillar_matrix",
-            lambda *_args, **_kwargs: (matrix, []),
+            lambda *_args, **_kwargs: (matrix, metadata),
         )
         monkeypatch.setattr(
             computer.feature_builder,
@@ -571,3 +664,73 @@ class TestStressDirection:
         assert serialized["loaded_series"] == 2
         assert set(serialized["used_series"]) == {"used_a", "used_b"}
         assert serialized["excluded_series"] == ["constant"]
+
+    def test_pillar_constraint_excludes_opposite_feature(self, monkeypatch):
+        dates = pd.date_range("2020-01-03", periods=160, freq="W-FRI")
+        rng = np.random.default_rng(47)
+        common = np.cumsum(rng.normal(size=len(dates)))
+        matrix = pd.DataFrame(
+            {
+                "date": dates,
+                "support_a_zscore": common + rng.normal(0, 0.1, len(dates)),
+                "support_b_zscore": 0.8 * common + rng.normal(0, 0.1, len(dates)),
+                "opposite_zscore": -common + rng.normal(0, 0.1, len(dates)),
+            }
+        )
+        metadata = [
+            FeatureMetadata(
+                series_id=series_id,
+                pillar="stress",
+                country="US",
+                transform="zscore",
+                unit="index",
+                sign=1,
+                source_frequency="weekly",
+                data_quality=1.0,
+                last_updated="2026-07-03",
+            )
+            for series_id in ("support_a", "support_b", "opposite")
+        ]
+        quality = DataQualityReport(
+            pillar="stress",
+            total_series=3,
+            loaded_series=3,
+            missing_series=[],
+            low_coverage_series=[],
+            stale_series=[],
+            sign_violations=[],
+        )
+        computer = GLCIComputer(fetcher=object(), storage=object())
+        monkeypatch.setattr(
+            computer.feature_builder,
+            "build_pillar_matrix",
+            lambda *_args, **_kwargs: (matrix, metadata),
+        )
+        monkeypatch.setattr(
+            computer.feature_builder,
+            "validate_pillar_data",
+            lambda *_args, **_kwargs: quality,
+        )
+
+        result = computer._compute_pillar_factor(
+            "stress",
+            start_date=None,
+            end_date=None,
+            target_freq="W",
+            method="pca_shrunk",
+            verbose=False,
+        )
+
+        assert result.loadings.loc["opposite_zscore", "factor_1"] == pytest.approx(
+            0.0,
+            abs=1e-8,
+        )
+        assert "opposite_zscore" not in result.metadata["used_features"]
+        assert "opposite_zscore" in result.metadata["excluded_features"]
+        assert result.metadata["constraint_excluded_features"] == [
+            "opposite_zscore"
+        ]
+        assert result.metadata["constraint_exclusion_share"] == pytest.approx(1 / 3)
+        assert result.metadata["max_series_loading_share"] <= 0.60
+        assert "opposite" in result.metadata["excluded_series"]
+        assert quality.sign_violations == []

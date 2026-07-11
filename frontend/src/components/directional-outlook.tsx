@@ -112,9 +112,9 @@ export function DirectionalOutlookView({
               ? "At least one asset has a negative historical regime edge with a paired 95% CI below zero. Positive returns and regime support are kept separate."
               : "No statistically supported asset tilt is available, so these are directional watchpoints, not a forecast."}
         {outlook.regimeAgreement === false
-          ? " The published regime and the expanding-window backtest classifier disagree, so no combined tilt is shown."
+          ? " The published regime and the backtest payload disagree, so no combined tilt is shown."
           : outlook.regimeAgreement == null
-            ? " The expanding-window backtest regime is unavailable, so no combined tilt is shown."
+            ? " The backtest regime is unavailable, so no combined tilt is shown."
             : ""}
         {!outlook.signalFresh
           ? " The signal is more than one week old, so current price confirmation is withheld."

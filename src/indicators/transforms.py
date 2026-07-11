@@ -193,7 +193,10 @@ def align_series(
     Returns:
         DataFrame with series as columns, dates as index
     """
-    aligned = pd.DataFrame()
+    # ``DataFrame.empty`` is true for both an uninitialized frame and a
+    # genuinely empty intersection.  Keep those states distinct so a later
+    # input cannot replace the result of an earlier, empty inner join.
+    aligned: pd.DataFrame | None = None
     
     for name, df in series_dict.items():
         df = df.copy()
@@ -201,10 +204,13 @@ def align_series(
         df = df.set_index(date_col)[[value_col]]
         df.columns = [name]
         
-        if aligned.empty:
+        if aligned is None:
             aligned = df
         else:
             aligned = aligned.join(df, how=method)
+
+    if aligned is None:
+        return pd.DataFrame(columns=[date_col])
     
     if fill_method == "ffill":
         aligned = aligned.ffill()
@@ -245,9 +251,11 @@ def detect_regime(
         df = compute_zscore(df, value_col)
     
     low, high = thresholds
-    df["regime"] = 0
-    df.loc[df["zscore"] < low, "regime"] = -1
-    df.loc[df["zscore"] > high, "regime"] = 1
+    finite = np.isfinite(df["zscore"])
+    df["regime"] = np.nan
+    df.loc[finite, "regime"] = 0
+    df.loc[finite & (df["zscore"] < low), "regime"] = -1
+    df.loc[finite & (df["zscore"] > high), "regime"] = 1
     
     return df
 

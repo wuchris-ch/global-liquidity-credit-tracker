@@ -18,6 +18,49 @@ HAS_MIXED_FREQ = (
     find_spec("statsmodels.tsa.statespace.dynamic_factor_mq") is not None
 )
 
+
+SIGN_CONSTRAINT_TOLERANCE = 1e-6
+
+
+class FactorSignConstraintError(ValueError):
+    """Raised when a fitted factor contradicts an economic sign constraint."""
+
+    def __init__(self, violations: list[str], details: list[str] | None = None) -> None:
+        self.violations = list(dict.fromkeys(violations))
+        self.details = details or self.violations
+        super().__init__(
+            "Factor loading sign constraint violated for: " + "; ".join(self.details)
+        )
+
+
+def find_sign_violations(
+    loadings: pd.DataFrame,
+    sign_constraints: dict[str, int],
+    *,
+    factor_col: str = "factor_1",
+    tolerance: float = SIGN_CONSTRAINT_TOLERANCE,
+) -> list[str]:
+    """Return constrained features with materially wrong-signed loadings."""
+    if tolerance < 0:
+        raise ValueError("sign constraint tolerance cannot be negative")
+    if factor_col not in loadings.columns:
+        raise ValueError(f"Loading column '{factor_col}' is unavailable")
+
+    violations = []
+    for feature, expected_sign in sign_constraints.items():
+        if expected_sign not in (-1, 1):
+            raise ValueError(
+                f"Sign constraint for '{feature}' must be +1 or -1, got {expected_sign}"
+            )
+        if feature not in loadings.index:
+            # Near-constant or otherwise unusable features can be removed before
+            # fitting and are reported separately as excluded inputs.
+            continue
+        loading = float(loadings.loc[feature, factor_col])
+        if not np.isfinite(loading) or loading * expected_sign < -tolerance:
+            violations.append(str(feature))
+    return violations
+
 # Try to import sklearn for PCA fallback
 try:
     from sklearn.decomposition import PCA
@@ -117,6 +160,8 @@ class DynamicFactorModel:
         self._columns = None
         self._fitted = False
         self._data_quality = None
+        self._factor_orientations = np.ones(self.n_factors, dtype=float)
+        self._sign_violations: list[str] = []
     
     def validate_data(self, X: pd.DataFrame) -> DataQualityCheck:
         """Validate input data before fitting.
@@ -191,6 +236,10 @@ class DynamicFactorModel:
         Returns:
             self
         """
+        self._fitted = False
+        self._sign_violations = []
+        self._factor_orientations = np.ones(self.n_factors, dtype=float)
+
         # Validate data
         self._data_quality = self.validate_data(X)
         
@@ -220,12 +269,41 @@ class DynamicFactorModel:
             self._fit_pca_shrunk(X_clean)
         else:
             self._fit_pca(X_clean)
-        
+
+        raw_loadings = self._get_raw_loadings()
+        self._factor_orientations = self._determine_factor_orientations(raw_loadings)
+        oriented_loadings = self._orient_loadings(raw_loadings)
+        self._sign_violations = find_sign_violations(
+            oriented_loadings,
+            self.sign_constraints,
+        )
+        if self._sign_violations:
+            details = []
+            for feature in self._sign_violations:
+                loading = float(oriented_loadings.loc[feature, "factor_1"])
+                expected = self.sign_constraints[feature]
+                details.append(
+                    f"{feature} (loading={loading:.6g}, expected={expected:+d})"
+                )
+            raise FactorSignConstraintError(self._sign_violations, details)
+
         self._fitted = True
         return self
     
     def _choose_method(self, X: pd.DataFrame) -> str:
         """Automatically choose the best estimation method."""
+        # The GLCI supplies economic sign constraints for every oriented input.
+        # Of the available estimators, the shrunk PCA path can enforce those
+        # constraints during fitting. An unconstrained DFM can only discover a
+        # contradiction after the fact, which would make the selected method
+        # depend on the current missing-data pattern.
+        if self.sign_constraints:
+            if HAS_SKLEARN:
+                return "pca_shrunk"
+            raise RuntimeError(
+                "Sign-constrained factor extraction requires scikit-learn"
+            )
+
         missing_pct = X.isna().sum().sum() / X.size if X.size > 0 else 0
         
         # Check if dropna() would eliminate too much data (DFM requirement)
@@ -301,7 +379,15 @@ class DynamicFactorModel:
         self._fit_dfm(X)
     
     def _fit_pca_shrunk(self, X: pd.DataFrame) -> None:
-        """Fit using PCA with shrinkage on loadings."""
+        """Fit PCA with ridge shrinkage and optional loading constraints.
+
+        For the one-factor GLCI model, each configured economic sign is
+        enforced in a projected alternating least-squares fit. Loadings and the
+        final factor are updated jointly until they agree. A feature that moves
+        against the oriented common factor receives a zero loading instead of
+        silently reversing its economic meaning. The post-fit audit remains in
+        place as a gate.
+        """
         data = self._prepare_pca_data(X)
         
         # Check if we have enough data
@@ -323,27 +409,138 @@ class DynamicFactorModel:
             pca = PCA(n_components=self.n_factors)
             pca.fit(data_scaled)
             
-            # Apply shrinkage to loadings using Ridge regression
-            # This makes loadings more stable when variables are correlated
             factors_raw = pca.transform(data_scaled)
             
             # Ensure factors_raw is 2D for Ridge
             if factors_raw.ndim == 1:
                 factors_raw = factors_raw.reshape(-1, 1)
-            
-            # Re-estimate loadings with ridge regularization
-            shrunk_loadings = []
-            for i in range(data_scaled.shape[1]):
-                ridge = Ridge(alpha=self.shrinkage_alpha, fit_intercept=False)
-                ridge.fit(factors_raw, data_scaled[:, i])
-                # Ridge coef shape is (n_factors,), we need it as a row
-                shrunk_loadings.append(ridge.coef_.flatten())
-        
-        self._shrunk_loadings = np.array(shrunk_loadings)
+
+            if self.sign_constraints and self.n_factors != 1:
+                raise ValueError(
+                    "Sign-constrained pca_shrunk currently supports one factor"
+                )
+
+            if self.sign_constraints:
+                (
+                    self._shrunk_loadings,
+                    fitted_factor,
+                    self._constraint_iterations,
+                ) = self._fit_constrained_rank_one(data_scaled, factors_raw[:, 0])
+                reconstruction = np.outer(
+                    fitted_factor,
+                    self._shrunk_loadings[:, 0],
+                )
+                total_sum_squares = float(np.square(data_scaled).sum())
+                residual_sum_squares = float(
+                    np.square(data_scaled - reconstruction).sum()
+                )
+                self._shrunk_explained_variance = (
+                    1.0 - residual_sum_squares / total_sum_squares
+                    if total_sum_squares > 0
+                    else float("nan")
+                )
+            else:
+                # Without sign constraints, retain the general multi-factor
+                # ridge decoder used by the diagnostic estimator.
+                shrunk_loadings = []
+                for i in range(data_scaled.shape[1]):
+                    ridge = Ridge(
+                        alpha=self.shrinkage_alpha,
+                        fit_intercept=False,
+                    )
+                    ridge.fit(factors_raw, data_scaled[:, i])
+                    shrunk_loadings.append(ridge.coef_.flatten())
+                self._shrunk_loadings = np.asarray(shrunk_loadings)
+                self._shrunk_explained_variance = float(
+                    np.sum(pca.explained_variance_ratio_)
+                )
+
+        active_loadings = np.any(
+            np.abs(self._shrunk_loadings) > SIGN_CONSTRAINT_TOLERANCE,
+            axis=1,
+        )
+        if int(active_loadings.sum()) < self.min_variables:
+            raise ValueError(
+                "Sign constraints left fewer than "
+                f"{self.min_variables} active factor inputs"
+            )
+
+        factor_projection = data_scaled @ self._shrunk_loadings
+        self._factor_projection_mean = np.mean(factor_projection, axis=0)
+        self._factor_projection_std = np.std(factor_projection, axis=0)
+        if np.any(~np.isfinite(self._factor_projection_std)) or np.any(
+            self._factor_projection_std <= 1e-12
+        ):
+            raise ValueError("Shrunk factor projection has no usable variation")
         self._model = pca
         self._valid_index = data_clean.index
         self._full_data = data
         self._method_used = "pca_shrunk"
+
+    def _fit_constrained_rank_one(
+        self,
+        data_scaled: np.ndarray,
+        initial_factor: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, int]:
+        """Jointly solve a ridge-shrunk rank-one model with signed loadings."""
+        for feature, expected_sign in self.sign_constraints.items():
+            if expected_sign not in (-1, 1):
+                raise ValueError(
+                    f"Sign constraint for '{feature}' must be +1 or -1, "
+                    f"got {expected_sign}"
+                )
+
+        factor = np.asarray(initial_factor, dtype=float).copy()
+        provisional = data_scaled.T @ factor
+        constrained_scores = [
+            provisional[self._columns.index(feature)] * expected_sign
+            for feature, expected_sign in self.sign_constraints.items()
+            if feature in self._columns
+        ]
+        if constrained_scores and float(np.mean(constrained_scores)) < 0:
+            factor *= -1
+
+        factor_std = float(np.std(factor))
+        if not np.isfinite(factor_std) or factor_std <= 1e-12:
+            raise ValueError("Initial PCA factor has no usable variation")
+        factor = (factor - float(np.mean(factor))) / factor_std
+
+        previous_loadings: np.ndarray | None = None
+        tolerance = 1e-10
+        for iteration in range(1, self.max_iter + 1):
+            denominator = float(factor @ factor + self.shrinkage_alpha)
+            loadings = (data_scaled.T @ factor) / denominator
+
+            for feature, expected_sign in self.sign_constraints.items():
+                if feature not in self._columns:
+                    continue
+                position = self._columns.index(feature)
+                if loadings[position] * expected_sign < 0:
+                    loadings[position] = 0.0
+
+            projection = data_scaled @ loadings
+            projection_std = float(np.std(projection))
+            if not np.isfinite(projection_std) or projection_std <= 1e-12:
+                raise ValueError("Sign constraints removed all factor variation")
+            next_factor = (
+                projection - float(np.mean(projection))
+            ) / projection_std
+
+            factor_change = float(np.max(np.abs(next_factor - factor)))
+            loading_change = (
+                float("inf")
+                if previous_loadings is None
+                else float(np.max(np.abs(loadings - previous_loadings)))
+            )
+            factor = next_factor
+            if factor_change <= tolerance and loading_change <= tolerance:
+                return loadings.reshape(-1, 1), factor, iteration
+            previous_loadings = loadings
+
+        raise RuntimeError(
+            "Sign-constrained rank-one factor did not converge within "
+            f"{self.max_iter} iterations"
+        )
     
     def _fit_pca(self, X: pd.DataFrame) -> None:
         """Fit using standard PCA (fallback method)."""
@@ -448,8 +645,7 @@ class DynamicFactorModel:
         # interface uses rows as observations.
         factors = np.asarray(self._results.factors.smoothed).T
         
-        # Apply sign adjustment based on average loading direction
-        factors = self._adjust_factor_sign(factors)
+        factors = self._apply_factor_orientation(factors)
         
         if hasattr(self._results, "data"):
             index = self._results.data.row_labels
@@ -472,15 +668,13 @@ class DynamicFactorModel:
             data_scaled = self._scaler.transform(data)
             
             if self._method_used == "pca_shrunk":
-                # Use shrunk loadings - shape: (n_variables, n_factors)
-                # data_scaled shape: (n_obs, n_variables)
-                # Result should be: (n_obs, n_factors)
                 factors = data_scaled @ self._shrunk_loadings
-                # Normalize
-                factor_mean = np.nanmean(factors, axis=0)
-                factor_std = np.nanstd(factors, axis=0)
-                factor_std = np.where(factor_std == 0, 1, factor_std)  # Avoid division by zero
-                factors = (factors - factor_mean) / factor_std
+                # Use training normalization for both in-sample and new data.
+                # Re-normalizing each transform request would make the same
+                # observation depend on the requested slice.
+                factors = (
+                    factors - self._factor_projection_mean
+                ) / self._factor_projection_std
             else:
                 factors = self._model.transform(data_scaled)
         else:
@@ -492,39 +686,59 @@ class DynamicFactorModel:
         if factors.ndim == 1:
             factors = factors.reshape(-1, 1)
         
-        # Apply sign adjustment
-        factors = self._adjust_factor_sign(factors)
+        factors = self._apply_factor_orientation(factors)
         
         factor_names = [f"factor_{i+1}" for i in range(self.n_factors)]
         
         return pd.DataFrame(factors, index=data.index, columns=factor_names)
     
-    def _adjust_factor_sign(self, factors: np.ndarray) -> np.ndarray:
-        """Adjust factor sign to ensure positive average loading.
-        
-        Since input features are economically oriented before extraction, all
-        loadings should be positive.
-        This method ensures the factor is oriented so that the average loading
-        is positive (i.e., increases in the factor mean increases in components).
-        """
-        loadings = self.get_loadings()
-        
+    def _determine_factor_orientations(self, loadings: pd.DataFrame) -> np.ndarray:
+        """Choose one global sign per factor before auditing individual loadings."""
+        orientations = np.ones(self.n_factors, dtype=float)
         for i in range(self.n_factors):
             factor_col = f"factor_{i+1}"
             if factor_col not in loadings.columns:
                 continue
-            
-            # Check if average loading is negative
-            avg_loading = loadings[factor_col].mean()
-            
-            if avg_loading < 0:
-                # Flip factor to make average loading positive
-                if isinstance(factors, np.ndarray):
-                    factors[:, i] *= -1
-                else:
-                    factors.iloc[:, i] *= -1
-        
-        return factors
+
+            constrained_scores = []
+            for feature, expected_sign in self.sign_constraints.items():
+                if expected_sign not in (-1, 1):
+                    raise ValueError(
+                        f"Sign constraint for '{feature}' must be +1 or -1, "
+                        f"got {expected_sign}"
+                    )
+                if feature in loadings.index:
+                    constrained_scores.append(
+                        float(loadings.loc[feature, factor_col]) * expected_sign
+                    )
+
+            orientation_score = (
+                float(np.mean(constrained_scores))
+                if constrained_scores
+                else float(loadings[factor_col].mean())
+            )
+            if np.isfinite(orientation_score) and orientation_score < 0:
+                orientations[i] = -1.0
+        return orientations
+
+    def _apply_factor_orientation(self, factors: np.ndarray) -> np.ndarray:
+        """Apply the fitted global orientation to factor scores."""
+        oriented = np.asarray(factors, dtype=float).copy()
+        oriented *= self._factor_orientations.reshape(1, -1)
+        return oriented
+
+    def _orient_loadings(self, loadings: pd.DataFrame) -> pd.DataFrame:
+        """Apply the same global orientation to reported factor loadings."""
+        oriented = loadings.copy()
+        for i, orientation in enumerate(self._factor_orientations):
+            factor_col = f"factor_{i+1}"
+            if factor_col in oriented.columns:
+                oriented[factor_col] = oriented[factor_col] * orientation
+        return oriented
+
+    def get_sign_violations(self) -> list[str]:
+        """Return the features rejected by the latest sign audit."""
+        return list(self._sign_violations)
     
     def get_loadings(self) -> pd.DataFrame:
         """Get factor loadings for each variable.
@@ -534,9 +748,13 @@ class DynamicFactorModel:
         """
         if not self._fitted:
             raise ValueError("Model must be fitted first")
-        
+
+        return self._orient_loadings(self._get_raw_loadings())
+
+    def _get_raw_loadings(self) -> pd.DataFrame:
+        """Get estimator-native loadings before the global sign orientation."""
         factor_names = [f"factor_{i+1}" for i in range(self.n_factors)]
-        
+
         if self._method_used == "dfm":
             # Extract loadings from DFM results
             loadings = self._results.params
@@ -588,6 +806,10 @@ class DynamicFactorModel:
             if sse is None or centered_tss in (None, 0):
                 return float("nan")
             return 1 - sse / centered_tss
+        elif self._method_used == "pca_shrunk" and hasattr(
+            self, "_shrunk_explained_variance"
+        ):
+            return self._shrunk_explained_variance
         else:
             if HAS_SKLEARN and hasattr(self._model, "explained_variance_ratio_"):
                 return sum(self._model.explained_variance_ratio_)
@@ -608,9 +830,18 @@ class DynamicFactorModel:
         else:
             converged = True
         
+        loadings = self.get_loadings()
+        constraint_exclusions = [
+            feature
+            for feature in self.sign_constraints
+            if feature in loadings.index
+            and abs(float(loadings.loc[feature, "factor_1"]))
+            <= SIGN_CONSTRAINT_TOLERANCE
+        ]
+
         return FactorModelResult(
             factors=self.transform(),
-            loadings=self.get_loadings(),
+            loadings=loadings,
             explained_variance=self.get_explained_variance(),
             method=self._method_used,
             converged=converged,
@@ -618,7 +849,21 @@ class DynamicFactorModel:
                 "n_factors": self.n_factors,
                 "n_observations": len(self.transform()),
                 "n_variables": len(self._columns) if self._columns else 0,
-                "data_quality": self._data_quality.__dict__ if self._data_quality else {}
+                "data_quality": self._data_quality.__dict__ if self._data_quality else {},
+                "sign_constraints": self.sign_constraints,
+                "sign_constraint_tolerance": SIGN_CONSTRAINT_TOLERANCE,
+                "sign_violations": self.get_sign_violations(),
+                "constraint_exclusions": constraint_exclusions,
+                "loading_semantics": (
+                    "joint_rank_one_decoder_loadings"
+                    if self._method_used == "pca_shrunk" and self.sign_constraints
+                    else "estimator_loadings"
+                ),
+                "constraint_solver_iterations": getattr(
+                    self,
+                    "_constraint_iterations",
+                    None,
+                ),
             }
         )
 

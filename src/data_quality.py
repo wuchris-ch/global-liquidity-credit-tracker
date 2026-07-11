@@ -216,6 +216,24 @@ def build_glci_trust_payload(
             "method": stats.get("method"),
             "explained_variance": _safe_number(stats.get("explained_variance")),
             "n_variables": _safe_number(stats.get("n_variables")),
+            "loading_semantics": stats.get("loading_semantics"),
+            "constraint_solver_iterations": _safe_number(
+                stats.get("constraint_solver_iterations")
+            ),
+            "constraint_exclusion_share": _safe_number(
+                stats.get("constraint_exclusion_share")
+            ),
+            "max_series_loading_share": _safe_number(
+                stats.get("max_series_loading_share")
+            ),
+            "series_loading_shares": {
+                str(series_id): _safe_number(share)
+                for series_id, share in (
+                    stats.get("series_loading_shares", {})
+                    if isinstance(stats.get("series_loading_shares"), dict)
+                    else {}
+                ).items()
+            },
             "data_quality": {
                 "total_series": _safe_number(
                     quality.get("total_series", len(components))
@@ -229,6 +247,9 @@ def build_glci_trust_payload(
                 "missing_series": sorted(pillar_missing),
                 "low_coverage": sorted(set(_series_names(quality.get("low_coverage")))),
                 "stale_series": sorted(pillar_stale),
+                "constraint_excluded_features": sorted(
+                    set(_series_names(quality.get("constraint_excluded_features")))
+                ),
             },
         }
 

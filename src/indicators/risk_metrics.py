@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
 
 from ..etl.fetcher import DataFetcher
 from ..etl.storage import DataStorage
@@ -36,8 +35,12 @@ class AssetRiskMetrics:
     sharpe_by_regime: dict[str, float | None]  # regime_label -> sharpe
     return_by_regime: dict[str, float | None]
     volatility_by_regime: dict[str, float | None]
-    correlation_with_glci: float
+    correlation_with_glci: float | None
     rolling_sharpe_data: list[dict]  # [{date, value}, ...]
+    # Internal calculation policy. These are disclosed in result/storage
+    # metadata but intentionally omitted from the stable asset JSON schema.
+    annualization_factor: int
+    rolling_window: int
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -62,7 +65,7 @@ class RiskDashboardResult:
     """Complete risk dashboard data."""
     computed_at: str
     risk_free_rate: float
-    current_regime: str
+    current_regime: str | None
     assets: list[AssetRiskMetrics]
     regime_performance_matrix: dict  # For heatmap visualization
     metadata: dict = field(default_factory=dict)
@@ -88,9 +91,15 @@ ASSET_CONFIG = {
     "russell2000_price": {"name": "Russell 2000", "category": "Small Cap Equities"},
     "gold_price": {"name": "Gold", "category": "Commodities"},
     "silver_price": {"name": "Silver", "category": "Commodities"},
-    "bitcoin_price": {"name": "Bitcoin", "category": "Crypto"},
-    "ethereum_price": {"name": "Ethereum", "category": "Crypto"},
-    "zcash_price": {"name": "Zcash", "category": "Crypto"},
+    "bitcoin_price": {
+        "name": "Bitcoin", "category": "Crypto", "annualization_factor": 365
+    },
+    "ethereum_price": {
+        "name": "Ethereum", "category": "Crypto", "annualization_factor": 365
+    },
+    "zcash_price": {
+        "name": "Zcash", "category": "Crypto", "annualization_factor": 365
+    },
     "long_bond_price": {"name": "Long Bonds (TLT)", "category": "Fixed Income"},
 }
 
@@ -98,17 +107,28 @@ ASSET_CONFIG = {
 class RiskMetricsComputer:
     """Computes risk metrics conditioned on GLCI regimes."""
 
-    ANNUALIZATION_FACTOR = 252  # Trading days per year
+    ANNUALIZATION_FACTOR = 252  # Default for trading-day assets
+    CALENDAR_ANNUALIZATION_FACTOR = 365
+    MIN_CORRELATION_OBSERVATIONS = 20
 
     def __init__(
         self,
         fetcher: DataFetcher | None = None,
         storage: DataStorage | None = None,
-        rolling_window: int = 252,
+        rolling_window: int | None = None,
     ) -> None:
+        if rolling_window is not None and rolling_window < 1:
+            raise ValueError("rolling_window must be a positive integer")
         self.fetcher = fetcher or DataFetcher()
         self.storage = storage or DataStorage()
-        self.rolling_window = rolling_window
+        self._rolling_window_override = rolling_window
+        # Keep the historical public/default value for compatibility. The
+        # effective default is resolved per asset by _rolling_window_for().
+        self.rolling_window = (
+            rolling_window
+            if rolling_window is not None
+            else self.ANNUALIZATION_FACTOR
+        )
 
     def compute(
         self,
@@ -165,13 +185,23 @@ class RiskMetricsComputer:
         regime_matrix = self._build_regime_matrix(asset_metrics)
 
         # 5. Get current regime
-        current_regime = "neutral"
-        if not glci_df.empty:
-            regime_code = int(glci_df["regime"].iloc[-1])
-            current_regime = {-1: "tight", 0: "neutral", 1: "loose"}.get(regime_code, "neutral")
+        current_regime = self._current_regime(glci_df)
 
         # 6. Get current risk-free rate
         current_rf = float(rf_df["value"].iloc[-1]) if rf_df is not None and not rf_df.empty else 0.0
+
+        rolling_window_policy = (
+            "explicit_override"
+            if self._rolling_window_override is not None
+            else "one_year_by_asset_clock"
+        )
+        asset_clock_policy = {
+            asset.asset_id: {
+                "annualization_factor": asset.annualization_factor,
+                "rolling_window": asset.rolling_window,
+            }
+            for asset in asset_metrics
+        }
 
         result = RiskDashboardResult(
             computed_at=datetime.utcnow().isoformat(),
@@ -182,6 +212,9 @@ class RiskMetricsComputer:
             metadata={
                 "rolling_window": self.rolling_window,
                 "annualization_factor": self.ANNUALIZATION_FACTOR,
+                "annualization_policy": "per_asset_observation_clock",
+                "rolling_window_policy": rolling_window_policy,
+                "asset_clock_policy": asset_clock_policy,
                 "start_date": start_date,
                 "end_date": end_date,
                 "n_assets": len(asset_metrics),
@@ -196,6 +229,18 @@ class RiskMetricsComputer:
 
         return result
 
+    @staticmethod
+    def _current_regime(glci_df: pd.DataFrame) -> str | None:
+        """Return the latest row's regime without inventing neutral."""
+        if glci_df.empty or "regime" not in glci_df:
+            return None
+        latest = pd.to_numeric(glci_df["regime"], errors="coerce").iloc[-1]
+        if pd.isna(latest):
+            return None
+        return {-1: "tight", 0: "neutral", 1: "loose"}.get(
+            int(latest)
+        )
+
     def _load_glci_regimes(self) -> pd.DataFrame | None:
         """Load GLCI data with regime classifications."""
         glci_df = self.storage.load_curated("indices", "glci")
@@ -205,10 +250,8 @@ class RiskMetricsComputer:
         glci_df = _as_ns_dates(glci_df)
         glci_df = glci_df.sort_values("date")
 
-        # Ensure regime column exists
         if "regime" not in glci_df.columns:
-            # Default to neutral if no regime column
-            glci_df["regime"] = 0
+            raise ValueError("Stored GLCI data is missing the regime column")
 
         glci_df["regime_label"] = glci_df["regime"].map({
             -1: "tight", 0: "neutral", 1: "loose"
@@ -222,7 +265,9 @@ class RiskMetricsComputer:
             df = self.fetcher.fetch_series("treasury_3m")
             df = _as_ns_dates(df)
             df = df.sort_values("date")
-            # Convert annual rate to daily (divide by 252)
+            # Retain the legacy trading-day field for callers that inspect it.
+            # Asset metrics derive their own daily rate from ``value`` because
+            # calendar-daily assets use 365 observations per year.
             df["daily_rf"] = df["value"] / 100 / self.ANNUALIZATION_FACTOR
             return df
         except Exception as e:
@@ -232,7 +277,7 @@ class RiskMetricsComputer:
     def _compute_asset_metrics(
         self,
         asset_id: str,
-        config: dict[str, str],
+        config: dict[str, str | int],
         glci_df: pd.DataFrame,
         rf_df: pd.DataFrame | None,
         start_date: str | None,
@@ -243,6 +288,8 @@ class RiskMetricsComputer:
         price_df = self.fetcher.fetch_series(asset_id, start_date, end_date)
         price_df = _as_ns_dates(price_df)
         price_df = price_df.sort_values("date")
+        annualization_factor = self._annualization_factor(asset_id, price_df["date"])
+        rolling_window = self._rolling_window_for(annualization_factor)
 
         # Compute daily returns
         price_df["return"] = price_df["value"].pct_change()
@@ -259,13 +306,32 @@ class RiskMetricsComputer:
 
         # Merge with risk-free rate
         if rf_df is not None and not rf_df.empty:
+            if "value" in rf_df.columns:
+                rf_for_merge = rf_df[["date", "value"]].rename(
+                    columns={"value": "annual_rf_percent"}
+                )
+            else:
+                # Compatibility for callers supplying the old, precomputed
+                # trading-day rate without its annual source value.
+                rf_for_merge = rf_df[["date", "daily_rf"]].copy()
             merged = pd.merge_asof(
                 merged.sort_values("date"),
-                rf_df[["date", "daily_rf"]].sort_values("date"),
+                rf_for_merge.sort_values("date"),
                 on="date",
                 direction="backward"
             )
-            merged["daily_rf"] = merged["daily_rf"].fillna(0)
+            if "annual_rf_percent" in merged.columns:
+                merged["daily_rf"] = (
+                    merged["annual_rf_percent"].fillna(0)
+                    / 100
+                    / annualization_factor
+                )
+            else:
+                merged["daily_rf"] = (
+                    merged["daily_rf"].fillna(0)
+                    * self.ANNUALIZATION_FACTOR
+                    / annualization_factor
+                )
         else:
             merged["daily_rf"] = 0
 
@@ -276,9 +342,11 @@ class RiskMetricsComputer:
         merged = merged.dropna(subset=["return"])
 
         # Overall metrics
-        current_sharpe = self._compute_sharpe(merged["excess_return"])
-        ann_return = float(merged["return"].mean() * self.ANNUALIZATION_FACTOR * 100)
-        ann_vol = float(merged["return"].std() * np.sqrt(self.ANNUALIZATION_FACTOR) * 100)
+        current_sharpe = self._compute_sharpe(
+            merged["excess_return"], annualization_factor
+        )
+        ann_return = float(merged["return"].mean() * annualization_factor * 100)
+        ann_vol = float(merged["return"].std() * np.sqrt(annualization_factor) * 100)
         max_dd = self._compute_max_drawdown(price_df["value"].dropna())
 
         # Metrics by regime
@@ -289,12 +357,14 @@ class RiskMetricsComputer:
         for regime in ["tight", "neutral", "loose"]:
             regime_data = merged[merged["regime_label"] == regime]
             if len(regime_data) > 20:  # Minimum observations for meaningful stats
-                sharpe_by_regime[regime] = self._compute_sharpe(regime_data["excess_return"])
+                sharpe_by_regime[regime] = self._compute_sharpe(
+                    regime_data["excess_return"], annualization_factor
+                )
                 return_by_regime[regime] = float(
-                    regime_data["return"].mean() * self.ANNUALIZATION_FACTOR * 100
+                    regime_data["return"].mean() * annualization_factor * 100
                 )
                 vol_by_regime[regime] = float(
-                    regime_data["return"].std() * np.sqrt(self.ANNUALIZATION_FACTOR) * 100
+                    regime_data["return"].std() * np.sqrt(annualization_factor) * 100
                 )
             else:
                 sharpe_by_regime[regime] = None
@@ -302,13 +372,14 @@ class RiskMetricsComputer:
                 vol_by_regime[regime] = None
 
         # Rolling Sharpe
-        rolling_sharpe = self._compute_rolling_sharpe(merged)
+        rolling_sharpe = self._compute_rolling_sharpe(
+            merged, annualization_factor
+        )
 
-        # Correlation with GLCI
-        glci_returns = merged["glci_value"].pct_change()
-        correlation = merged["return"].corr(glci_returns)
-        if pd.isna(correlation):
-            correlation = 0.0
+        # Correlation is measured on a common weekly clock. Comparing daily
+        # returns with a forward-filled weekly index otherwise creates mostly
+        # zero GLCI changes and a single artificial jump each week.
+        correlation = self._compute_glci_correlation(price_df, glci_df)
 
         return AssetRiskMetrics(
             asset_id=asset_id,
@@ -321,12 +392,52 @@ class RiskMetricsComputer:
             sharpe_by_regime=sharpe_by_regime,
             return_by_regime=return_by_regime,
             volatility_by_regime=vol_by_regime,
-            correlation_with_glci=float(correlation),
-            rolling_sharpe_data=rolling_sharpe
+            correlation_with_glci=correlation,
+            rolling_sharpe_data=rolling_sharpe,
+            annualization_factor=annualization_factor,
+            rolling_window=rolling_window,
         )
 
-    def _compute_sharpe(self, excess_returns: pd.Series) -> float:
+    @classmethod
+    def _annualization_factor(
+        cls,
+        asset_id: str,
+        dates: pd.Series | pd.DatetimeIndex | None = None,
+    ) -> int:
+        """Return the appropriate daily observation count for an asset.
+
+        Known calendar-daily assets are explicit in ``ASSET_CONFIG``. For an
+        unconfigured series, regular weekend observations provide a safe
+        fallback signal that the market trades seven days per week.
+        """
+        configured = ASSET_CONFIG.get(asset_id, {}).get("annualization_factor")
+        if configured is not None:
+            return int(configured)
+
+        if dates is not None:
+            clean_dates = pd.DatetimeIndex(pd.to_datetime(dates)).dropna().unique()
+            if len(clean_dates) >= 30:
+                weekend_share = float((clean_dates.dayofweek >= 5).mean())
+                gaps = pd.Series(clean_dates.sort_values()).diff().dt.days.dropna()
+                median_gap = float(gaps.median()) if not gaps.empty else np.inf
+                if weekend_share >= 0.20 and median_gap <= 1.0:
+                    return cls.CALENDAR_ANNUALIZATION_FACTOR
+
+        return cls.ANNUALIZATION_FACTOR
+
+    def _rolling_window_for(self, annualization_factor: int) -> int:
+        """Resolve the lookback, honoring an explicit constructor override."""
+        if self._rolling_window_override is not None:
+            return self._rolling_window_override
+        return annualization_factor
+
+    def _compute_sharpe(
+        self,
+        excess_returns: pd.Series,
+        annualization_factor: int | None = None,
+    ) -> float | None:
         """Compute annualized Sharpe ratio."""
+        factor = annualization_factor or self.ANNUALIZATION_FACTOR
         clean_returns = excess_returns.dropna()
         if len(clean_returns) < 20:
             return 0.0
@@ -339,15 +450,23 @@ class RiskMetricsComputer:
         if pd.isna(std_return) or std_return < 1e-12:
             return 0.0
 
-        return float((mean_return / std_return) * np.sqrt(self.ANNUALIZATION_FACTOR))
+        return float((mean_return / std_return) * np.sqrt(factor))
 
-    def _compute_rolling_sharpe(self, df: pd.DataFrame) -> list[dict]:
+    def _compute_rolling_sharpe(
+        self,
+        df: pd.DataFrame,
+        annualization_factor: int | None = None,
+    ) -> list[dict]:
         """Compute rolling Sharpe ratio time series."""
-        rolling_mean = df["excess_return"].rolling(window=self.rolling_window).mean()
-        rolling_std = df["excess_return"].rolling(window=self.rolling_window).std()
+        factor = annualization_factor or self.ANNUALIZATION_FACTOR
+        window = self._rolling_window_for(factor)
+        rolling_mean = df["excess_return"].rolling(window=window).mean()
+        rolling_std = df["excess_return"].rolling(window=window).std()
 
         # Avoid division by zero
-        rolling_sharpe = (rolling_mean / rolling_std.replace(0, np.nan)) * np.sqrt(self.ANNUALIZATION_FACTOR)
+        rolling_sharpe = (
+            (rolling_mean / rolling_std.replace(0, np.nan)) * np.sqrt(factor)
+        )
 
         result = []
         for date, sharpe in zip(df["date"], rolling_sharpe):
@@ -358,6 +477,49 @@ class RiskMetricsComputer:
                 })
 
         return result
+
+    def _compute_glci_correlation(
+        self,
+        price_df: pd.DataFrame,
+        glci_df: pd.DataFrame,
+    ) -> float:
+        """Correlate W-FRI asset returns with W-FRI GLCI level changes."""
+        prices = (
+            price_df[["date", "value"]]
+            .dropna(subset=["date", "value"])
+            .drop_duplicates(subset="date", keep="last")
+            .set_index("date")["value"]
+            .sort_index()
+        )
+        glci_values = (
+            glci_df[["date", "value"]]
+            .dropna(subset=["date", "value"])
+            .drop_duplicates(subset="date", keep="last")
+            .set_index("date")["value"]
+            .sort_index()
+        )
+
+        weekly = pd.concat(
+            [
+                prices.resample("W-FRI").last().pct_change(fill_method=None).rename(
+                    "asset_return"
+                ),
+                glci_values.resample("W-FRI").last().diff().rename("glci_change"),
+            ],
+            axis=1,
+            join="inner",
+        ).dropna()
+
+        if len(weekly) < self.MIN_CORRELATION_OBSERVATIONS:
+            return None
+        if (
+            weekly["asset_return"].std() < 1e-12
+            or weekly["glci_change"].std() < 1e-12
+        ):
+            return None
+
+        correlation = weekly["asset_return"].corr(weekly["glci_change"])
+        return None if pd.isna(correlation) else float(correlation)
 
     def _compute_max_drawdown(self, prices: pd.Series) -> float:
         """Compute maximum drawdown percentage."""
@@ -428,7 +590,14 @@ class RiskMetricsComputer:
                     rolling_df,
                     "risk",
                     f"rolling_sharpe_{asset.asset_id}",
-                    metadata={"asset_id": asset.asset_id, "window": self.rolling_window}
+                    metadata={
+                        "asset_id": asset.asset_id,
+                        "annualization_factor": asset.annualization_factor,
+                        "window": asset.rolling_window,
+                        "rolling_window_policy": result.metadata[
+                            "rolling_window_policy"
+                        ],
+                    }
                 )
 
 

@@ -1,9 +1,10 @@
 """Track Record / Backtest of the GLCI regime classifier.
 
 Evaluates whether reconstructed GLCI regime classifications predict forward
-returns. Regime thresholds use only expanding history, but the upstream GLCI
-series is built from the current data vintage and is not point-in-time history.
-Compares against NFCI-alone and unconditional buy-and-hold base rates.
+returns. The GLCI uses the production 104-week rolling classifier; NFCI uses
+an expanding-history benchmark. The upstream GLCI series is built from the
+current data vintage and is not point-in-time history. Compares both classifiers
+against unconditional buy-and-hold base rates.
 
 Outputs:
   data/curated/backtest/track_record.parquet (long-format table)
@@ -29,6 +30,8 @@ from .risk_metrics import ASSET_CONFIG
 HORIZONS = [4, 13, 26]
 REGIME_LABELS = {-1: "tight", 0: "neutral", 1: "loose"}
 BURN_IN_PERIODS = 52
+GLCI_REGIME_WINDOW = 104
+GLCI_REGIME_MIN_PERIODS = 20
 REGIME_THRESHOLDS = (-1.0, 1.0)
 MIN_OBS_PER_REGIME = 20
 BOOTSTRAP_ITERATIONS = 5000
@@ -40,6 +43,8 @@ FREQUENCY = "W-FRI"
 ENTRY_LAG_WEEKS = 1
 HISTORICAL_MODE = "reconstructed_current_vintage"
 POINT_IN_TIME_HISTORY = False
+GLCI_REGIME_METHOD = "rolling_104_period_zscore"
+NFCI_REGIME_METHOD = "expanding_zscore"
 GLCI_CARRY_FORWARD_WEEKS = 0
 MARKET_CARRY_FORWARD_WEEKS = 1
 
@@ -82,6 +87,7 @@ class BacktestResult:
     bootstrap_method: str = BOOTSTRAP_METHOD
     bootstrap_iterations: int = BOOTSTRAP_ITERATIONS
     min_obs_per_regime: int = MIN_OBS_PER_REGIME
+    regime_threshold_method: str = GLCI_REGIME_METHOD
 
     def to_dict(self) -> dict:
         return {
@@ -92,7 +98,7 @@ class BacktestResult:
             "entry_lag_weeks": self.entry_lag_weeks,
             "historical_mode": self.historical_mode,
             "point_in_time": self.point_in_time,
-            "regime_threshold_method": "expanding_zscore",
+            "regime_threshold_method": self.regime_threshold_method,
             "bootstrap_method": self.bootstrap_method,
             "bootstrap_iterations": self.bootstrap_iterations,
             "min_obs_per_regime": self.min_obs_per_regime,
@@ -123,6 +129,32 @@ def expanding_zscore_regime(
     regime.loc[mask & (zscore >= low) & (zscore <= high)] = 0
     regime.loc[mask & (zscore > high)] = 1
 
+    return pd.DataFrame({"zscore": zscore, "regime": regime})
+
+
+def rolling_zscore_regime(
+    values: pd.Series,
+    window: int = GLCI_REGIME_WINDOW,
+    min_periods: int = GLCI_REGIME_MIN_PERIODS,
+    thresholds: tuple[float, float] = REGIME_THRESHOLDS,
+) -> pd.DataFrame:
+    """Reproduce the production GLCI rolling regime classifier.
+
+    The live GLCI uses a 104-week rolling mean and sample standard deviation,
+    emitting its first classification after 20 observations. Keeping this
+    logic here makes the Playbook evaluate the same signal shown elsewhere in
+    the product instead of a different expanding-window classifier.
+    """
+    rolling_mean = values.rolling(window=window, min_periods=min_periods).mean()
+    rolling_std = values.rolling(window=window, min_periods=min_periods).std()
+    zscore = (values - rolling_mean) / rolling_std
+
+    regime = pd.Series(np.nan, index=values.index)
+    finite = zscore.notna() & np.isfinite(zscore)
+    low, high = thresholds
+    regime.loc[finite & (zscore < low)] = -1
+    regime.loc[finite & (zscore >= low) & (zscore <= high)] = 0
+    regime.loc[finite & (zscore > high)] = 1
     return pd.DataFrame({"zscore": zscore, "regime": regime})
 
 
@@ -401,7 +433,7 @@ def _paired_regime_stats(
 
 
 class BacktestComputer:
-    """Compute expanding-window backtest of regime classifier vs asset returns."""
+    """Backtest production GLCI and benchmark NFCI regime classifiers."""
 
     def __init__(
         self,
@@ -442,7 +474,10 @@ class BacktestComputer:
                 f"({glci_series.index.min().date()} to {glci_series.index.max().date()})"
             )
 
-        glci_regime = expanding_zscore_regime(glci_series)
+        # Evaluate the same rolling classifier that produces the live GLCI
+        # regime. The expanding classifier remains useful for the NFCI
+        # benchmark, but it is not a substitute for the production signal.
+        glci_regime = rolling_zscore_regime(glci_series)
         if verbose:
             counts = glci_regime["regime"].value_counts().sort_index()
             print(f"  GLCI classified: {int(glci_regime['regime'].notna().sum())} obs")
@@ -482,10 +517,24 @@ class BacktestComputer:
                         f"    Warning: could not compute backtest for {asset_id}: {e}"
                     )
 
-        classifiers = {"glci": self._classifier_meta("glci", glci_regime, glci_series)}
+        classifiers = {
+            "glci": self._classifier_meta(
+                "glci",
+                glci_regime,
+                glci_series,
+                threshold_method=GLCI_REGIME_METHOD,
+                window_periods=GLCI_REGIME_WINDOW,
+                min_periods=GLCI_REGIME_MIN_PERIODS,
+            )
+        }
         if nfci_regime is not None and nfci_series is not None:
             classifiers["nfci"] = self._classifier_meta(
-                "nfci", nfci_regime, nfci_series
+                "nfci",
+                nfci_regime,
+                nfci_series,
+                threshold_method=NFCI_REGIME_METHOD,
+                window_periods=None,
+                min_periods=BURN_IN_PERIODS,
             )
 
         first_classified = glci_regime["regime"].first_valid_index()
@@ -645,6 +694,10 @@ class BacktestComputer:
         name: str,
         regime_df: pd.DataFrame,
         values: pd.Series,
+        *,
+        threshold_method: str,
+        window_periods: int | None,
+        min_periods: int,
     ) -> dict:
         valid = regime_df.dropna(subset=["regime"])
         counts_labeled = {
@@ -674,6 +727,9 @@ class BacktestComputer:
 
         return {
             "name": name,
+            "threshold_method": threshold_method,
+            "window_periods": window_periods,
+            "min_periods": min_periods,
             "n_per_regime": counts_labeled,
             "current_regime": current_regime,
             "timeline": timeline,
@@ -711,11 +767,14 @@ class BacktestComputer:
                 "entry_lag_weeks": result.entry_lag_weeks,
                 "historical_mode": result.historical_mode,
                 "point_in_time": result.point_in_time,
-                "regime_threshold_method": "expanding_zscore",
+                "regime_threshold_method": result.regime_threshold_method,
                 "bootstrap_iterations": result.bootstrap_iterations,
                 "bootstrap_method": result.bootstrap_method,
                 "bootstrap_min_finite_draw_fraction": MIN_FINITE_BOOTSTRAP_FRACTION,
-                "burn_in_periods": BURN_IN_PERIODS,
+                # Legacy key describes the primary GLCI classifier.
+                "burn_in_periods": GLCI_REGIME_MIN_PERIODS,
+                "regime_window_periods": GLCI_REGIME_WINDOW,
+                "nfci_burn_in_periods": BURN_IN_PERIODS,
                 "min_obs_per_regime": MIN_OBS_PER_REGIME,
             },
         )

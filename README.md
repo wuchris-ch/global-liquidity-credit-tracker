@@ -16,7 +16,7 @@ The frontend is organized as a daily research note in six sections:
 - [Today](https://global-liquidity-credit-tracker.vercel.app/), the 30-second brief: regime verdict, what changed, what it has meant, plumbing vitals
 - [Index](https://global-liquidity-credit-tracker.vercel.app/glci), the GLCI deep dive: pillar decomposition, regime history, methodology
 - [Flows](https://global-liquidity-credit-tracker.vercel.app/flows), a price-leadership gauge for AI/semis vs crypto vs gold vs small caps vs duration, each scored against its own norm, plus bitcoin priced in semiconductors
-- [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns by reconstructed regime with expanding thresholds, explicit timing, and confidence intervals
+- [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns using the production rolling regime classifier, explicit timing, and confidence intervals
 - [Plumbing](https://global-liquidity-credit-tracker.vercel.app/plumbing), net liquidity vs S&P 500, TGA/RRP components, credit spreads, central banks
 - [Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), chart any series against any other, with preset overlays
 
@@ -116,7 +116,7 @@ again as a gate before anything is published to `gh-pages`
 - `us_m2`, `eu_m3`, `china_m2`, `japan_m2`
 
 ### Credit Spreads
-- `ted_spread` - TED Spread
+- `ted_spread` - TED Spread (discontinued; historical context only)
 - `ice_bofa_us_high_yield_spread` - US HY Spread
 - `ice_bofa_us_ig_spread` - US IG Spread
 
@@ -147,8 +147,11 @@ Fed Total Assets - Treasury General Account - Reverse Repo
 ```
 A widely-used indicator of USD liquidity conditions.
 
-### USD Funding Stress
-Z-score average of TED spread, HY spread, and IG spread.
+### USD Credit Stress
+Weighted z-score average of US high-yield OAS (weight 1.0) and investment-grade
+OAS (weight 0.5). The API ID remains `usd_funding_stress` for compatibility.
+The discontinued TED spread is retained only as historical source data and is
+not a live composite or GLCI component.
 
 ### Global CB Assets
 Sum of major central bank balance sheets (USD-normalized).
@@ -162,9 +165,14 @@ Tri-pillar composite index combining:
 All three pillars are required. If any pillar cannot be fitted, the update
 fails before saving or publishing instead of redistributing its weight. Pillar
 scores are standardized to a common unit-variance scale before the fixed
-40/35/25 weights are applied.
+40/35/25 weights are applied. The production factor fit enforces configured
+loading signs. Wrong-direction features receive zero loading and are disclosed;
+distinct-source, exclusion-share, and source-concentration gates prevent a
+pillar from collapsing onto one input.
+The pillar weights are explicit policy choices, not return-fitted calibration.
 
-Regime classification: Tight (z-score < -1), Neutral (-1 to +1), Loose (> +1)
+Regime classification: Tight (z-score < -1), Neutral (-1 to +1), Loose (> +1).
+Rows without a finite z-score during burn-in remain unclassified.
 
 The displayed history is a reconstruction using the current source-data
 vintage and factor estimates. It is not a point-in-time vintage history.
@@ -179,8 +187,8 @@ The Risk by Regime dashboard shows how different asset classes perform under var
 - Sharpe ratios (overall and by regime)
 - Annualized returns and volatility
 - Maximum drawdown
-- Correlation with GLCI
-- Rolling 252-day Sharpe ratio time series
+- Weekly correlation with GLCI level changes
+- Rolling one-year Sharpe ratio time series (252 trading days or 365 crypto days)
 
 **Assets tracked:**
 - Large Cap Equities: S&P 500, Nasdaq 100
@@ -216,14 +224,15 @@ says so explicitly.
 The Track Record dashboard backtests the GLCI regime classifier against forward asset returns to measure its predictive value.
 
 **Methodology:**
-- Expanding-window regime thresholds with a 52-week burn-in period
+- The same rolling 104-week regime thresholds used by the live index, with a 20-week minimum
 - Friday-to-Friday data grid, next-week entry, and 4, 13, and 26-week forward return horizons
 - Compares GLCI regime classifier against an NFCI baseline
 - Paired moving-block 95% confidence intervals over the full weekly row sequence
 
-The expanding classifier prevents future composite observations from changing
-past threshold labels. It does not make the upstream GLCI point-in-time: source
-revisions and factor re-estimation can still change reconstructed history.
+The rolling classifier uses no composite observations after the signal week.
+It does not make the upstream GLCI point-in-time: source revisions and factor
+re-estimation can still change reconstructed history. NFCI retains an expanding
+52-week classifier as an independent baseline.
 
 **Metrics shown:**
 - Hit rate and median forward return within each reconstructed regime
@@ -243,7 +252,7 @@ global_liquidity_tracker/
 │   └── indicators/
 │       ├── glci.py             # GLCI index computation
 │       ├── risk_metrics.py     # Risk by Regime metrics
-│       ├── backtest.py         # Track Record expanding-window backtest
+│       ├── backtest.py         # Track Record rolling-regime backtest
 │       ├── dynamic_factor.py   # DFM latent factor extraction
 │       ├── factors.py          # Feature engineering (FX, real, GDP scaling)
 │       ├── transforms.py       # Data transforms (zscore, growth, impulse, gap)
@@ -286,7 +295,7 @@ python cli.py show fed_total_assets --tail 30
 # Compute risk metrics
 python -c "from src.indicators.risk_metrics import compute_risk_metrics; compute_risk_metrics(save=True)"
 
-# Compute backtest track record (expanding-window, 52-week burn-in)
+# Compute backtest track record (production rolling regime classifier)
 python cli.py backtest --save
 ```
 

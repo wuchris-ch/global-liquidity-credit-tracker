@@ -24,7 +24,10 @@ from .factors import (
 )
 from .dynamic_factor import (
     DynamicFactorModel,
+    FactorSignConstraintError,
+    SIGN_CONSTRAINT_TOLERANCE,
     combine_factors,
+    find_sign_violations,
 )
 from .transforms import (
     detect_regime,
@@ -43,6 +46,87 @@ TARGET_FREQUENCIES = {
     "Q": "QE",
     "A": "YE",
 }
+MIN_ACTIVE_SERIES_PER_PILLAR = 2
+MAX_CONSTRAINT_EXCLUSION_SHARE = 0.50
+MAX_SERIES_LOADING_SHARE = 0.60
+
+
+def _validate_factor_coverage(
+    loadings: pd.Series,
+    sign_constraints: dict[str, int],
+    feature_to_series: dict[str, str],
+) -> dict:
+    """Gate a pillar on distinct inputs, binding constraints, and dominance."""
+    active_features = [
+        str(feature)
+        for feature, loading in loadings.items()
+        if np.isfinite(loading)
+        and abs(float(loading)) > SIGN_CONSTRAINT_TOLERANCE
+    ]
+    unmapped = sorted(set(active_features) - set(feature_to_series))
+    if unmapped:
+        raise ValueError(
+            "Active factor features have no source-series metadata: "
+            + ", ".join(unmapped)
+        )
+
+    active_series = sorted({feature_to_series[feature] for feature in active_features})
+    if len(active_series) < MIN_ACTIVE_SERIES_PER_PILLAR:
+        raise ValueError(
+            "Factor coverage requires at least "
+            f"{MIN_ACTIVE_SERIES_PER_PILLAR} distinct active source series; "
+            f"got {len(active_series)}"
+        )
+
+    constrained_features = [
+        feature for feature in sign_constraints if feature in loadings.index
+    ]
+    constraint_excluded_features = [
+        feature
+        for feature in constrained_features
+        if abs(float(loadings.loc[feature])) <= SIGN_CONSTRAINT_TOLERANCE
+    ]
+    exclusion_share = (
+        len(constraint_excluded_features) / len(constrained_features)
+        if constrained_features
+        else 0.0
+    )
+    if exclusion_share > MAX_CONSTRAINT_EXCLUSION_SHARE:
+        raise ValueError(
+            "Sign constraints excluded "
+            f"{exclusion_share:.0%} of fitted features; maximum allowed is "
+            f"{MAX_CONSTRAINT_EXCLUSION_SHARE:.0%}"
+        )
+
+    series_loading_totals: dict[str, float] = {}
+    for feature in active_features:
+        series_id = feature_to_series[feature]
+        series_loading_totals[series_id] = (
+            series_loading_totals.get(series_id, 0.0)
+            + abs(float(loadings.loc[feature]))
+        )
+    total_loading = sum(series_loading_totals.values())
+    series_loading_shares = {
+        series_id: loading / total_loading
+        for series_id, loading in sorted(series_loading_totals.items())
+    }
+    max_series_share = max(series_loading_shares.values(), default=0.0)
+    if max_series_share > MAX_SERIES_LOADING_SHARE:
+        dominant_series = max(series_loading_shares, key=series_loading_shares.get)
+        raise ValueError(
+            f"Factor loading concentration is {max_series_share:.0%} in "
+            f"'{dominant_series}'; maximum allowed is "
+            f"{MAX_SERIES_LOADING_SHARE:.0%}"
+        )
+
+    return {
+        "active_features": active_features,
+        "active_series": active_series,
+        "constraint_excluded_features": constraint_excluded_features,
+        "constraint_exclusion_share": exclusion_share,
+        "series_loading_shares": series_loading_shares,
+        "max_series_loading_share": max_series_share,
+    }
 
 
 def _apply_pillar_signs(
@@ -153,12 +237,19 @@ class GLCIComputer:
             target_freq: Target frequency ('W' for weekly)
             factor_method: Method for factor extraction
             save_output: Whether to save results to storage
-            optimize_weights: Whether to optimize pillar weights dynamically
+            optimize_weights: Reserved compatibility flag. True is rejected;
+                no validated production weight optimizer is implemented.
             verbose: Whether to print progress
             
         Returns:
             GLCIResult with all components
         """
+        if optimize_weights:
+            raise NotImplementedError(
+                "Dynamic pillar-weight optimization is not implemented; "
+                "the GLCI uses fixed configured policy weights"
+            )
+
         config = get_index_config(self.INDEX_ID)
         if not config:
             raise ValueError(f"Index '{self.INDEX_ID}' not found in configuration")
@@ -169,7 +260,7 @@ class GLCIComputer:
         
         if verbose:
             print(f"Computing GLCI with pillars: {pillar_names}")
-            print(f"Initial pillar weights: {pillar_weights}")
+            print(f"Fixed pillar weights: {pillar_weights}")
         
         # Step 1: Extract factor for each pillar
         pillar_factors = {}
@@ -324,6 +415,22 @@ class GLCIComputer:
                 "method": result.method,
                 "explained_variance": result.explained_variance,
                 "n_variables": result.metadata.get("n_variables", 0),
+                "loading_semantics": result.metadata.get("loading_semantics"),
+                "constraint_solver_iterations": result.metadata.get(
+                    "constraint_solver_iterations"
+                ),
+                "constraint_exclusion_share": result.metadata.get(
+                    "constraint_exclusion_share",
+                    0.0,
+                ),
+                "max_series_loading_share": result.metadata.get(
+                    "max_series_loading_share",
+                    0.0,
+                ),
+                "series_loading_shares": result.metadata.get(
+                    "series_loading_shares",
+                    {},
+                ),
                 "data_quality": {
                     "total_series": result.data_quality.total_series if result.data_quality else 0,
                     "loaded_series": len(used_series),
@@ -333,6 +440,11 @@ class GLCIComputer:
                     "missing_series": result.data_quality.missing_series if result.data_quality else [],
                     "low_coverage": [s[0] for s in (result.data_quality.low_coverage_series or [])] if result.data_quality else [],
                     "stale_series": [s[0] for s in (result.data_quality.stale_series or [])] if result.data_quality else [],
+                    "sign_violations": result.data_quality.sign_violations if result.data_quality else [],
+                    "constraint_excluded_features": result.metadata.get(
+                        "constraint_excluded_features",
+                        [],
+                    ),
                 }
             }
         
@@ -351,6 +463,7 @@ class GLCIComputer:
                 "Rolling regime thresholds do not make upstream inputs point-in-time."
             ),
             "factor_method": factor_method,
+            "pillar_weight_policy": "fixed_configured",
             "pillar_scaling": "full_sample_zscore_on_common_history",
             "normalize": normalize_config,
             "pillar_stats": pillar_stats,
@@ -431,6 +544,12 @@ class GLCIComputer:
         
         try:
             model.fit(X)
+        except FactorSignConstraintError as e:
+            quality_report.sign_violations = e.violations
+            self.feature_builder.record_sign_violations(pillar_name, e.violations)
+            if verbose:
+                print(f"  ✗ Loading sign audit failed: {e}")
+            raise
         except Exception as e:
             if verbose:
                 print(f"  ⚠ Factor model failed: {e}, trying fallback...")
@@ -442,20 +561,39 @@ class GLCIComputer:
                 min_observations=20,
                 min_variables=2
             )
-            model.fit(X)
+            try:
+                model.fit(X)
+            except FactorSignConstraintError as sign_error:
+                quality_report.sign_violations = sign_error.violations
+                self.feature_builder.record_sign_violations(
+                    pillar_name,
+                    sign_error.violations,
+                )
+                if verbose:
+                    print(f"  ✗ Loading sign audit failed: {sign_error}")
+                raise
         
         factor_result = model.get_result()
+        sign_violations = find_sign_violations(
+            factor_result.loadings,
+            sign_constraints,
+        )
+        quality_report.sign_violations = sign_violations
+        self.feature_builder.record_sign_violations(pillar_name, sign_violations)
+        if sign_violations:
+            raise FactorSignConstraintError(sign_violations)
 
-        used_features = [str(feature) for feature in factor_result.loadings.index]
         feature_to_series = {
             f"{item.series_id}_{item.transform}": item.series_id
             for item in metadata
         }
-        used_series = sorted({
-            feature_to_series[feature]
-            for feature in used_features
-            if feature in feature_to_series
-        })
+        coverage = _validate_factor_coverage(
+            factor_result.loadings["factor_1"],
+            sign_constraints,
+            feature_to_series,
+        )
+        used_features = coverage["active_features"]
+        used_series = coverage["active_series"]
         available_series = sorted({item.series_id for item in metadata})
         excluded_series = sorted(set(available_series) - set(used_series))
         excluded_features = sorted(set(feature_to_series) - set(used_features))
@@ -473,13 +611,33 @@ class GLCIComputer:
             method=factor_result.method,
             data_quality=quality_report,
             metadata={
-                "n_variables": len(factor_result.loadings.index),
+                "n_variables": len(used_features),
                 "n_observations": len(factor_series),
                 "converged": factor_result.converged,
                 "used_features": used_features,
                 "excluded_features": excluded_features,
                 "used_series": used_series,
                 "excluded_series": excluded_series,
+                "sign_constraint_tolerance": factor_result.metadata.get(
+                    "sign_constraint_tolerance"
+                ),
+                "sign_violations": sign_violations,
+                "constraint_excluded_features": coverage[
+                    "constraint_excluded_features"
+                ],
+                "constraint_exclusion_share": coverage[
+                    "constraint_exclusion_share"
+                ],
+                "series_loading_shares": coverage["series_loading_shares"],
+                "max_series_loading_share": coverage[
+                    "max_series_loading_share"
+                ],
+                "loading_semantics": factor_result.metadata.get(
+                    "loading_semantics"
+                ),
+                "constraint_solver_iterations": factor_result.metadata.get(
+                    "constraint_solver_iterations"
+                ),
             }
         )
     

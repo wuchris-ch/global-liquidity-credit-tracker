@@ -45,17 +45,17 @@ jobs:
             if git cat-file -e origin/gh-pages:latest/api/glci/trust/index.json 2>/dev/null; then
               git show origin/gh-pages:latest/api/glci/trust/index.json > /tmp/prior_glci_trust.json
               python - <<'PY'
-              import json
-              import pandas as pd
+          import json
+          import pandas as pd
 
-              ledger = pd.read_parquet("data/curated/indices/glci_vintages.parquet")
-              with open("/tmp/prior_glci_trust.json") as handle:
-                  prior_count = int(json.load(handle)["snapshots"]["count"])
-              if len(ledger) < prior_count:
-                  raise SystemExit(
-                      f"Snapshot ledger regressed from {prior_count} to {len(ledger)} rows"
-                  )
-              PY
+          ledger = pd.read_parquet("data/curated/indices/glci_vintages.parquet")
+          with open("/tmp/prior_glci_trust.json") as handle:
+              prior_count = int(json.load(handle)["snapshots"]["count"])
+          if len(ledger) < prior_count:
+              raise SystemExit(
+                  f"Snapshot ledger regressed from {prior_count} to {len(ledger)} rows"
+              )
+          PY
             fi
             echo "Restored prior GLCI publication snapshots"
           elif git cat-file -e origin/gh-pages:state/glci_vintages.required 2>/dev/null || \

@@ -74,7 +74,8 @@ Everything below runs offline (no API keys, no network):
 
 ```bash
 make test    # 80+ unit tests: transforms, GLCI factor model, Sharpe/regime
-             # metrics, backtest timing controls, export validation
+             # metrics, backtest timing controls, export validation, and
+             # shell-syntax checks on the GitHub Actions workflows
 make smoke   # config integrity + numerics + local artifact validation
 ```
 
@@ -251,7 +252,7 @@ global_liquidity_tracker/
 │   ├── raw/                    # Raw fetched data (parquet)
 │   └── curated/                # Computed indices (parquet + JSON)
 ├── docs/                       # Methodology, sources, proof map, samples
-├── tests/                      # Offline calculation test suite (pytest)
+├── tests/                      # Offline test suite (pytest): calculations + workflow syntax
 ├── scripts/
 │   ├── update_data.py          # Scheduled fetch + compute
 │   ├── export_to_json.py       # Static JSON export + validation

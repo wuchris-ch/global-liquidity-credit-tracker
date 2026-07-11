@@ -93,6 +93,10 @@ workflow restores that ledger from `gh-pages/state/`, verifies its row count
 against the prior trust payload, and refuses to publish if established state is
 missing or regresses. The first publish is the only automatic bootstrap.
 
+The inline bash in the workflows (including that restore step) is itself
+syntax-checked offline by `tests/test_workflows.py`, so a YAML indentation
+mistake in a `run:` block fails `make test` instead of the next scheduled run.
+
 ## Things that will break production
 
 - Deleting the `gh-pages` branch. It holds every published payload; the

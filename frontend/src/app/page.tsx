@@ -13,6 +13,7 @@ import { RangeTabs } from "@/components/range-tabs";
 import { RegimeStamp } from "@/components/regime-stamp";
 import { Sparkline } from "@/components/sparkline";
 import { DataLoadError } from "@/components/data-load-error";
+import { DirectionalOutlookView } from "@/components/directional-outlook";
 import { getDateRange, type TimeRange } from "@/lib/utils";
 import { formatShortDate, getFreshnessStatus } from "@/lib/data-status";
 import {
@@ -22,7 +23,6 @@ import {
   currentRegimeStanding,
   invalidationSentence,
   ordinal,
-  playbookSentence,
   standingSentence,
   transitionView,
   verdictHeadline,
@@ -30,6 +30,7 @@ import {
   type ChangeSpec,
 } from "@/lib/brief";
 import { flowsTeaserSentence } from "@/lib/flows-brief";
+import { buildDirectionalOutlook } from "@/lib/outlook";
 import type { DataPoint } from "@/lib/api";
 
 const VITALS_RANGE = getDateRange("6m");
@@ -57,8 +58,8 @@ const DIRECTION_GLYPH: Record<ChangeItem["direction"], { glyph: string; classNam
 };
 
 const TRANSITION_TONE = {
-  building: "text-positive",
-  fading: "text-negative",
+  improving: "text-positive",
+  weakening: "text-negative",
   stable: "text-muted-foreground",
 } as const;
 
@@ -148,21 +149,29 @@ export default function TodayPage() {
     return buildChangeItems(specs);
   }, [netLiquidity.data, rrp.data, tga.data, hySpread.data, sofr.data, stress.data]);
 
-  const playbook = useMemo(
-    () => (glci.data ? playbookSentence(backtest.data, glci.data.regime) : null),
-    [backtest.data, glci.data]
-  );
-  const playbookGold = useMemo(
-    () =>
-      glci.data
-        ? playbookSentence(backtest.data, glci.data.regime, "gold_price", "gold")
-        : null,
-    [backtest.data, glci.data]
+  const flowsTeaser = useMemo(
+    () => {
+      if (!flows.data) return null;
+      const current = flows.data.destinations.filter((destination) => {
+        const tone = getFreshnessStatus(destination.last_date).tone;
+        return tone === "current" || tone === "recent";
+      });
+      return flowsTeaserSentence(current);
+    },
+    [flows.data]
   );
 
-  const flowsTeaser = useMemo(
-    () => (flows.data ? flowsTeaserSentence(flows.data.destinations) : null),
-    [flows.data]
+  const outlook = useMemo(
+    () =>
+      glci.data
+        ? buildDirectionalOutlook(
+            backtest.data,
+            flows.data,
+            glci.data.regime,
+            glci.data.date
+          )
+        : null,
+    [backtest.data, flows.data, glci.data]
   );
 
   const freshness = glci.data ? getFreshnessStatus(glci.data.date) : null;
@@ -269,38 +278,35 @@ export default function TodayPage() {
           </div>
 
           <aside className="border-t border-border pt-7 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-            <h3 className="text-sm font-semibold tracking-tight">
-              What has followed {standing.regime} regimes
-            </h3>
-            {playbook ? (
-              <div className="mt-4 space-y-4">
-                <p className="font-serif text-[1.0625rem] leading-relaxed">{playbook.text}</p>
-                {playbookGold && (
-                  <p className="font-serif text-[1.0625rem] leading-relaxed text-muted-foreground">
-                    {playbookGold.text}
-                  </p>
-                )}
-                <Link
-                  href="/playbook"
-                  className="inline-block font-mono text-xs text-primary underline-offset-4 hover:underline"
-                >
-                  Full playbook, all assets and horizons →
-                </Link>
-              </div>
-            ) : (
-              <p className="mt-4 font-serif text-[0.9375rem] italic text-muted-foreground">
-                Historical forward-return results are unavailable right now.
-              </p>
-            )}
-
-            <h3 className="mt-8 text-sm font-semibold tracking-tight">What would change this view</h3>
+            <h3 className="text-sm font-semibold tracking-tight">What would change this view</h3>
             <p className="mt-3 font-serif text-[1.0625rem] leading-relaxed">
               {invalidationSentence(g)}
             </p>
           </aside>
         </div>
 
-        <div className="mt-8 border-y border-border py-4" aria-label="Signal integrity">
+        <div className="mt-8 border-y border-border py-6" aria-label="Directional outlook">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-2">
+            <h3 className="text-sm font-semibold tracking-tight">What the data favors now</h3>
+            <Link
+              href="/playbook"
+              className="font-mono text-xs text-primary underline-offset-4 hover:underline"
+            >
+              Full playbook →
+            </Link>
+          </div>
+          <div className="mt-4">
+            {outlook ? (
+              <DirectionalOutlookView outlook={outlook} compact />
+            ) : (
+              <p className="font-serif text-[0.9375rem] italic text-muted-foreground">
+                Historical forward-return results are unavailable right now.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-8 border-b border-border pb-4" aria-label="Signal integrity">
           <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
             <span className="text-xs font-semibold uppercase tracking-[0.12em]">Signal integrity</span>
             {dataQuality && dataQuality.total_components > 0 ? (

@@ -84,18 +84,18 @@ export function momentumDirection(momentum: number): Momentum {
 
 const HEADLINES: Record<Regime, Record<Momentum, string>> = {
   loose: {
-    building: "Liquidity is loose and still building.",
-    steady: "Liquidity is loose and holding.",
-    fading: "Liquidity is loose, but the tide is slowing.",
+    building: "Liquidity is loose and getting easier.",
+    steady: "Liquidity is loose and stable.",
+    fading: "Liquidity is loose, but weakening.",
   },
   neutral: {
     building: "Conditions are neutral and improving.",
-    steady: "Conditions are neutral and holding.",
+    steady: "Conditions are neutral and stable.",
     fading: "Conditions are neutral and softening.",
   },
   tight: {
     building: "Conditions are tight, but easing at the margin.",
-    steady: "Liquidity is tight and holding.",
+    steady: "Liquidity is tight and stable.",
     fading: "Liquidity is tight and getting tighter.",
   },
 };
@@ -104,7 +104,7 @@ export function verdictHeadline(regime: Regime, momentum: number): string {
   return HEADLINES[regime][momentumDirection(momentum)];
 }
 
-export type TransitionState = "building" | "fading" | "stable";
+export type TransitionState = "improving" | "weakening" | "stable";
 
 export interface TransitionView {
   state: TransitionState;
@@ -114,19 +114,20 @@ export interface TransitionView {
 /** A compact, deterministic read of the composite's four-week direction. */
 export function transitionView(momentum: number): TransitionView {
   const direction = momentumDirection(momentum);
-  const state: TransitionState = direction === "steady" ? "stable" : direction;
+  const state: TransitionState =
+    direction === "steady" ? "stable" : direction === "building" ? "improving" : "weakening";
   const magnitude = Math.abs(momentum).toFixed(1);
 
-  if (state === "building") {
+  if (state === "improving") {
     return {
       state,
-      detail: `The composite rose ${magnitude} points over four weeks.`,
+      detail: `Four-week momentum is positive: the composite rose ${magnitude} points.`,
     };
   }
-  if (state === "fading") {
+  if (state === "weakening") {
     return {
       state,
-      detail: `The composite fell ${magnitude} points over four weeks.`,
+      detail: `Four-week momentum is negative: the composite fell ${magnitude} points.`,
     };
   }
   return {
@@ -178,7 +179,7 @@ export function invalidationSentence(
 }
 
 /**
- * "The index stands at 84.0, 0.2σ above its two-year trend, in the neutral
+ * "The index stands at 84.0, 0.2σ above its 104-week mean, in the neutral
  * band for a 7th week."
  */
 export function standingSentence(
@@ -191,7 +192,7 @@ export function standingSentence(
     glci.regime === "neutral" ? "the neutral band" : `${glci.regime} territory`;
   const tenure =
     standing.weeks === 1 ? "its first week" : `a ${ordinal(standing.weeks)} week`;
-  return `The index stands at ${glci.value.toFixed(1)}, ${sigma}σ ${side} its two-year trend, in ${band} for ${tenure}.`;
+  return `The index stands at ${glci.value.toFixed(1)}, ${sigma}σ ${side} its 104-week mean, in ${band} for ${tenure}.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -206,16 +207,16 @@ interface PillarPhrases {
 /** Plain-language phrasing per pillar. Values are post-sign: stress is already inverted. */
 const PILLAR_PHRASES: Record<string, PillarPhrases> = {
   liquidity: {
-    positive: "central-bank liquidity is doing the lifting",
-    negative: "central-bank liquidity is the main drag",
+    positive: "central-bank liquidity supports the index",
+    negative: "central-bank liquidity drags on the index",
   },
   credit: {
-    positive: "credit growth is adding",
-    negative: "credit growth is subtracting",
+    positive: "credit growth supports the index",
+    negative: "credit growth drags on the index",
   },
   stress: {
-    positive: "calm funding markets are adding",
-    negative: "funding stress is subtracting",
+    positive: "calm funding markets support the index",
+    negative: "funding stress drags on the index",
   },
 };
 
@@ -232,8 +233,8 @@ export function attributionSentence(pillars: GLCIPillar[]): string {
 
   const phrase = (p: GLCIPillar, lead: boolean): string => {
     const phrases = PILLAR_PHRASES[p.name] ?? {
-      positive: `${p.name} is adding`,
-      negative: `${p.name} is subtracting`,
+      positive: `${p.name} supports the index`,
+      negative: `${p.name} drags on the index`,
     };
     const base = p.contribution >= 0 ? phrases.positive : phrases.negative;
     const amount =

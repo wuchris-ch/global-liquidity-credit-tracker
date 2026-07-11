@@ -343,3 +343,4 @@ class TestBacktestMetadata:
         assert payload["regime_threshold_method"] == "expanding_zscore"
         assert payload["bootstrap_method"] == BOOTSTRAP_METHOD
         assert payload["bootstrap_iterations"] == BOOTSTRAP_ITERATIONS
+        assert payload["min_obs_per_regime"] == MIN_OBS_PER_REGIME

@@ -15,7 +15,7 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "Global Liquidity & Credit",
   description:
-    "A daily read on global liquidity and credit conditions: regime, drivers, and what it has meant for assets.",
+    "A daily read on global liquidity and credit: regime, drivers, and the directional asset outlook.",
 };
 
 export const viewport: Viewport = {
@@ -43,8 +43,8 @@ export default function RootLayout({
             <footer className="border-t border-border">
               <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
                 <p className="font-mono text-xs text-muted-foreground">
-                  Sources: FRED, BIS, World Bank, NY Fed, Yahoo Finance. Updated twice daily.
-                  Not investment advice.
+                  Sources: FRED, BIS, World Bank, NY Fed, Yahoo Finance. The update job runs every
+                  12 hours; check each data-through date before using a signal. Not investment advice.
                 </p>
               </div>
             </footer>

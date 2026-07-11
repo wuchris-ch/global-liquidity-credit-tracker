@@ -255,6 +255,7 @@ export interface BacktestResponse {
   regime_threshold_method?: string;
   bootstrap_method?: string;
   bootstrap_iterations?: number;
+  min_obs_per_regime?: number;
   classifiers: Record<string, BacktestClassifierMeta>;
   assets: BacktestAssetResult[];
 }

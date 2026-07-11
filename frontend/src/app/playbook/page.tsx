@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useBacktestData } from "@/hooks/use-backtest-data";
+import { useFlowsData } from "@/hooks/use-flows-data";
 import { useRiskData } from "@/hooks/use-risk-data";
 import { RegimeStamp, regimeLabel } from "@/components/regime-stamp";
 import { DataLoadError } from "@/components/data-load-error";
+import { DirectionalOutlookView } from "@/components/directional-outlook";
 import { formatShortDate } from "@/lib/data-status";
-import { playbookSentence, signed } from "@/lib/brief";
+import { signed } from "@/lib/brief";
+import { buildDirectionalOutlook, PAIRED_BOOTSTRAP_METHOD } from "@/lib/outlook";
 import api from "@/lib/api";
 import type {
   AssetRiskMetrics,
@@ -23,8 +26,9 @@ import type {
  * own expanding-window classifier can disagree near regime boundaries; that
  * divergence is disclosed, not silently substituted.
  */
-function useCanonicalRegime(): { regime: Regime | null; isLoading: boolean } {
+function useCanonicalRegime(): { regime: Regime | null; date: string | null; isLoading: boolean } {
   const [regime, setRegime] = useState<Regime | null>(null);
+  const [date, setDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -37,6 +41,7 @@ function useCanonicalRegime(): { regime: Regime | null; isLoading: boolean } {
         if (label === "loose" || label === "neutral" || label === "tight") {
           setRegime(label);
         }
+        setDate(latest.date ?? null);
       })
       .catch(() => undefined)
       .finally(() => {
@@ -47,7 +52,7 @@ function useCanonicalRegime(): { regime: Regime | null; isLoading: boolean } {
     };
   }, []);
 
-  return { regime, isLoading };
+  return { regime, date, isLoading };
 }
 
 // ---------------------------------------------------------------------------
@@ -77,7 +82,7 @@ function num(v: number | null | undefined, decimals = 1): string {
 }
 
 const REGIME_ORDER: Regime[] = ["loose", "neutral", "tight"];
-const PAIRED_BOOTSTRAP_METHOD = "paired_full_calendar_moving_block";
+const HORIZON_ORDER: BacktestHorizon[] = ["4", "13", "26"];
 
 const REGIME_WASH: Record<Regime, string> = {
   loose: "regime-wash-loose",
@@ -136,12 +141,14 @@ function edgeSignificant(
 function HitCell({
   stats,
   pairedInference,
+  className = "",
 }: {
   stats: BacktestStats | null;
   pairedInference: boolean;
+  className?: string;
 }) {
   return (
-    <td className="py-3 pl-5 text-right align-top">
+    <td className={`py-3 pl-5 text-right align-top ${className}`}>
       <span className="font-mono text-sm tabular-nums">{hitPct(stats?.hit_rate)}</span>
       <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
         n {stats?.n ?? "–"}
@@ -177,9 +184,11 @@ function MedianCell({
 function EdgeCell({
   stats,
   pairedInference,
+  className = "",
 }: {
   stats: BacktestStats | null;
   pairedInference: boolean;
+  className?: string;
 }) {
   const sig = edgeSignificant(stats, pairedInference);
   const edge = stats?.edge ?? null;
@@ -190,7 +199,7 @@ function EdgeCell({
         : "text-negative"
       : "text-muted-foreground";
   return (
-    <td className="py-3 pl-5 text-right align-top">
+    <td className={`py-3 pl-5 text-right align-top ${className}`}>
       <span className={`font-mono text-sm tabular-nums ${tone}`}>
         {edgePp(edge)}
         {sig === false && (
@@ -222,14 +231,19 @@ function ForwardReturnsTable({
   assets,
   regime,
   pairedInference,
+  focusHorizon,
 }: {
   assets: BacktestAssetResult[];
   regime: Regime;
   pairedInference: boolean;
+  focusHorizon: BacktestHorizon;
 }) {
   const groupHead = "pb-1 pl-5 text-left font-sans text-[0.6875rem] font-semibold uppercase tracking-wider";
   const subHead =
     "border-b border-border pb-2 pl-5 text-right font-sans text-[0.6875rem] font-medium text-muted-foreground";
+
+  const band = (horizon: BacktestHorizon) =>
+    horizon === focusHorizon ? `${REGIME_WASH[regime]} ${REGIME_TEXT[regime]}` : "";
 
   return (
     <div className="overflow-x-auto">
@@ -237,39 +251,45 @@ function ForwardReturnsTable({
         <thead>
           <tr>
             <th className="pb-1 text-left" />
-            <th colSpan={2} className={`${groupHead} text-muted-foreground`}>
-              4 weeks
-            </th>
-            <th
-              colSpan={4}
-              className={`${groupHead} ${REGIME_WASH[regime]} ${REGIME_TEXT[regime]} band-inset-x`}
-            >
-              13 weeks · {regimeLabel(regime)} regime
-            </th>
-            <th colSpan={2} className={`${groupHead} text-muted-foreground`}>
-              26 weeks
-            </th>
+            {HORIZON_ORDER.map((horizon) => (
+              <th
+                key={horizon}
+                colSpan={horizon === focusHorizon ? 4 : 2}
+                className={`${groupHead} ${
+                  horizon === focusHorizon
+                    ? `${band(horizon)} band-inset-x`
+                    : "text-muted-foreground"
+                }`}
+              >
+                {horizon} weeks
+                {horizon === focusHorizon && ` · ${regimeLabel(regime)} read`}
+              </th>
+            ))}
           </tr>
           <tr>
             <th className="border-b border-border pb-2 text-left font-sans text-[0.6875rem] font-medium text-muted-foreground">
               Asset
             </th>
-            <th className={subHead}>Hit</th>
-            <th className={subHead}>Median</th>
-            <th className={`${subHead} ${REGIME_WASH[regime]} band-inset-l`}>Hit</th>
-            <th className={`${subHead} ${REGIME_WASH[regime]}`}>Base</th>
-            <th className={`${subHead} ${REGIME_WASH[regime]}`}>Edge</th>
-            <th className={`${subHead} ${REGIME_WASH[regime]} band-inset-r pr-3`}>Median</th>
-            <th className={subHead}>Hit</th>
-            <th className={subHead}>Median</th>
+            {HORIZON_ORDER.map((horizon) => {
+              const focused = horizon === focusHorizon;
+              const wash = focused ? REGIME_WASH[regime] : "";
+              return (
+                <Fragment key={horizon}>
+                  <th className={`${subHead} ${wash} ${focused ? "band-inset-l" : ""}`}>
+                    Hit
+                  </th>
+                  {focused && <th className={`${subHead} ${wash}`}>Base</th>}
+                  {focused && <th className={`${subHead} ${wash}`}>Edge</th>}
+                  <th className={`${subHead} ${wash} ${focused ? "band-inset-r pr-3" : ""}`}>
+                    Median
+                  </th>
+                </Fragment>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
           {assets.map((asset) => {
-            const s4 = cellStats(asset, "glci", regime, "4");
-            const s13 = cellStats(asset, "glci", regime, "13");
-            const s26 = cellStats(asset, "glci", regime, "26");
-            const b13 = baseRate(asset, "13");
             return (
               <tr key={asset.id} className="border-b border-border">
                 <td className="py-3 pr-3 align-top">
@@ -278,18 +298,39 @@ function ForwardReturnsTable({
                     {asset.category}
                   </span>
                 </td>
-                <HitCell stats={s4} pairedInference={pairedInference} />
-                <MedianCell stats={s4} />
-                <HitCell stats={s13} pairedInference={pairedInference} />
-                <td className="py-3 pl-5 text-right align-top">
-                  <span className="font-mono text-sm tabular-nums text-muted-foreground">
-                    {hitPct(b13?.hit_rate)}
-                  </span>
-                </td>
-                <EdgeCell stats={s13} pairedInference={pairedInference} />
-                <MedianCell stats={s13} className="pr-3" />
-                <HitCell stats={s26} pairedInference={pairedInference} />
-                <MedianCell stats={s26} />
+                {HORIZON_ORDER.map((horizon) => {
+                  const stats = cellStats(asset, "glci", regime, horizon);
+                  const base = baseRate(asset, horizon);
+                  const focused = horizon === focusHorizon;
+                  const wash = focused ? REGIME_WASH[regime] : "";
+                  return (
+                    <Fragment key={horizon}>
+                      <HitCell
+                        stats={stats}
+                        pairedInference={pairedInference}
+                        className={`${wash} ${focused ? "band-inset-l" : ""}`}
+                      />
+                      {focused && (
+                        <td className={`py-3 pl-5 text-right align-top ${wash}`}>
+                          <span className="font-mono text-sm tabular-nums text-muted-foreground">
+                            {hitPct(base?.hit_rate)}
+                          </span>
+                        </td>
+                      )}
+                      {focused && (
+                        <EdgeCell
+                          stats={stats}
+                          pairedInference={pairedInference}
+                          className={wash}
+                        />
+                      )}
+                      <MedianCell
+                        stats={stats}
+                        className={`${wash} ${focused ? "band-inset-r pr-3" : ""}`}
+                      />
+                    </Fragment>
+                  );
+                })}
               </tr>
             );
           })}
@@ -300,15 +341,17 @@ function ForwardReturnsTable({
 }
 
 // ---------------------------------------------------------------------------
-// Section 3: hit rates across all three regimes at 13 weeks
+// Section 3: hit rates across all three regimes at the active horizon
 // ---------------------------------------------------------------------------
 
 function RegimeComparisonTable({
   assets,
   currentRegime,
+  horizon,
 }: {
   assets: BacktestAssetResult[];
   currentRegime: Regime;
+  horizon: BacktestHorizon;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -338,7 +381,7 @@ function RegimeComparisonTable({
             <tr key={asset.id} className="border-b border-border">
               <td className="py-3 pr-3 text-sm font-medium">{asset.name}</td>
               {REGIME_ORDER.map((r) => {
-                const s = cellStats(asset, "glci", r, "13");
+                const s = cellStats(asset, "glci", r, horizon);
                 return (
                   <td
                     key={r}
@@ -474,14 +517,14 @@ function ClassifierComparisonTable({
 function RiskRow({ asset }: { asset: AssetRiskMetrics }) {
   const items: { label: string; value: string; tone?: string }[] = [
     {
-      label: "Ann. return",
+      label: "Annual return",
       value: `${signed(asset.annualized_return, 1)}%`,
       tone: asset.annualized_return >= 0 ? "text-positive" : "text-negative",
     },
-    { label: "Ann. volatility", value: `${num(asset.annualized_volatility)}%` },
-    { label: "Sharpe (1y)", value: num(asset.current_sharpe, 2) },
+    { label: "Annual volatility", value: `${num(asset.annualized_volatility)}%` },
+    { label: "Full-sample Sharpe", value: num(asset.current_sharpe, 2) },
     { label: "Max drawdown", value: `${num(asset.max_drawdown)}%`, tone: "text-negative" },
-    { label: "Corr. with GLCI", value: num(asset.correlation_with_glci, 2) },
+    { label: "Correlation with GLCI", value: num(asset.correlation_with_glci, 2) },
     { label: "Sharpe · loose", value: num(asset.sharpe_by_regime.loose, 2) },
     { label: "Sharpe · neutral", value: num(asset.sharpe_by_regime.neutral, 2) },
     { label: "Sharpe · tight", value: num(asset.sharpe_by_regime.tight, 2) },
@@ -532,6 +575,7 @@ function PlaybookSkeleton() {
 
 export default function PlaybookPage() {
   const backtest = useBacktestData();
+  const flows = useFlowsData();
   const risk = useRiskData();
   const canonical = useCanonicalRegime();
 
@@ -549,9 +593,15 @@ export default function PlaybookPage() {
     classifierRegime != null &&
     canonical.regime !== classifierRegime;
 
-  const lead = useMemo(
-    () => playbookSentence(backtest.data, regime),
-    [backtest.data, regime]
+  const outlook = useMemo(
+    () =>
+      buildDirectionalOutlook(
+        backtest.data,
+        flows.data,
+        regime,
+        canonical.date ?? backtest.data?.date_range?.end
+      ),
+    [backtest.data, flows.data, regime, canonical.date]
   );
 
   const bothFailed = Boolean(backtest.error && risk.error);
@@ -578,6 +628,7 @@ export default function PlaybookPage() {
 
   const data = backtest.data;
   const pairedInference = data?.bootstrap_method === PAIRED_BOOTSTRAP_METHOD;
+  const focusHorizon = outlook?.horizon ?? "13";
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-8">
@@ -591,16 +642,19 @@ export default function PlaybookPage() {
           <RegimeStamp regime={regime} />
         </div>
         <h1 className="mt-4 max-w-4xl font-serif text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl">
-          What has followed this regime.
+          What may do well after this signal.
         </h1>
         <p className="mt-5 max-w-[70ch] font-serif text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          {lead?.text ?? "Historical forward-return results are unavailable right now."}
+          Start with the preferred reportable horizon: 13 weeks when available, then 4, then 26.
+          Current price leadership is a separate confirmation check. The highlighted horizon shows
+          hit rate, median, base rate, edge, paired edge CI, and sample size. Other horizons keep hit
+          rate, median, and sample size visible for comparison.
         </p>
         <p className="mt-4 max-w-[80ch] font-serif text-[0.9375rem] leading-relaxed text-muted-foreground">
-          Forward returns conditioned on expanding-threshold regime labels. The threshold step
-          uses only composite observations through each week, but the upstream source data and
-          factor estimates use the current vintage. This is reconstructed history, not a
-          point-in-time record, and it can change.
+          These are conditional forward returns from reconstructed, current-vintage history, not a
+          point-in-time forecast. The expanding-window classifier avoids using future composite
+          readings for its threshold, but source revisions and factor re-estimation can still
+          change the past.
         </p>
       </section>
 
@@ -622,6 +676,27 @@ export default function PlaybookPage() {
 
       {data ? (
         <>
+          {/* Directional read */}
+          <div className="rule mt-10" />
+          <section className="mt-8" aria-labelledby="directional-read-title">
+            <h2 id="directional-read-title" className="text-sm font-semibold tracking-tight">
+              What the evidence supports
+            </h2>
+            <p className="mt-0.5 max-w-[75ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
+              History sets the direction; trailing price leadership can confirm or challenge it.
+              Neither is a promise about the next return.
+            </p>
+            <div className="mt-5 max-w-4xl">
+              {outlook ? (
+                <DirectionalOutlookView outlook={outlook} />
+              ) : (
+                <p className="font-serif text-[0.9375rem] italic text-muted-foreground">
+                  Historical forward-return results are unavailable right now.
+                </p>
+              )}
+            </div>
+          </section>
+
           {/* Forward returns table */}
           <div className="rule mt-10" />
           <section className="mt-8">
@@ -630,20 +705,21 @@ export default function PlaybookPage() {
             </h2>
             <p className="mt-0.5 max-w-[70ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
               {pairedInference
-                ? "Hit-rate CIs describe the regime subgroup. Edge is that subgroup hit rate minus the unconditional rate over the same classifier-eligible weeks; it is colored only when its separate paired 95% CI excludes zero."
-                : "Hit rates and edges are descriptive. This published backtest predates the paired-inference schema, so confidence intervals and significance markers stay hidden until the data refreshes."}
+                ? "Hit rate is the share of signals followed by a gain. Base rate is the asset's usual hit rate over the same eligible weeks. Edge is hit rate minus base rate; color appears only when the paired 95% CI excludes zero."
+                : "Hit rate is the share of signals followed by a gain. Base rate is the asset's usual hit rate, and edge is hit rate minus base rate. This older payload has no paired confidence intervals, so every edge is descriptive."}
             </p>
             <div className="mt-5">
               <ForwardReturnsTable
                 assets={data.assets}
                 regime={regime}
                 pairedInference={pairedInference}
+                focusHorizon={focusHorizon}
               />
             </div>
             <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground/80">
-              GLCI classifier · medians are forward returns over the horizon
-              {pairedInference ? " · n.s. = the paired edge CI includes zero" : ""} · cells
-              condition on the signal-date regime
+              Median = middle forward return · CI = confidence interval · n = sample size
+              {pairedInference ? " · n.s. = paired 95% edge CI includes zero" : ""} · cells
+              use the signal-date GLCI regime
               {data.entry_lag_weeks === 1
                 ? " · returns enter on the next weekly bar"
                 : (data.entry_lag_weeks ?? 0) > 1
@@ -659,14 +735,19 @@ export default function PlaybookPage() {
               The same assets across all three regimes
             </h2>
             <p className="mt-0.5 max-w-[70ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
-              13-week subgroup hit rates by regime. Compare the columns descriptively; paired edge
-              inference is reported separately.
+              {focusHorizon}-week subgroup hit rates by regime. Compare the columns descriptively;
+              paired edge inference is reported separately.
             </p>
             <div className="mt-5">
-              <RegimeComparisonTable assets={data.assets} currentRegime={regime} />
+              <RegimeComparisonTable
+                assets={data.assets}
+                currentRegime={regime}
+                horizon={focusHorizon}
+              />
             </div>
             <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground/80">
-              GLCI classifier · 13-week horizon · small figures are median return and sample size
+              GLCI classifier · {focusHorizon}-week horizon · small figures are median return and
+              sample size
             </p>
           </section>
 
@@ -678,22 +759,20 @@ export default function PlaybookPage() {
             </h2>
             <div className="mt-4 max-w-[70ch] space-y-4 font-serif text-[1.0625rem] leading-relaxed">
               <p>
-                The regime-label step uses an expanding-window z-score: its mean and standard
-                deviation use only composite observations up to that week, with a one-year burn-in
-                before any label is emitted. Tight is below −1, loose above +1, and neutral in
-                between. This protects the threshold calculation from future composite
-                observations, but it does not make the full pipeline point-in-time. Source series
-                can be revised and the factor model is re-estimated on the current sample, so past
-                composite values and labels can change.
+                <span className="font-medium">Regime labels.</span> The expanding-window z-score uses
+                only composite readings available through each week, after a one-year burn-in.
+                Tight is below −1σ, Loose is above +1σ, and Neutral is between them. This removes
+                future composite readings from the threshold step, but the full pipeline is not
+                point-in-time. Source revisions and factor re-estimation can change past values and
+                labels.
               </p>
               <p>
-                Because consecutive forward windows overlap (next week&apos;s 13-week return shares
-                12 weeks with this one), naive standard errors would overstate confidence. The
-                paired bootstrap resamples contiguous blocks from the full weekly calendar,
-                keeping returns and regime labels together. Each draw recomputes both the regime
-                subgroup and unconditional hit rates over that classifier&apos;s labeled weeks; their
-                within-draw difference forms the edge CI. Sample sizes are printed in every cell
-                because a 100% hit rate on 20 observations is a curiosity, not a strategy.
+                <span className="font-medium">Confidence intervals.</span> Forward windows overlap:
+                next week&apos;s 13-week return shares 12 weeks with this one. A paired moving-block
+                bootstrap resamples contiguous weeks, keeping returns and regime labels together.
+                Each draw recomputes the regime hit rate, base rate, and their difference, which is
+                the edge CI. Sample sizes stay visible because a 100% hit rate on 20 observations
+                is a curiosity, not a strategy.
               </p>
               {!pairedInference && (
                 <p>
@@ -704,11 +783,11 @@ export default function PlaybookPage() {
                 </p>
               )}
               <p>
-                The honest benchmark is the Chicago Fed&apos;s NFCI, a well-known financial
-                conditions index run through the same classifier with the same thresholds. The
-                comparison below shows each classifier&apos;s edge at 13 weeks
-                {pairedInference ? " with its own paired interval" : " descriptively"}. It does
-                not estimate an interval for the difference between GLCI and NFCI.
+                <span className="font-medium">Benchmark.</span> The Chicago Fed&apos;s NFCI goes through
+                the same classifier and thresholds. The comparison below shows each
+                classifier&apos;s 13-week edge
+                {pairedInference ? " with its own paired CI" : " descriptively"}. It does not
+                estimate a CI for the difference between GLCI and NFCI.
               </p>
             </div>
             <div className="mt-5">
@@ -734,7 +813,7 @@ export default function PlaybookPage() {
                 <h2 className="text-sm font-semibold tracking-tight">Risk profile</h2>
                 <p className="mt-0.5 max-w-[70ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
                   Full-sample risk statistics for the assets with computed metrics. Sharpe ratios
-                  use a 252-day window and the 3-month Treasury as the risk-free rate.
+                  use excess returns over the 3-month Treasury rate.
                 </p>
                 <div className="mt-5">
                   {risk.data.assets.map((asset) => (

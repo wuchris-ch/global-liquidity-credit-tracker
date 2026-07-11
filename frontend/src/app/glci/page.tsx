@@ -286,12 +286,10 @@ export default function GlciPage() {
           One number for global liquidity and credit.
         </h1>
         <p className="mt-5 max-w-[70ch] font-serif text-lg leading-relaxed text-muted-foreground">
-          The GLCI is a weekly composite of three latent factors: central-bank
-          liquidity (40%), private credit growth (35%) and funding stress (25%,
-          inverted so that calmer markets raise the index). The composite is
-          scaled to a mean of 100 and a standard deviation of 10, then
-          classified as Loose, Neutral or Tight where its two-year rolling
-          z-score crosses ±1σ.
+          The GLCI combines three weekly latent factors: central-bank liquidity (40%), private
+          credit growth (35%), and inverted funding stress (25%). Higher readings mean easier
+          conditions. The index is scaled to a mean of 100 and a standard deviation of 10. A
+          104-week rolling z-score sets the Loose, Neutral, and Tight regimes at ±1σ.
         </p>
         <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-2">
           <RegimeStamp regime={g.regime} detail={`${ordinal(standing.weeks)} week`} />
@@ -323,7 +321,7 @@ export default function GlciPage() {
       <div className="rule mt-10" />
       <section className="mt-8">
         <h2 className="text-sm font-semibold tracking-tight">
-          What is inside the number
+          What is driving the index
         </h2>
 
         {orderedPillars.length === 0 ? (
@@ -454,34 +452,23 @@ export default function GlciPage() {
           <div>
             <h3 className="text-sm font-semibold tracking-tight">The three pillars</h3>
             <p className="mt-2 font-serif leading-relaxed">
-              The index blends three families of weekly data. The liquidity
-              pillar (40% weight) tracks central-bank balance sheets, reserve
-              balances and monetary aggregates. The credit pillar (35%) tracks
-              private-sector credit growth from bank lending and BIS credit
-              data. The funding-stress pillar (25%) tracks credit spreads and
-              funding rates, and enters the composite inverted: higher stress
-              lowers the index. Before extraction, every component series is
-              resampled to weekly, transformed (a 104-week rolling z-score, a
-              52-week growth rate, or both). Its economic sign is applied to
-              the transformed feature so that its expected factor loading is
-              positive.
+              The liquidity pillar (40%) tracks central-bank balance sheets, reserve balances,
+              and monetary aggregates. The credit pillar (35%) tracks bank lending and BIS
+              private-credit data. The funding-stress pillar (25%) tracks credit spreads and
+              funding rates, then enters inverted so higher stress lowers the index. Each component
+              is resampled weekly and transformed with a 104-week rolling z-score, a 52-week growth
+              rate, or both. Its economic sign is set before factor extraction.
             </p>
           </div>
           <div>
             <h3 className="text-sm font-semibold tracking-tight">Factor extraction</h3>
             <p className="mt-2 font-serif leading-relaxed">
-              Each pillar is summarized by a single latent factor. When the
-              data panel is complete enough (at least half the rows complete,
-              no more than 30% missing), the factor comes from a dynamic
-              factor model estimated by maximum likelihood through the Kalman
-              filter. Otherwise the pipeline falls back to the first principal
-              component, with loadings re-estimated by Ridge regression for
-              stability when components are collinear.
-              The factor is oriented so that its average loading is positive:
-              factor up means components up. The three factors are then put on
-              the same unit-variance scale before the fixed weights are applied.
-              All three pillars are required; if one cannot be computed, the
-              update fails before a partial or reweighted index can be published.
+              Each pillar becomes one latent factor. With a complete enough data panel, a dynamic
+              factor model is estimated by maximum likelihood through the Kalman filter. Otherwise,
+              the pipeline uses the first principal component and can re-estimate loadings with
+              Ridge regression when components are collinear. Each factor is oriented so a higher
+              value means easier conditions, then scaled to unit variance. All three pillars are
+              required; the update fails rather than publishing a partial or reweighted index.
             </p>
           </div>
           <div>
@@ -489,15 +476,12 @@ export default function GlciPage() {
               Normalization and regimes
             </h3>
             <p className="mt-2 font-serif leading-relaxed">
-              The three factors are combined at fixed weights (liquidity 0.40,
-              credit 0.35, stress 0.25, with stress inverted) and the
-              composite is scaled to a mean of 100 and a standard deviation of
-              10, so one band on the chart is one standard deviation. Regimes
-              come from a rolling z-score of the composite over a 104-week
-              window: below −1σ is tight, above +1σ is loose, anything in
-              between is neutral. The dashboard also reports 4-week momentum
-              and an uncalibrated boundary-pressure score based on the
-              distance to the nearest threshold and the z-score trend.
+              Fixed weights combine liquidity (0.40), credit (0.35), and inverted stress (0.25).
+              The result is scaled to mean 100 and standard deviation 10, so one chart band equals
+              one standard deviation. The 104-week rolling z-score defines Tight below −1σ, Loose
+              above +1σ, and Neutral between them. Four-week momentum shows direction. The
+              boundary-pressure score is uncalibrated and uses distance to the nearest threshold
+              plus the z-score trend.
             </p>
           </div>
           <div>

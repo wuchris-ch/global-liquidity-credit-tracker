@@ -53,8 +53,18 @@ const PROSE_NAMES: Record<string, string> = {
   long_bonds: "long Treasuries (TLT)",
 };
 
-function proseName(dest: FlowDestination): string {
+export function proseName(dest: FlowDestination): string {
   return PROSE_NAMES[dest.id] ?? dest.name;
+}
+
+function returnForWindow(dest: FlowDestination, windowWeeks: number): number | null {
+  if (windowWeeks === 4) return dest.ret_4w;
+  if (windowWeeks === 26) return dest.ret_26w;
+  return dest.ret_13w;
+}
+
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /** Destinations with a leadership score, strongest relative bid first. */
@@ -92,7 +102,20 @@ export function flowsHeadline(destinations: FlowDestination[]): string {
     if (aiZ >= 0.75 && cryptoZ >= 0.75) return "AI and crypto are both trading well above their own norms.";
     if (aiZ <= -0.75 && cryptoZ <= -0.75) return "Risk-sensitive prices are weak across AI and crypto.";
   }
-  return "No destination has decisive price leadership right now.";
+
+  const ranked = rankedByFlow(destinations);
+  const top = ranked[0];
+  const bottom = ranked[ranked.length - 1];
+  if (top && bottom && (top.flow_z ?? 0) >= 1 && (bottom.flow_z ?? 0) <= -1) {
+    return `${top.name} has the strongest price leadership; ${bottom.name} has the weakest.`;
+  }
+  if (top && (top.flow_z ?? 0) >= 1) {
+    return `${top.name} has the clearest price leadership right now.`;
+  }
+  if (bottom && (bottom.flow_z ?? 0) <= -1) {
+    return `${bottom.name} has the clearest price weakness right now.`;
+  }
+  return "No asset has decisive price leadership right now.";
 }
 
 // ---------------------------------------------------------------------------
@@ -112,13 +135,40 @@ export function flowsLeadSentence(
   if (ranked.length < 2) return null;
   const top = ranked[0];
   const bottom = ranked[ranked.length - 1];
+  const topReturn = returnForWindow(top, windowWeeks);
+  const bottomReturn = returnForWindow(bottom, windowWeeks);
 
   return (
-    `Over the past ${windowWeeks} weeks the strongest bid landed in ` +
-    `${proseName(top)}, ${signedPct(top.ret_13w)} and a ${signedSigma(top.flow_z)} ` +
-    `stretch of its own three-year norm; the weakest is ${proseName(bottom)}, ` +
-    `${signedPct(bottom.ret_13w)} (${signedSigma(bottom.flow_z)}).`
+    `Over the past ${windowWeeks} weeks, ${proseName(top)} had the strongest return ` +
+    `relative to its own three-year history: ${signedPct(topReturn)}, a ` +
+    `${signedSigma(top.flow_z)} reading. ${capitalize(proseName(bottom))} was weakest at ` +
+    `${signedPct(bottomReturn)} (${signedSigma(bottom.flow_z)}).`
   );
+}
+
+/** A conditional, forward-looking watch line without treating momentum as a forecast. */
+export function flowsWatchSentence(destinations: FlowDestination[]): string | null {
+  const ranked = rankedByFlow(destinations);
+  if (ranked.length === 0) return null;
+  const leaders = ranked.filter((d) => (d.flow_z ?? 0) >= 1).slice(0, 2);
+  const weak = [...ranked].reverse().filter((d) => (d.flow_z ?? 0) <= -1).slice(0, 2);
+  if (!leaders.length && !weak.length) {
+    return "No asset is beyond ±1σ of its own return history. Watch for the first decisive break from that range.";
+  }
+
+  const clauses: string[] = [];
+  if (leaders.length) {
+    clauses.push(
+      `watch whether ${leaders.map(proseName).join(" and ")} ${leaders.length === 1 ? "stays" : "stay"} above +1σ`
+    );
+  }
+  if (weak.length) {
+    clauses.push(
+      `watch whether ${weak.map(proseName).join(" and ")} ${weak.length === 1 ? "recovers" : "recover"} above −1σ`
+    );
+  }
+  const sentence = clauses.join("; ");
+  return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}. Staying beyond those thresholds would confirm the current ranking; moving back inside would weaken it.`;
 }
 
 /** Short teaser for the Today page: top destination vs bottom destination. */

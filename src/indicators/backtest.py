@@ -81,6 +81,7 @@ class BacktestResult:
     point_in_time: bool = POINT_IN_TIME_HISTORY
     bootstrap_method: str = BOOTSTRAP_METHOD
     bootstrap_iterations: int = BOOTSTRAP_ITERATIONS
+    min_obs_per_regime: int = MIN_OBS_PER_REGIME
 
     def to_dict(self) -> dict:
         return {
@@ -94,6 +95,7 @@ class BacktestResult:
             "regime_threshold_method": "expanding_zscore",
             "bootstrap_method": self.bootstrap_method,
             "bootstrap_iterations": self.bootstrap_iterations,
+            "min_obs_per_regime": self.min_obs_per_regime,
             "classifiers": self.classifiers,
             "assets": [a.to_dict() for a in self.assets],
         }

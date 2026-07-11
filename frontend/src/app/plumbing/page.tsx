@@ -43,20 +43,20 @@ function driverClause(d: DriverChanges): string | null {
   if (d.fed != null)
     candidates.push({
       contribution: d.fed,
-      lift: "an expanding Fed balance sheet did most of the lifting",
-      drain: "Fed balance-sheet runoff did most of the draining",
+      lift: "an expanding Fed balance sheet was the largest support",
+      drain: "Fed balance-sheet runoff was the largest drag",
     });
   if (d.tga != null)
     candidates.push({
       contribution: -d.tga,
-      lift: "a falling Treasury General Account did most of the lifting",
-      drain: "a rebuilding Treasury General Account did most of the draining",
+      lift: "a falling Treasury General Account was the largest support",
+      drain: "a rebuilding Treasury General Account was the largest drag",
     });
   if (d.rrp != null)
     candidates.push({
       contribution: -d.rrp,
-      lift: "money leaving the reverse-repo facility did most of the lifting",
-      drain: "money parking back at the reverse-repo facility did most of the draining",
+      lift: "money leaving the reverse-repo facility was the largest support",
+      drain: "money returning to the reverse-repo facility was the largest drag",
     });
   if (candidates.length === 0) return null;
   const top = candidates.reduce((a, b) =>
@@ -74,7 +74,7 @@ function buildLead(
   const levelText = compactDollars(level);
   if (!change4w) return `Net liquidity stands at ${levelText}.`;
   if (Math.abs(change4w.deltaAbs) < 2e9) {
-    return `Net liquidity is little changed over four weeks at ${levelText}; the pipes are quiet.`;
+    return `Net liquidity is little changed over four weeks at ${levelText}.`;
   }
   const dir = change4w.deltaAbs >= 0 ? "up" : "down";
   const base = `Net liquidity stands at ${levelText}, ${dir} ${compactDollars(
@@ -88,10 +88,10 @@ function spreadsReading(hyBp: number | null, igBp: number | null): string | unde
   if (hyBp == null) return undefined;
   const tone =
     hyBp < 350
-      ? "calm by historical standards"
+      ? "relatively tight"
       : hyBp <= 500
-        ? "wide enough to keep watching"
-        : "stressed by any historical measure";
+        ? "elevated enough to keep watching"
+        : "wide and signaling elevated credit stress";
   const igClause = igBp != null ? ` and investment grade ${Math.round(igBp)}bp` : "";
   return `High-yield is paying ${Math.round(hyBp)}bp over Treasuries${igClause}, ${tone}.`;
 }
@@ -307,10 +307,10 @@ export default function PlumbingPage() {
   // asserting the tide narrative against a weak correlation.
   const overlayReading =
     correlation52w == null
-      ? "Equities have tended to follow the liquidity tide; the gap between the lines is the tell."
+      ? "The 52-week correlation is unavailable. Compare the levels without assuming lead-lag."
       : Math.abs(correlation52w) >= 0.3
-        ? `Equities have been following the liquidity tide: weekly changes ran a ${signedTwo(correlation52w)} correlation over the past year.`
-        : `The tide matters over quarters, not weeks: weekly changes ran only a ${signedTwo(correlation52w)} correlation over the past year. Watch the levels, not the wiggles.`;
+        ? `Weekly changes had a ${signedTwo(correlation52w)} correlation over the past 52 weeks. The relationship was ${correlation52w >= 0 ? "positive" : "negative"}, but correlation does not establish lead-lag.`
+        : `Weekly changes had a weak ${signedTwo(correlation52w)} correlation over the past 52 weeks. The short-term moves did not line up reliably.`;
 
   const components: {
     key: string;
@@ -477,7 +477,7 @@ export default function PlumbingPage() {
       <ChartSection
         className="mt-8"
         title="Central-bank balance sheets"
-        reading="Each balance sheet indexed to 100 at the start of the range, local currency; divergence between the lines is policy divergence."
+        reading="Each balance sheet starts at 100. The lines show which central-bank balance sheet expanded or contracted most in local-currency terms."
         source="Fed (USD), ECB (EUR), BoJ (JPY) total assets, via FRED. Indexed to 100 at range start."
       >
         {fedStatus === "pending" ? (

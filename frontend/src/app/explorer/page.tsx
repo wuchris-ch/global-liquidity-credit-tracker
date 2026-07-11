@@ -45,7 +45,7 @@ const PRESETS: Preset[] = [
   { label: "S&P 500 vs Bitcoin", ids: ["sp500_price", "bitcoin_price"], normalize: true },
   { label: "HY vs IG spreads", ids: ["ice_bofa_us_high_yield_spread", "ice_bofa_us_ig_spread"], normalize: false },
   { label: "Central bank balance sheets", ids: ["fed_total_assets", "ecb_total_assets", "boj_total_assets"], normalize: true },
-  { label: "Gold vs real liquidity", ids: ["gold_price", "fed_total_assets"], normalize: true },
+  { label: "Gold vs Fed assets", ids: ["gold_price", "fed_total_assets"], normalize: true },
   { label: "Funding rates", ids: ["sofr", "fed_funds_rate", "euro_short_term_rate"], normalize: false },
 ];
 
@@ -216,10 +216,10 @@ export default function ExplorerPage() {
           The Explorer
         </span>
         <h1 className="mt-4 max-w-4xl font-serif text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl">
-          Chart anything against anything.
+          Compare up to five market and macro series.
         </h1>
         <p className="mt-5 max-w-[70ch] font-serif text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          Overlay up to five series from the source library and read them on a common base.
+          Index each series to 100 for a like-for-like comparison, or inspect the raw values.
         </p>
 
         {/* Presets */}
@@ -368,8 +368,8 @@ export default function ExplorerPage() {
           selected.length === 0
             ? undefined
             : normalize
-              ? "Each series starts the window at 100; the gap that opens is the story."
-              : "Raw values on a shared axis; switch to indexed if the scales fight."
+              ? "Each series starts the window at 100, so the chart compares relative change. Co-movement does not establish causality or lead-lag."
+              : "Raw values share one axis. Switch to indexed view when the units or scales differ."
         }
         source={sourceLine}
         control={

@@ -358,7 +358,7 @@ class FeatureMatrixBuilder:
             missing_series=missing_series,
             low_coverage_series=low_coverage,
             stale_series=stale_series,
-            sign_violations=[]  # Will be filled after factor extraction
+            sign_violations=[],
         )
         
         self._quality_reports[pillar_name] = report
@@ -367,6 +367,16 @@ class FeatureMatrixBuilder:
     def get_quality_reports(self) -> dict[str, DataQualityReport]:
         """Get all data quality reports."""
         return self._quality_reports
+
+    def record_sign_violations(
+        self,
+        pillar_name: str,
+        violations: list[str],
+    ) -> None:
+        """Attach a post-estimation loading-sign audit to a pillar report."""
+        report = self._quality_reports.get(pillar_name)
+        if report is not None:
+            report.sign_violations = list(dict.fromkeys(violations))
     
     def _fetch_series_cached(
         self,

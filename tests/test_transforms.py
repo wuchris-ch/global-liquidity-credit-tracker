@@ -61,7 +61,17 @@ class TestDetectRegime:
         df = df_of(list(range(60)))
         out = detect_regime(df)
         assert "regime" in out.columns
-        assert set(out["regime"].unique()).issubset({-1, 0, 1})
+        assert out.loc[out["zscore"].isna(), "regime"].isna().all()
+        assert set(out["regime"].dropna().unique()).issubset({-1, 0, 1})
+
+    def test_non_finite_zscores_remain_unclassified(self):
+        df = df_of([0] * 6)
+        df["zscore"] = [np.nan, np.inf, -np.inf, -2.0, 0.0, 2.0]
+
+        out = detect_regime(df, thresholds=(-1.0, 1.0))
+
+        assert out["regime"].iloc[:3].isna().all()
+        assert out["regime"].iloc[3:].tolist() == [-1.0, 0.0, 1.0]
 
 
 class TestForwardLookingSafety:
@@ -150,6 +160,23 @@ class TestAlignSeries:
         b = df_of([10, 20], freq="W-FRI")
         out = align_series({"a": a, "b": b}, method="inner")
         assert len(out) == 2
+
+    def test_empty_inner_intersection_is_not_reset_by_later_series(self):
+        a = df_of([1, 2], freq="D", start="2024-01-01")
+        b = df_of([10, 20], freq="D", start="2024-02-01")
+        # This overlaps b, which used to replace the already-empty a/b
+        # intersection because DataFrame.empty was used as initialization
+        # state.
+        c = df_of([100, 200], freq="D", start="2024-02-01")
+
+        out = align_series(
+            {"a": a, "b": b, "c": c},
+            method="inner",
+            fill_method=None,
+        )
+
+        assert out.empty
+        assert out.columns.tolist() == ["date", "a", "b", "c"]
 
 
 class TestStandardize:

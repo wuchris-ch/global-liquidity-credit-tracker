@@ -144,7 +144,7 @@ export default function TodayPage() {
       { label: "The Treasury General Account", data: tga.data, scale: 1e6, unit: "usd", goodWhen: "down", flatBelow: 2e9 },
       { label: "High-yield spreads", data: hySpread.data, scale: 100, unit: "bps", goodWhen: "down", flatBelow: 4 },
       { label: "SOFR", data: sofr.data, unit: "pct", goodWhen: "down", flatBelow: 0.02 },
-      { label: "The funding-stress index", data: stress.data, unit: "index", goodWhen: "down", flatBelow: 0.15 },
+      { label: "The credit-stress index", data: stress.data, unit: "index", goodWhen: "down", flatBelow: 0.15 },
     ];
     return buildChangeItems(specs);
   }, [netLiquidity.data, rrp.data, tga.data, hySpread.data, sofr.data, stress.data]);
@@ -426,7 +426,7 @@ export default function TodayPage() {
             spark={sofr.data.map((d) => d.value)}
           />
           <Vital
-            label="Funding stress"
+            label="Credit stress"
             value={(() => { const v = latestOf(stress.data); return v != null ? `${v < 0 ? "−" : ""}${Math.abs(v).toFixed(2)}σ` : null; })()}
             delta={(() => { const d = deltaOverDays(stress.data, 7); return d != null ? `${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(2)}` : null; })()}
             deltaGood={(() => { const d = deltaOverDays(stress.data, 7); return d != null ? d <= 0 : null; })()}

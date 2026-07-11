@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from src.indicators.aggregator import Aggregator
+from src.config import get_index_config
 from conftest import StubFetcher, make_series
 
 
@@ -47,19 +48,44 @@ class TestFedNetLiquidity:
 
 
 class TestZscoreAverage:
-    def test_funding_stress_is_weighted_zscore_average(self, daily_dates):
+    def test_credit_stress_is_weighted_zscore_average(self, daily_dates):
         n = len(daily_dates)
-        rng = np.random.default_rng(0)
+        hy = np.linspace(3.0, 8.0, n)
+        ig = np.linspace(1.0, 2.0, n) ** 2
         fetcher = StubFetcher({
-            "ted_spread": make_series(daily_dates, rng.normal(0.5, 0.1, n)),
-            "ice_bofa_us_high_yield_spread": make_series(daily_dates, rng.normal(4.0, 0.5, n)),
-            "ice_bofa_us_ig_spread": make_series(daily_dates, rng.normal(1.2, 0.2, n)),
+            "ice_bofa_us_high_yield_spread": make_series(daily_dates, hy),
+            "ice_bofa_us_ig_spread": make_series(daily_dates, ig),
         })
         df = Aggregator(fetcher=fetcher).compute_index("usd_funding_stress")
 
         assert not df.empty
-        # A z-score average over stationary noise stays in a tight band
-        assert df["value"].dropna().abs().max() < 5
+        hy_z = pd.Series(hy).rolling(252, min_periods=20).apply(
+            lambda values: (values.iloc[-1] - values.mean()) / values.std()
+        )
+        ig_z = pd.Series(ig).rolling(252, min_periods=20).apply(
+            lambda values: (values.iloc[-1] - values.mean()) / values.std()
+        )
+        expected = (hy_z + 0.5 * ig_z) / 1.5
+
+        assert df["date"].iloc[0] == daily_dates[19]
+        assert len(df) == n - 19
+        assert df["value"].iloc[-1] == pytest.approx(expected.iloc[-1])
+
+    def test_zscore_burn_in_is_not_reported_as_zero(self, daily_dates):
+        n = len(daily_dates)
+        fetcher = StubFetcher({
+            "ice_bofa_us_high_yield_spread": make_series(
+                daily_dates, np.linspace(3.0, 8.0, n)
+            ),
+            "ice_bofa_us_ig_spread": make_series(
+                daily_dates, np.linspace(1.0, 2.0, n)
+            ),
+        })
+
+        stress = Aggregator(fetcher=fetcher).compute_index("usd_funding_stress")
+
+        assert stress["date"].min() == daily_dates[19]
+        assert stress["value"].notna().all()
 
     def test_stress_spike_raises_index(self, daily_dates):
         n = len(daily_dates)
@@ -69,13 +95,43 @@ class TestZscoreAverage:
 
         def build(values):
             return StubFetcher({
-                "ted_spread": make_series(daily_dates, values),
                 "ice_bofa_us_high_yield_spread": make_series(daily_dates, values),
                 "ice_bofa_us_ig_spread": make_series(daily_dates, values),
             })
 
         stress = Aggregator(fetcher=build(spiked)).compute_index("usd_funding_stress")
         assert stress["value"].iloc[-1] > 1.0
+
+
+class TestStressConfiguration:
+    def test_credit_stress_retains_api_id_and_oas_weights(self):
+        config = get_index_config("usd_funding_stress")
+        weights = {
+            component["series"]: component["weight"]
+            for component in config["components"]
+        }
+
+        assert weights == {
+            "ice_bofa_us_high_yield_spread": 1.0,
+            "ice_bofa_us_ig_spread": 0.5,
+        }
+        assert config["name"] == "USD Credit Stress"
+
+    def test_glci_stress_pillar_excludes_discontinued_ted(self):
+        config = get_index_config("global_liquidity_credit_index")
+        components = {
+            component["series"]
+            for component in config["pillars"]["stress"]["components"]
+        }
+
+        assert components == {
+            "ice_bofa_us_high_yield_spread",
+            "ice_bofa_us_ig_spread",
+            "sofr",
+            "fed_funds_rate",
+            "vix",
+            "nfci",
+        }
 
 
 class TestUnknownIndex:

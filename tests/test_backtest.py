@@ -1,7 +1,7 @@
 """Tests for the Track Record backtest (src/indicators/backtest.py).
 
-The expanding regime threshold must not use future observations. Separate
-tests assert that the reconstructed upstream history is disclosed as such.
+The GLCI backtest must reproduce the live rolling classifier. The expanding
+classifier remains covered separately for the NFCI benchmark.
 """
 
 import numpy as np
@@ -14,6 +14,9 @@ from src.indicators.backtest import (
     BOOTSTRAP_METHOD,
     BURN_IN_PERIODS,
     ENTRY_LAG_WEEKS,
+    GLCI_REGIME_METHOD,
+    GLCI_REGIME_MIN_PERIODS,
+    GLCI_REGIME_WINDOW,
     MIN_OBS_PER_REGIME,
     BacktestComputer,
     BacktestResult,
@@ -23,6 +26,7 @@ from src.indicators.backtest import (
     _to_weekly_grid,
     compute_forward_returns,
     expanding_zscore_regime,
+    rolling_zscore_regime,
 )
 
 
@@ -68,6 +72,36 @@ class TestExpandingZscoreRegime:
         values[-1] = -25.0
         out = expanding_zscore_regime(weekly_series(values))
         assert out["regime"].iloc[-1] == -1
+
+
+class TestRollingZscoreRegime:
+    def test_matches_production_rolling_calculation(self):
+        s = weekly_series(np.arange(1, 140, dtype=float))
+        out = rolling_zscore_regime(s)
+        t = 120
+        history = s.iloc[t - GLCI_REGIME_WINDOW + 1 : t + 1]
+        expected = (s.iloc[t] - history.mean()) / history.std()
+
+        assert out["zscore"].iloc[t] == pytest.approx(expected)
+
+    def test_warmup_is_unclassified(self):
+        s = weekly_series(np.arange(1, 60, dtype=float))
+        out = rolling_zscore_regime(s)
+
+        assert out["zscore"].iloc[: GLCI_REGIME_MIN_PERIODS - 1].isna().all()
+        assert out["regime"].iloc[: GLCI_REGIME_MIN_PERIODS - 1].isna().all()
+        assert pd.notna(out["regime"].iloc[GLCI_REGIME_MIN_PERIODS - 1])
+
+    def test_future_values_do_not_change_past_labels(self):
+        rng = np.random.default_rng(8)
+        base = rng.normal(size=180)
+        shocked = base.copy()
+        shocked[150:] += 25
+
+        a = rolling_zscore_regime(weekly_series(base))
+        b = rolling_zscore_regime(weekly_series(shocked))
+
+        pd.testing.assert_frame_equal(a.iloc[:150], b.iloc[:150])
 
 
 class TestForwardReturns:
@@ -340,7 +374,33 @@ class TestBacktestMetadata:
         assert payload["entry_lag_weeks"] == 1
         assert payload["historical_mode"] == "reconstructed_current_vintage"
         assert payload["point_in_time"] is False
-        assert payload["regime_threshold_method"] == "expanding_zscore"
+        assert payload["regime_threshold_method"] == GLCI_REGIME_METHOD
         assert payload["bootstrap_method"] == BOOTSTRAP_METHOD
         assert payload["bootstrap_iterations"] == BOOTSTRAP_ITERATIONS
         assert payload["min_obs_per_regime"] == MIN_OBS_PER_REGIME
+
+    def test_classifier_metadata_discloses_distinct_clocks(self):
+        computer = BacktestComputer(fetcher=object(), storage=object())
+        values = weekly_series(np.arange(1, 130, dtype=float))
+
+        glci_meta = computer._classifier_meta(
+            "glci",
+            rolling_zscore_regime(values),
+            values,
+            threshold_method=GLCI_REGIME_METHOD,
+            window_periods=GLCI_REGIME_WINDOW,
+            min_periods=GLCI_REGIME_MIN_PERIODS,
+        )
+        nfci_meta = computer._classifier_meta(
+            "nfci",
+            expanding_zscore_regime(values),
+            values,
+            threshold_method="expanding_zscore",
+            window_periods=None,
+            min_periods=BURN_IN_PERIODS,
+        )
+
+        assert glci_meta["window_periods"] == 104
+        assert glci_meta["min_periods"] == 20
+        assert nfci_meta["window_periods"] is None
+        assert nfci_meta["min_periods"] == 52

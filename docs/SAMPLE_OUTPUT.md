@@ -52,8 +52,9 @@ Per-series latest observation with week-over-week change.
 ## `api/risk/sp500_price/index.json` (rolling series truncated)
 
 Risk metrics conditioned on GLCI regime for one asset. `rolling_sharpe`
-contains the full 252-day rolling Sharpe history; only the last two points
-are shown here.
+contains the full one-year rolling Sharpe history on the asset's observation
+clock (252 observations for this equity, 365 for calendar-daily crypto); only
+the last two points are shown here.
 
 ```json
 {

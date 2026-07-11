@@ -9,6 +9,7 @@ import type {
 } from "@/lib/api";
 
 export const PAIRED_BOOTSTRAP_METHOD = "paired_full_calendar_moving_block";
+export const PRODUCTION_GLCI_REGIME_METHOD = "rolling_104_period_zscore";
 
 const HORIZON_PREFERENCE: BacktestHorizon[] = ["13", "4", "26"];
 const DEFAULT_MIN_OBSERVATIONS = 20;
@@ -190,7 +191,12 @@ export function buildDirectionalOutlook(
   signalDate?: string | null,
   evaluationDate = localDateISO()
 ): DirectionalOutlook | null {
-  if (!backtest) return null;
+  if (
+    !backtest ||
+    backtest.regime_threshold_method !== PRODUCTION_GLCI_REGIME_METHOD
+  ) {
+    return null;
+  }
 
   const horizon = selectHorizon(backtest, regime);
   const pairedInference = backtest.bootstrap_method === PAIRED_BOOTSTRAP_METHOD;

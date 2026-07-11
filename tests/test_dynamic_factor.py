@@ -5,6 +5,7 @@ import pytest
 
 from src.indicators.dynamic_factor import (
     DynamicFactorModel,
+    FactorSignConstraintError,
     combine_factors,
 )
 
@@ -78,6 +79,19 @@ class TestFactorExtraction:
         corr = abs(np.corrcoef(extracted.values, true_factor.values)[0, 1])
         assert corr > 0.95
 
+    def test_unconstrained_shrunk_pca_preserves_multi_factor_shape(self):
+        X, _ = make_factor_data(seed=18)
+        model = DynamicFactorModel(
+            n_factors=2,
+            method="pca_shrunk",
+        ).fit(X)
+
+        result = model.get_result()
+
+        assert result.factors.shape == (len(X), 2)
+        assert result.loadings.shape == (X.shape[1], 2)
+        assert 0 < result.explained_variance <= 1
+
     def test_positive_average_loading_orientation(self):
         # Features are economically oriented upstream, so the factor must be oriented
         # with positive average loading: factor up = components up.
@@ -85,6 +99,91 @@ class TestFactorExtraction:
         model = DynamicFactorModel(n_factors=1, method="pca")
         model.fit(X)
         assert model.get_loadings()["factor_1"].mean() > 0
+
+    @pytest.mark.parametrize("method", ["pca", "pca_shrunk"])
+    def test_same_direction_sign_constraints_pass(self, method):
+        X, _ = make_factor_data(seed=31)
+        model = DynamicFactorModel(
+            n_factors=1,
+            method=method,
+            sign_constraints={column: 1 for column in X.columns},
+        )
+
+        model.fit(X)
+
+        assert model.get_sign_violations() == []
+        assert (model.get_loadings()["factor_1"] >= -1e-6).all()
+
+    def test_unconstrained_pca_rejects_materially_opposite_loading(self):
+        rng = np.random.default_rng(44)
+        common = np.cumsum(rng.normal(size=180))
+        X = pd.DataFrame(
+            {
+                "support_a": common + rng.normal(0, 0.15, len(common)),
+                "support_b": 0.8 * common + rng.normal(0, 0.15, len(common)),
+                "opposite": -common + rng.normal(0, 0.15, len(common)),
+            }
+        )
+        model = DynamicFactorModel(
+            n_factors=1,
+            method="pca",
+            sign_constraints={column: 1 for column in X.columns},
+        )
+
+        with pytest.raises(FactorSignConstraintError, match="opposite") as exc_info:
+            model.fit(X)
+
+        assert exc_info.value.violations == ["opposite"]
+        assert model.get_sign_violations() == ["opposite"]
+
+    def test_constrained_shrunk_pca_zeros_materially_opposite_loading(self):
+        rng = np.random.default_rng(44)
+        common = np.cumsum(rng.normal(size=180))
+        X = pd.DataFrame(
+            {
+                "support_a": common + rng.normal(0, 0.15, len(common)),
+                "support_b": 0.8 * common + rng.normal(0, 0.15, len(common)),
+                "opposite": -common + rng.normal(0, 0.15, len(common)),
+            }
+        )
+        model = DynamicFactorModel(
+            n_factors=1,
+            method="pca_shrunk",
+            sign_constraints={column: 1 for column in X.columns},
+        )
+
+        model.fit(X)
+
+        result = model.get_result()
+        loadings = result.loadings["factor_1"]
+        assert loadings["support_a"] > 0
+        assert loadings["support_b"] > 0
+        assert loadings["opposite"] == pytest.approx(0.0, abs=1e-8)
+        assert model.get_sign_violations() == []
+        assert result.metadata["constraint_exclusions"] == ["opposite"]
+        assert result.metadata["loading_semantics"] == (
+            "joint_rank_one_decoder_loadings"
+        )
+
+        # Active decoder loadings agree with the jointly fitted final factor.
+        factor = result.factors["factor_1"]
+        assert X["support_a"].corr(factor) > 0
+        assert X["support_b"].corr(factor) > 0
+        assert X["opposite"].corr(factor) < 0
+
+    def test_shrunk_transform_uses_training_normalization(self):
+        X, _ = make_factor_data(seed=52)
+        constraints = {column: 1 for column in X.columns}
+        model = DynamicFactorModel(
+            n_factors=1,
+            method="pca_shrunk",
+            sign_constraints=constraints,
+        ).fit(X)
+
+        full = model.transform(X)
+        prefix = model.transform(X.iloc[:100])
+
+        pd.testing.assert_frame_equal(prefix, full.iloc[:100])
 
     def test_explained_variance_is_high_for_one_factor_world(self):
         X, _ = make_factor_data(seed=4)

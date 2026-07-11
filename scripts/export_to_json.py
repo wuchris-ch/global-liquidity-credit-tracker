@@ -212,7 +212,7 @@ def export_indices_list(index_cfg: Dict[str, dict], output_dir: Path) -> None:
         items.append(
             {
                 "id": index_id,
-                "name": index_id.replace("_", " ").title(),
+                "name": cfg.get("name", index_id.replace("_", " ").title()),
                 "description": cfg.get("description", ""),
                 "frequency": cfg.get("frequency", ""),
                 "components": len(cfg.get("components", cfg.get("pillars", {}))),
@@ -234,10 +234,11 @@ def export_single_index(
         for _, row in df.iterrows()
         if not pd.isna(row["value"])
     ]
+    config = get_index_config(index_id)
     payload = {
         "id": index_id,
-        "name": index_id.replace("_", " ").title(),
-        "description": get_index_config(index_id).get("description", ""),
+        "name": config.get("name", index_id.replace("_", " ").title()),
+        "description": config.get("description", ""),
         "data": data_points,
     }
     write_json(output_dir / "api" / "indices" / index_id / "index.json", payload)
@@ -345,7 +346,14 @@ def export_glci(storage: DataStorage, output_dir: Path) -> bool:
     )
 
     # Regime history
-    regimes_df = glci_df[["date", "regime"]].copy()
+    all_regimes = glci_df[["date", "regime"]].copy()
+    latest_history_regime = None
+    if pd.notna(all_regimes["regime"].iloc[-1]):
+        latest_history_regime = REGIME_LABELS.get(
+            int(all_regimes["regime"].iloc[-1])
+        )
+    regimes_df = all_regimes
+    regimes_df = regimes_df.dropna(subset=["regime"]).reset_index(drop=True)
     regimes_df["regime_label"] = regimes_df["regime"].map(REGIME_LABELS)
 
     periods = []
@@ -376,7 +384,11 @@ def export_glci(storage: DataStorage, output_dir: Path) -> bool:
     regime_counts = regimes_df["regime_label"].value_counts().to_dict()
     write_json(
         output_dir / "api" / "glci" / "regime-history" / "index.json",
-        {"periods": periods, "counts": regime_counts, "current": current_regime},
+        {
+            "periods": periods,
+            "counts": regime_counts,
+            "current": latest_history_regime,
+        },
     )
 
     return True
@@ -442,11 +454,15 @@ def export_risk_metrics(storage: DataStorage, output_dir: Path) -> bool:
 
     # Get current regime from GLCI
     glci_df = storage.load_curated("indices", "glci")
-    current_regime = "neutral"
+    current_regime = None
     if glci_df is not None and not glci_df.empty:
         glci_df = glci_df.sort_values("date")
-        regime_code = int(glci_df.iloc[-1].get("regime", 0))
-        current_regime = REGIME_LABELS.get(regime_code, "neutral")
+        regimes = pd.to_numeric(
+            glci_df.get("regime", pd.Series(dtype=float)),
+            errors="coerce",
+        )
+        if not regimes.empty and pd.notna(regimes.iloc[-1]):
+            current_regime = REGIME_LABELS.get(int(regimes.iloc[-1]))
 
     # Build assets list
     assets = []
@@ -469,7 +485,7 @@ def export_risk_metrics(storage: DataStorage, output_dir: Path) -> bool:
                 "neutral": round(float(row["return_neutral"]), 2) if pd.notna(row.get("return_neutral")) else None,
                 "loose": round(float(row["return_loose"]), 2) if pd.notna(row.get("return_loose")) else None,
             },
-            "correlation_with_glci": round(float(row["correlation_with_glci"]), 3) if pd.notna(row.get("correlation_with_glci")) else 0,
+            "correlation_with_glci": round(float(row["correlation_with_glci"]), 3) if pd.notna(row.get("correlation_with_glci")) else None,
         }
 
         # Try to load rolling sharpe data

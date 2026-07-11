@@ -30,7 +30,7 @@ All components are resampled to weekly (Friday, last observation) and
 inner-joined before the subtraction. The ×1000 unit conversion is asserted by
 `tests/test_config_integrity.py::test_fed_net_liquidity_unit_conversion`.
 
-## 2. USD Funding Stress
+## 2. USD Credit Stress
 
 **Code:** `_compute_zscore_average` in [`src/indicators/aggregator.py`](../src/indicators/aggregator.py)
 
@@ -41,7 +41,10 @@ Stress_t = Σ_i w_i · z_i,t / Σ_i w_i
 z_i,t   = (x_i,t − μ_i,[t−252,t]) / σ_i,[t−252,t]
 ```
 
-Components: TED spread (w=1), ICE BofA HY OAS (w=1), ICE BofA IG OAS (w=0.5).
+Components: ICE BofA HY OAS (w=1) and ICE BofA IG OAS (w=0.5). The API ID
+remains `usd_funding_stress` for compatibility. TED is discontinued and is
+retained as historical source data only; it is not part of this live composite
+or the GLCI stress pillar.
 
 ## 3. Global Liquidity & Credit Index (GLCI)
 
@@ -61,21 +64,21 @@ For each pillar *p* ∈ {liquidity, credit, stress}:
    is positive (e.g. reverse repo enters the liquidity pillar with sign -1
    because it drains liquidity). A pillar-level economic sign is applied only
    after factor extraction.
-2. **Factor extraction.** A single latent factor is extracted with, in
-   order of preference (`method="auto"`):
-   - **DFM** — statsmodels `DynamicFactor`, maximum-likelihood estimation via
-     the Kalman filter, when ≥50% of
-     rows are complete and missingness ≤ 30%;
-   - **PCA with shrinkage** — first principal component, loadings
-     re-estimated by Ridge regression (`α = 0.1`) for stability under
-     collinearity;
-   - **plain PCA** (numpy SVD fallback if scikit-learn is unavailable).
-3. **Orientation and scale.** The factor is flipped, if necessary, so its
-   average loading is positive (factor up = components up). After the three
-   factors are restricted to their common history, each is standardized to
-   mean zero and unit variance before the 40/35/25 weights are applied. This
-   keeps estimator scale from changing the effective pillar weights. Asserted by
-   `tests/test_dynamic_factor.py::test_positive_average_loading_orientation`.
+2. **Factor extraction.** The production `method="auto"` path uses a
+   one-factor, sign-constrained PCA model. The first principal component
+   initializes the common score, then Ridge regression (`α = 0.1`) shrinks
+   the loadings. Coefficient bounds enforce each input's configured economic
+   direction. The factor and loadings are solved jointly until convergence. A
+   component that moves against the fitted factor receives zero loading and is
+   disclosed in `constraint_excluded_features`; it cannot silently reverse the
+   pillar. Plain PCA and DFM remain explicit diagnostic options, but their
+   output must pass the same post-fit loading audit.
+3. **Orientation and scale.** Factor scores and loadings share one global
+   orientation (factor up = oriented components up). After the three factors
+   are restricted to their common history, each is standardized to mean zero
+   and unit variance before the 40/35/25 weights are applied. This keeps
+   estimator scale from changing the effective pillar weights. Asserted by
+   `tests/test_dynamic_factor.py` sign-constraint tests.
 
 ### 3.2 Composite
 
@@ -83,8 +86,14 @@ For each pillar *p* ∈ {liquidity, credit, stress}:
 GLCI_raw,t = Σ_p w_p · f_p,t        w = {liquidity: 0.40, credit: 0.35, stress: 0.25}
 ```
 
-The stress factor enters **inverted** (pillar sign -1: higher stress lowers
-the index). The composite is then normalized to mean 100, stdev 10:
+These are fixed policy weights, not weights calibrated or optimized against
+asset returns. Requests for dynamic weight optimization are rejected rather
+than silently ignored.
+
+The stress pillar uses HY OAS, IG OAS, SOFR, the effective federal funds rate,
+VIX, and NFCI. The stress factor enters **inverted** (pillar sign -1: higher
+stress lowers the index). The composite is then normalized to mean 100, stdev
+10:
 
 ```
 GLCI_t = 100 + 10 · (GLCI_raw,t − μ) / σ
@@ -93,6 +102,12 @@ GLCI_t = 100 + 10 · (GLCI_raw,t − μ) / σ
 All three configured pillars are required. If any pillar cannot be computed,
 the run fails before a partial or reweighted composite can be saved or
 published.
+
+Each fitted pillar must retain at least two distinct source series, may exclude
+at most 50% of its fitted features through binding sign constraints, and may
+assign at most 60% of absolute loading mass to one source series. The run fails
+if any gate is breached. Metadata reports the exclusions, exclusion share, and
+source-level loading shares.
 
 ### 3.3 Regime classification
 
@@ -103,6 +118,9 @@ z_t < −1   →  tight  (−1)
 −1 ≤ z_t ≤ 1 →  neutral (0)
 z_t > +1   →  loose  (+1)
 ```
+
+Rows without a finite z-score, including the rolling-window burn-in, remain
+unclassified rather than being treated as neutral observations.
 
 The dashboard also reports 4-week momentum and a heuristic boundary-pressure
 score based on distance to the nearest threshold and the z-score trend
@@ -130,20 +148,25 @@ snapshots. They do not retroactively create missing source vintages.
 
 Daily asset returns `r_t = P_t / P_{t−1} − 1` are merged with the GLCI regime
 (as-of backward join: each day gets the most recent weekly regime) and the
-3-month T-bill rate (DGS3MO, de-annualized by /252) as the risk-free rate.
+3-month T-bill rate (DGS3MO) as the risk-free rate. Let `N_a` be the asset's
+observation clock: 252 for trading-day assets and 365 for calendar-daily crypto.
+The annual T-bill rate is de-annualized by `N_a`.
 
 For the full sample and for each regime bucket with > 20 observations:
 
 ```
-Sharpe      = mean(r_t − rf_t) / std(r_t − rf_t) · √252
-AnnReturn   = mean(r_t) · 252 · 100
-AnnVol      = std(r_t) · √252 · 100
+Sharpe      = mean(r_t − rf_t) / std(r_t − rf_t) · √N_a
+AnnReturn   = mean(r_t) · N_a · 100
+AnnVol      = std(r_t) · √N_a · 100
 MaxDrawdown = min_t (P_t − max_{s≤t} P_s) / max_{s≤t} P_s · 100
 ```
 
-Rolling Sharpe uses a 252-day window of excess returns. The Sharpe
-calculation has an epsilon guard (σ < 1e-12 → 0) so constant series do not
-produce astronomically large ratios
+Rolling Sharpe uses one year on the same clock: 252 observations for
+trading-day assets and 365 for crypto. Correlation with GLCI is computed on a
+common W-FRI grid between weekly asset returns and weekly GLCI level changes,
+with at least 20 aligned weeks; unavailable correlations remain null rather
+than being reported as zero. The Sharpe calculation has an epsilon guard
+(σ < 1e-12 → 0) so constant series do not produce astronomically large ratios
 (`tests/test_risk_metrics.py::test_zero_volatility_returns_zero`).
 
 Assets: S&P 500, Nasdaq 100, Semiconductors (SMH), Russell 2000 (IWM),
@@ -159,17 +182,20 @@ Tests whether the GLCI regime has predictive value for forward returns,
 against an NFCI-based classifier (inverted to match orientation) and the
 unconditional base rate.
 
-### 5.1 Expanding classifier and vintage limitation
+### 5.1 Production classifier and vintage limitation
 
-The backtest re-classifies the reconstructed GLCI with an **expanding window**:
+The backtest re-classifies the reconstructed GLCI with the same **rolling
+104-week window** used by the live index:
 
 ```
-z_t = (x_t − μ_{[0,t]}) / σ_{[0,t]}
+z_t = (x_t − μ_{[t−103,t]}) / σ_{[t−103,t]}
 ```
 
-with a 52-week burn-in (first year unclassified). Conditional on a fixed GLCI
+The first 19 observations are unclassified, and the first label is emitted at
+20 observations, matching the production minimum. Conditional on a fixed GLCI
 input series, changing later composite observations does not change earlier
-classifications. This is asserted directly by the backtest tests.
+classifications. NFCI retains an expanding 52-week classifier as an independent
+baseline.
 
 That invariant is narrower than a fully point-in-time backtest. Upstream source
 revisions and full-sample factor estimation can change the reconstructed GLCI

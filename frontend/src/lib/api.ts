@@ -151,7 +151,7 @@ export interface RegimePeriod {
 export interface RegimeHistory {
   periods: RegimePeriod[];
   counts: Record<string, number>;
-  current: string;
+  current: string | null;
 }
 
 // Risk by Regime types
@@ -173,7 +173,7 @@ export interface AssetRiskMetrics {
     neutral: number | null;
     loose: number | null;
   };
-  correlation_with_glci: number;
+  correlation_with_glci: number | null;
   rolling_sharpe?: DataPoint[];
 }
 
@@ -186,7 +186,7 @@ export interface RegimeMatrix {
 
 export interface RiskDashboardResponse {
   computed_at: string;
-  current_regime: Regime;
+  current_regime: Regime | null;
   assets: AssetRiskMetrics[];
   regime_matrix: RegimeMatrix;
 }

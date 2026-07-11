@@ -344,7 +344,7 @@ export default function GlciPage() {
                       Weight
                     </th>
                     <th className="py-2 pl-4 text-right text-xs font-medium tracking-wide text-muted-foreground">
-                      Contribution
+                      Raw contribution
                     </th>
                   </tr>
                 </thead>
@@ -373,9 +373,9 @@ export default function GlciPage() {
             </div>
             <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground/80">
               As of {formatShortDate(g.date)}. Factor values are post
-              sign-inversion (stress already enters inverted), so contribution
-              = value × weight and the three contributions are directly
-              additive; a negative contribution is a drag on the index.
+              sign-inversion (stress already enters inverted). Raw contribution
+              = value × weight; the three values add to the pre-normalization
+              composite, not to index points. A negative value is a drag.
             </p>
           </>
         )}
@@ -388,8 +388,8 @@ export default function GlciPage() {
           <ChartSection
             className="mt-8"
             title="Weighted pillar contributions"
-            reading="Each line is a pillar's factor value times its weight; the lines sum to the index in standardized units."
-            source="Weighted latent factors, post sign-inversion. Weekly. Zero line marks no contribution."
+            reading="Each line is a pillar's factor value times its weight; together they sum to the raw composite before its final 100/10 rescaling."
+            source="Weighted latent factors, post sign-inversion. Raw composite units, weekly. Zero marks no contribution."
           >
             <div className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-[0.6875rem] text-muted-foreground">
               {PILLAR_ORDER.map((name) => (
@@ -463,12 +463,14 @@ export default function GlciPage() {
           <div>
             <h3 className="text-sm font-semibold tracking-tight">Factor extraction</h3>
             <p className="mt-2 font-serif leading-relaxed">
-              Each pillar becomes one latent factor. With a complete enough data panel, a dynamic
-              factor model is estimated by maximum likelihood through the Kalman filter. Otherwise,
-              the pipeline uses the first principal component and can re-estimate loadings with
-              Ridge regression when components are collinear. Each factor is oriented so a higher
-              value means easier conditions, then scaled to unit variance. All three pillars are
-              required; the update fails rather than publishing a partial or reweighted index.
+              Each pillar becomes one latent factor. The production model initializes from the
+              first principal component, then re-estimates loadings with Ridge regression. Economic
+              sign constraints are enforced while factor and loadings are solved jointly: an input
+              that moves persistently against its configured direction receives zero loading and is
+              disclosed as excluded. Coverage and concentration gates prevent a pillar from
+              collapsing onto one source. Each factor is then scaled to unit variance. All three
+              pillars are required; the update fails rather than publishing a partial or reweighted
+              index.
             </p>
           </div>
           <div>
@@ -493,7 +495,7 @@ export default function GlciPage() {
               limited number of macro cycles, so regime statistics partly
               describe those specific episodes. The historical relationships
               in the playbook are conditional averages, not causal claims. The
-              backtest uses an expanding classifier with a one-year burn-in
+              backtest uses the same rolling 104-week classifier with a 20-week minimum
               and enters on the next weekly bar. That controls classification
               and execution timing, but it does not turn the upstream index
               into a point-in-time series. Source revisions and factor

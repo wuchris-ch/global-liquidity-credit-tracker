@@ -423,7 +423,7 @@ export default function PlumbingPage() {
         </p>
       </section>
 
-      {/* Credit spreads + funding stress */}
+      {/* Credit spreads + credit stress */}
       <div className="rule mt-10" />
       <div className="mt-8 grid gap-10 lg:grid-cols-12">
         <ChartSection
@@ -450,17 +450,17 @@ export default function PlumbingPage() {
         </ChartSection>
         <ChartSection
           className="lg:col-span-5"
-          title="Funding stress"
+          title="Credit stress"
           reading={stressReading(latestOf(stress.data))}
-          source="Composite z-score of credit spreads and funding rates. Zero is the recent norm; higher is tighter."
+          source="Weighted z-score of US high-yield and investment-grade option-adjusted spreads. Zero is the recent norm; higher is tighter."
         >
           {stressStatus === "pending" ? (
             <SectionSkeleton height={280} />
           ) : stressStatus === "error" ? (
-            <MonoNote>Funding-stress index unavailable in this export.</MonoNote>
+            <MonoNote>Credit-stress index unavailable in this export.</MonoNote>
           ) : (
             <LiquidityChart
-              title="Funding stress"
+              title="Credit stress"
               data={stress.data}
               color="var(--chart-2)"
               height={280}

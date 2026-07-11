@@ -9,7 +9,11 @@ import { DataLoadError } from "@/components/data-load-error";
 import { DirectionalOutlookView } from "@/components/directional-outlook";
 import { formatShortDate } from "@/lib/data-status";
 import { signed } from "@/lib/brief";
-import { buildDirectionalOutlook, PAIRED_BOOTSTRAP_METHOD } from "@/lib/outlook";
+import {
+  buildDirectionalOutlook,
+  PAIRED_BOOTSTRAP_METHOD,
+  PRODUCTION_GLCI_REGIME_METHOD,
+} from "@/lib/outlook";
 import api from "@/lib/api";
 import type {
   AssetRiskMetrics,
@@ -22,9 +26,8 @@ import type {
 
 /**
  * The canonical current regime is the one published by the GLCI endpoint
- * (104-week rolling z-score), which the rest of the app shows. The backtest's
- * own expanding-window classifier can disagree near regime boundaries; that
- * divergence is disclosed, not silently substituted.
+ * (104-week rolling z-score), which the backtest now reproduces exactly.
+ * Keeping the independent read still catches stale or mismatched payloads.
  */
 function useCanonicalRegime(): { regime: Regime | null; date: string | null; isLoading: boolean } {
   const [regime, setRegime] = useState<Regime | null>(null);
@@ -524,7 +527,7 @@ function RiskRow({ asset }: { asset: AssetRiskMetrics }) {
     { label: "Annual volatility", value: `${num(asset.annualized_volatility)}%` },
     { label: "Full-sample Sharpe", value: num(asset.current_sharpe, 2) },
     { label: "Max drawdown", value: `${num(asset.max_drawdown)}%`, tone: "text-negative" },
-    { label: "Correlation with GLCI", value: num(asset.correlation_with_glci, 2) },
+    { label: "Weekly GLCI-change corr.", value: num(asset.correlation_with_glci, 2) },
     { label: "Sharpe · loose", value: num(asset.sharpe_by_regime.loose, 2) },
     { label: "Sharpe · neutral", value: num(asset.sharpe_by_regime.neutral, 2) },
     { label: "Sharpe · tight", value: num(asset.sharpe_by_regime.tight, 2) },
@@ -578,9 +581,13 @@ export default function PlaybookPage() {
   const flows = useFlowsData();
   const risk = useRiskData();
   const canonical = useCanonicalRegime();
+  const productionBacktest =
+    backtest.data?.regime_threshold_method === PRODUCTION_GLCI_REGIME_METHOD
+      ? backtest.data
+      : null;
 
   const classifierRegime: Regime | null =
-    backtest.data?.classifiers?.glci?.current_regime ?? null;
+    productionBacktest?.classifiers?.glci?.current_regime ?? null;
 
   const regime: Regime =
     canonical.regime ??
@@ -596,12 +603,12 @@ export default function PlaybookPage() {
   const outlook = useMemo(
     () =>
       buildDirectionalOutlook(
-        backtest.data,
+        productionBacktest,
         flows.data,
         regime,
-        canonical.date ?? backtest.data?.date_range?.end
+        canonical.date ?? productionBacktest?.date_range?.end
       ),
-    [backtest.data, flows.data, regime, canonical.date]
+    [productionBacktest, flows.data, regime, canonical.date]
   );
 
   const bothFailed = Boolean(backtest.error && risk.error);
@@ -626,7 +633,8 @@ export default function PlaybookPage() {
     );
   }
 
-  const data = backtest.data;
+  const data = productionBacktest;
+  const legacyBacktestPayload = Boolean(backtest.data && !productionBacktest);
   const pairedInference = data?.bootstrap_method === PAIRED_BOOTSTRAP_METHOD;
   const focusHorizon = outlook?.horizon ?? "13";
 
@@ -652,8 +660,8 @@ export default function PlaybookPage() {
         </p>
         <p className="mt-4 max-w-[80ch] font-serif text-[0.9375rem] leading-relaxed text-muted-foreground">
           These are conditional forward returns from reconstructed, current-vintage history, not a
-          point-in-time forecast. The expanding-window classifier avoids using future composite
-          readings for its threshold, but source revisions and factor re-estimation can still
+          point-in-time forecast. The rolling classifier uses only composite readings through each
+          signal week, but source revisions and factor re-estimation can still
           change the past.
         </p>
       </section>
@@ -664,12 +672,10 @@ export default function PlaybookPage() {
             Classifier disagreement
           </p>
           <p className="mt-2 max-w-[80ch] font-serif text-[1.0625rem] leading-relaxed">
-            The published index reads {regime}, while the backtest&apos;s expanding-window
-            classifier reads {classifierRegime}
-            {data?.date_range?.end && ` through ${formatShortDate(data.date_range.end)}`}. Conditions
-            are close enough to a boundary that the {regime} and {classifierRegime} columns deserve
-            attention together; the first table uses the published {regime} label for the current
-            decision frame.
+            The published index reads {regime}, while the backtest payload reads {classifierRegime}
+            {data?.date_range?.end && ` through ${formatShortDate(data.date_range.end)}`}. The two
+            payloads are not aligned and should not be combined until the backtest is regenerated;
+            the first table keeps the published {regime} label as the current decision frame.
           </p>
         </aside>
       )}
@@ -759,8 +765,8 @@ export default function PlaybookPage() {
             </h2>
             <div className="mt-4 max-w-[70ch] space-y-4 font-serif text-[1.0625rem] leading-relaxed">
               <p>
-                <span className="font-medium">Regime labels.</span> The expanding-window z-score uses
-                only composite readings available through each week, after a one-year burn-in.
+                <span className="font-medium">Regime labels.</span> The 104-week rolling z-score uses
+                only composite readings available through each week, with a 20-week minimum.
                 Tight is below −1σ, Loose is above +1σ, and Neutral is between them. This removes
                 future composite readings from the threshold step, but the full pipeline is not
                 point-in-time. Source revisions and factor re-estimation can change past values and
@@ -783,8 +789,8 @@ export default function PlaybookPage() {
                 </p>
               )}
               <p>
-                <span className="font-medium">Benchmark.</span> The Chicago Fed&apos;s NFCI goes through
-                the same classifier and thresholds. The comparison below shows each
+                <span className="font-medium">Benchmark.</span> The Chicago Fed&apos;s NFCI retains an
+                expanding one-year classifier as an independent baseline. The comparison below shows each
                 classifier&apos;s 13-week edge
                 {pairedInference ? " with its own paired CI" : " descriptively"}. It does not
                 estimate a CI for the difference between GLCI and NFCI.
@@ -832,8 +838,9 @@ export default function PlaybookPage() {
         <>
           <div className="rule mt-10" />
           <p className="mt-8 max-w-[70ch] font-serif text-[1.0625rem] italic leading-relaxed text-muted-foreground">
-            The backtest payload could not be loaded, so the forward-return tables are unavailable
-            right now.
+            {legacyBacktestPayload
+              ? "The published backtest still uses the retired expanding classifier. Forward-return tables are withheld until it is regenerated with the production rolling classifier."
+              : "The backtest payload could not be loaded, so the forward-return tables are unavailable right now."}
           </p>
           {risk.data && risk.data.assets.length > 0 && (
             <>

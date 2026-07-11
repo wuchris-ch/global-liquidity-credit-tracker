@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timedelta
 import warnings
 
+import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -323,7 +324,7 @@ async def list_indices():
     for index_id, config in all_indices.items():
         result.append({
             "id": index_id,
-            "name": index_id.replace("_", " ").title(),
+            "name": config.get("name", index_id.replace("_", " ").title()),
             "description": config.get("description", ""),
             "frequency": config.get("frequency", ""),
             "components": len(config.get("components", config.get("pillars", {}))),
@@ -361,7 +362,7 @@ async def get_index(
         
         return IndexResponse(
             id=index_id,
-            name=index_id.replace("_", " ").title(),
+            name=config.get("name", index_id.replace("_", " ").title()),
             description=config.get("description", ""),
             data=data,
         )
@@ -569,7 +570,10 @@ async def get_regime_history(
             result = glci_computer.compute(start, end, save_output=False, verbose=False)
             glci_cache.set(start, end, result)
         
-        regimes_df = result.regimes
+        latest_regime = None
+        if not result.regimes.empty and pd.notna(result.regimes["regime"].iloc[-1]):
+            latest_regime = result.regimes["regime_label"].iloc[-1]
+        regimes_df = result.regimes.dropna(subset=["regime"]).reset_index(drop=True)
         
         # Build regime periods
         periods = []
@@ -604,7 +608,7 @@ async def get_regime_history(
         return {
             "periods": periods,
             "counts": regime_counts,
-            "current": current_regime
+            "current": latest_regime
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

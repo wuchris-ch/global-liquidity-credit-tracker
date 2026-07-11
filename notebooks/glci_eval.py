@@ -130,9 +130,9 @@ def compute_and_evaluate(
             )
             if len(merged) > 10:
                 corr = merged["glci"].corr(merged["stress"])
-                print(f"   GLCI vs USD Funding Stress: {corr:.3f}")
+                print(f"   GLCI vs USD Credit Stress: {corr:.3f}")
     except Exception as e:
-        print(f"   Could not compute Funding Stress correlation: {e}")
+        print(f"   Could not compute Credit Stress correlation: {e}")
     
     # 6. Stress Episode Analysis
     print("\n6. Stress Episode Analysis:")
@@ -280,6 +280,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 

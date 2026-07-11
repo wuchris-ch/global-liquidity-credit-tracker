@@ -16,6 +16,18 @@ def computer():
     return RiskMetricsComputer(fetcher=StubFetcher({}), storage=StubStorage())
 
 
+class MetadataStorage(StubStorage):
+    """Stub storage that also exposes metadata passed to each save."""
+
+    def __init__(self, curated=None):
+        super().__init__(curated)
+        self.saved_metadata = {}
+
+    def save_curated(self, df, category, name, metadata=None):
+        super().save_curated(df, category, name, metadata)
+        self.saved_metadata[(category, name)] = metadata
+
+
 class TestSharpe:
     def test_matches_textbook_formula(self, computer):
         rng = np.random.default_rng(0)
@@ -28,6 +40,110 @@ class TestSharpe:
 
     def test_too_few_observations_returns_zero(self, computer):
         assert computer._compute_sharpe(pd.Series([0.01, 0.02, -0.01])) == 0.0
+
+
+class TestAssetSpecificAnnualization:
+    def test_calendar_crypto_and_weekday_asset_use_different_clocks(self):
+        n_returns = 399
+        returns = 0.0007 + 0.004 * np.sin(np.arange(n_returns) / 9)
+        prices = np.concatenate([[100.0], 100 * np.cumprod(1 + returns)])
+        crypto_dates = pd.date_range("2020-01-01", periods=len(prices), freq="D")
+        equity_dates = pd.date_range("2020-01-01", periods=len(prices), freq="B")
+
+        first_date = min(crypto_dates.min(), equity_dates.min())
+        last_date = max(crypto_dates.max(), equity_dates.max())
+        weekly_dates = pd.date_range(
+            first_date - pd.Timedelta(days=7), last_date, freq="W-FRI"
+        )
+        glci = pd.DataFrame({
+            "date": weekly_dates,
+            "value": 100 + np.linspace(0, 2, len(weekly_dates)),
+            "regime": np.zeros(len(weekly_dates), dtype=int),
+        })
+        rf_dates = pd.date_range(first_date, last_date, freq="D")
+        rf_df = make_series(rf_dates, np.full(len(rf_dates), 5.0))
+
+        fetcher = StubFetcher({
+            "bitcoin_price": make_series(crypto_dates, prices, source="yahoo"),
+            "sp500_price": make_series(equity_dates, prices, source="yahoo"),
+            "treasury_3m": rf_df,
+        })
+        storage = StubStorage({("indices", "glci"): glci})
+        computer = RiskMetricsComputer(fetcher=fetcher, storage=storage)
+        glci_loaded = computer._load_glci_regimes()
+        rf_loaded = computer._load_risk_free_rate()
+
+        crypto = computer._compute_asset_metrics(
+            "bitcoin_price", ASSET_CONFIG["bitcoin_price"],
+            glci_loaded, rf_loaded, None, None,
+        )
+        equity = computer._compute_asset_metrics(
+            "sp500_price", ASSET_CONFIG["sp500_price"],
+            glci_loaded, rf_loaded, None, None,
+        )
+
+        realized = pd.Series(prices).pct_change().dropna()
+        expected_crypto_excess = realized - 0.05 / 365
+        expected_equity_excess = realized - 0.05 / 252
+
+        assert crypto.annualized_return == pytest.approx(realized.mean() * 365 * 100)
+        assert equity.annualized_return == pytest.approx(realized.mean() * 252 * 100)
+        assert crypto.annualized_volatility == pytest.approx(
+            realized.std() * np.sqrt(365) * 100
+        )
+        assert equity.annualized_volatility == pytest.approx(
+            realized.std() * np.sqrt(252) * 100
+        )
+        assert crypto.current_sharpe == pytest.approx(
+            expected_crypto_excess.mean()
+            / expected_crypto_excess.std()
+            * np.sqrt(365)
+        )
+        assert equity.current_sharpe == pytest.approx(
+            expected_equity_excess.mean()
+            / expected_equity_excess.std()
+            * np.sqrt(252)
+        )
+
+        crypto_window = expected_crypto_excess.iloc[-365:]
+        equity_window = expected_equity_excess.iloc[-252:]
+        expected_crypto_rolling = round(
+            float(crypto_window.mean() / crypto_window.std() * np.sqrt(365)), 3
+        )
+        expected_equity_rolling = round(
+            float(equity_window.mean() / equity_window.std() * np.sqrt(252)), 3
+        )
+        assert crypto.rolling_sharpe_data[-1]["value"] == expected_crypto_rolling
+        assert equity.rolling_sharpe_data[-1]["value"] == expected_equity_rolling
+        assert crypto.rolling_window == 365
+        assert equity.rolling_window == 252
+        assert len(crypto.rolling_sharpe_data) == len(realized) - 365 + 1
+        assert len(equity.rolling_sharpe_data) == len(realized) - 252 + 1
+
+    def test_explicit_rolling_window_overrides_both_asset_clocks(self):
+        computer = RiskMetricsComputer(
+            fetcher=StubFetcher({}), storage=StubStorage(), rolling_window=30
+        )
+        dates = pd.date_range("2024-01-01", periods=100, freq="D")
+        df = pd.DataFrame({
+            "date": dates,
+            "excess_return": 0.001 + 0.01 * np.sin(np.arange(len(dates))),
+        })
+
+        crypto = computer._compute_rolling_sharpe(df, 365)
+        equity = computer._compute_rolling_sharpe(df, 252)
+
+        assert computer._rolling_window_for(365) == 30
+        assert computer._rolling_window_for(252) == 30
+        assert len(crypto) == len(equity) == len(df) - 30 + 1
+        assert crypto[0]["date"] == equity[0]["date"] == "2024-01-30"
+
+    def test_unconfigured_calendar_series_is_inferred_from_weekends(self, computer):
+        calendar_dates = pd.date_range("2024-01-01", periods=60, freq="D")
+        weekday_dates = pd.date_range("2024-01-01", periods=60, freq="B")
+
+        assert computer._annualization_factor("unknown", calendar_dates) == 365
+        assert computer._annualization_factor("unknown", weekday_dates) == 252
 
 
 class TestMaxDrawdown:
@@ -88,6 +204,31 @@ def build_regime_world():
 
 
 class TestRegimeConditionedPipeline:
+    def test_current_regime_does_not_treat_unclassified_rows_as_neutral(self):
+        glci = pd.DataFrame({"regime": [np.nan, np.nan]})
+        assert RiskMetricsComputer._current_regime(glci) is None
+
+        glci = pd.DataFrame({"regime": [1.0, np.nan]})
+        assert RiskMetricsComputer._current_regime(glci) is None
+
+        glci = pd.DataFrame({"regime": [np.nan, 1.0]})
+        assert RiskMetricsComputer._current_regime(glci) == "loose"
+
+    def test_missing_regime_column_is_rejected(self):
+        storage = StubStorage({
+            ("indices", "glci"): pd.DataFrame({
+                "date": pd.date_range("2026-01-02", periods=3, freq="W-FRI"),
+                "value": [99.0, 100.0, 101.0],
+            })
+        })
+        computer = RiskMetricsComputer(
+            fetcher=StubFetcher({}),
+            storage=storage,
+        )
+
+        with pytest.raises(ValueError, match="missing the regime column"):
+            computer._load_glci_regimes()
+
     def test_returns_by_regime_reflect_construction(self):
         glci, price_df, rf_df = build_regime_world()
 
@@ -111,7 +252,7 @@ class TestRegimeConditionedPipeline:
         frames = {asset_id: price_df for asset_id in ASSET_CONFIG}
         frames["treasury_3m"] = rf_df
 
-        storage = StubStorage({("indices", "glci"): glci})
+        storage = MetadataStorage({("indices", "glci"): glci})
         computer = RiskMetricsComputer(fetcher=StubFetcher(frames), storage=storage)
 
         result = computer.compute(save_output=True, verbose=False)
@@ -121,6 +262,58 @@ class TestRegimeConditionedPipeline:
         assert ("risk", "risk_metrics") in storage.curated
         saved = storage.curated[("risk", "risk_metrics")]
         assert set(saved["asset_id"]) == set(ASSET_CONFIG)
+
+        policy = result.metadata["asset_clock_policy"]
+        assert result.metadata["annualization_policy"] == "per_asset_observation_clock"
+        assert result.metadata["rolling_window_policy"] == "one_year_by_asset_clock"
+        assert policy["sp500_price"] == {
+            "annualization_factor": 252,
+            "rolling_window": 252,
+        }
+        assert policy["bitcoin_price"] == {
+            "annualization_factor": 365,
+            "rolling_window": 365,
+        }
+        assert storage.saved_metadata[("risk", "risk_metrics")] == result.metadata
+        assert storage.saved_metadata[("risk", "rolling_sharpe_sp500_price")] == {
+            "asset_id": "sp500_price",
+            "annualization_factor": 252,
+            "window": 252,
+            "rolling_window_policy": "one_year_by_asset_clock",
+        }
+        assert storage.saved_metadata[("risk", "rolling_sharpe_bitcoin_price")] == {
+            "asset_id": "bitcoin_price",
+            "annualization_factor": 365,
+            "window": 365,
+            "rolling_window_policy": "one_year_by_asset_clock",
+        }
+
+    def test_explicit_window_is_disclosed_in_result_and_save_metadata(self):
+        glci, price_df, rf_df = build_regime_world()
+        storage = MetadataStorage({("indices", "glci"): glci})
+        computer = RiskMetricsComputer(
+            fetcher=StubFetcher({
+                "sp500_price": price_df,
+                "treasury_3m": rf_df,
+            }),
+            storage=storage,
+            rolling_window=30,
+        )
+
+        result = computer.compute(save_output=True, verbose=False)
+
+        assert result.metadata["rolling_window"] == 30
+        assert result.metadata["rolling_window_policy"] == "explicit_override"
+        assert result.metadata["asset_clock_policy"]["sp500_price"] == {
+            "annualization_factor": 252,
+            "rolling_window": 30,
+        }
+        assert storage.saved_metadata[("risk", "rolling_sharpe_sp500_price")] == {
+            "asset_id": "sp500_price",
+            "annualization_factor": 252,
+            "window": 30,
+            "rolling_window_policy": "explicit_override",
+        }
 
     def test_rolling_sharpe_dates_align_with_input(self):
         glci, price_df, rf_df = build_regime_world()
@@ -177,3 +370,71 @@ class TestRegimeConditionedPipeline:
         assert matrix["regimes"] == ["tight", "neutral", "loose"]
         assert len(matrix["assets"]) == len(ASSET_CONFIG)
         assert all(len(row) == 3 for row in matrix["sharpe_data"])
+
+    def test_glci_correlation_uses_weekly_returns_and_level_changes(self):
+        fridays = pd.date_range("2021-01-01", periods=36, freq="W-FRI")
+        changes = np.resize(np.array([-3.0, -1.0, 1.0, 3.0]), len(fridays))
+        changes[0] = 0.0
+        glci = pd.DataFrame({
+            "date": fridays,
+            "value": 100 + np.cumsum(changes),
+            "regime": np.zeros(len(fridays), dtype=int),
+        })
+
+        daily_dates = pd.date_range(fridays[0], fridays[-1], freq="B")
+        price = 100.0
+        daily_prices = []
+        friday_positions = {date: i for i, date in enumerate(fridays)}
+        for date in daily_dates:
+            if date.dayofweek == 0:
+                week_end = date + pd.Timedelta(days=4)
+                if week_end in friday_positions:
+                    price *= 1 + changes[friday_positions[week_end]] / 1000
+            daily_prices.append(price)
+        price_df = make_series(daily_dates, daily_prices)
+
+        fetcher = StubFetcher({"sp500_price": price_df})
+        storage = StubStorage({("indices", "glci"): glci})
+        computer = RiskMetricsComputer(fetcher=fetcher, storage=storage)
+        glci_loaded = computer._load_glci_regimes()
+        metrics = computer._compute_asset_metrics(
+            "sp500_price", ASSET_CONFIG["sp500_price"],
+            glci_loaded, None, None, None,
+        )
+
+        # Friday-to-Friday returns were constructed as a fixed multiple of
+        # the corresponding GLCI level change, so the weekly correlation is 1.
+        assert metrics.correlation_with_glci == pytest.approx(1.0, abs=1e-12)
+
+        # The former daily/forward-filled calculation looks only at Friday
+        # GLCI jumps, while this asset's weekly move occurs on Monday.
+        old_daily = pd.merge_asof(
+            price_df.assign(return_=price_df["value"].pct_change()),
+            glci[["date", "value"]].rename(columns={"value": "glci_value"}),
+            on="date",
+            direction="backward",
+        )
+        old_correlation = old_daily["return_"].corr(
+            old_daily["glci_value"].pct_change()
+        )
+        assert abs(metrics.correlation_with_glci - old_correlation) > 0.5
+
+    def test_glci_correlation_requires_twenty_aligned_weeks(self, computer):
+        fridays = pd.date_range("2024-01-05", periods=19, freq="W-FRI")
+        prices = make_series(fridays, 100 + np.arange(len(fridays)))
+        glci = pd.DataFrame({
+            "date": fridays,
+            "value": 100 + np.arange(len(fridays)) ** 2,
+        })
+
+        assert computer._compute_glci_correlation(prices, glci) is None
+
+    def test_undefined_glci_correlation_is_unavailable(self, computer):
+        fridays = pd.date_range("2024-01-05", periods=30, freq="W-FRI")
+        prices = make_series(fridays, 100 + np.arange(len(fridays)))
+        glci = pd.DataFrame({
+            "date": fridays,
+            "value": np.full(len(fridays), 100.0),
+        })
+
+        assert computer._compute_glci_correlation(prices, glci) is None

@@ -1,7 +1,5 @@
 """Aggregator for computing composite indices."""
 import pandas as pd
-import numpy as np
-from typing import Literal
 
 from ..config import get_index_config, get_all_indices, get_country_weights
 from ..etl.fetcher import DataFetcher
@@ -146,6 +144,19 @@ class Aggregator:
             {k: v.rename(columns={k: "value"}) for k, v in zscores.items()},
             method="inner"
         )
+
+        # A composite z-score is not defined until every configured component
+        # has completed its rolling warm-up. Treating those NaNs as zero would
+        # publish artificial "normal" observations and bias the early sample.
+        component_columns = [
+            comp["series"]
+            for comp in components
+            if comp["series"] in aligned.columns
+        ]
+        aligned = aligned.dropna(subset=component_columns).reset_index(drop=True)
+
+        if aligned.empty:
+            return pd.DataFrame(columns=["date", "value", "index_id"])
         
         # Weighted average
         total_weight = 0
@@ -156,7 +167,7 @@ class Aggregator:
             weight = comp.get("weight", 1.0)
             
             if series_id in aligned.columns:
-                result += aligned[series_id].fillna(0) * weight
+                result += aligned[series_id] * weight
                 total_weight += weight
         
         if total_weight > 0:
@@ -323,5 +334,5 @@ class Aggregator:
         start_date: str | None = None,
         end_date: str | None = None
     ) -> pd.DataFrame:
-        """Convenience method for USD Funding Stress index."""
+        """Convenience method for the USD Credit Stress index."""
         return self.compute_index("usd_funding_stress", start_date, end_date)

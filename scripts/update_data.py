@@ -126,7 +126,6 @@ def main():
         "fed_reverse_repo",
         "sofr",
         "fed_funds_rate",
-        "ted_spread",
         "ice_bofa_us_high_yield_spread",
         "ice_bofa_us_ig_spread",
         # Liquidity Monitor overlay + risk dashboard

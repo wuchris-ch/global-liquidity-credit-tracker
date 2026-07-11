@@ -8,10 +8,10 @@
   },
   {
     "id": "usd_funding_stress",
-    "name": "Usd Funding Stress",
-    "description": "USD Funding Stress Index (z-score average of spreads)",
+    "name": "USD Credit Stress",
+    "description": "USD Credit Stress Index (weighted z-score average of HY and IG OAS)",
     "frequency": "daily",
-    "components": 3
+    "components": 2
   },
   {
     "id": "global_cb_assets",

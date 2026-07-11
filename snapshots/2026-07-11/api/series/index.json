@@ -56,14 +56,6 @@
     "unit": "percent"
   },
   {
-    "id": "ted_spread",
-    "name": "TED Spread (3M LIBOR - 3M T-Bill)",
-    "source": "FRED",
-    "category": "Credit Spreads",
-    "frequency": "daily",
-    "unit": "percent"
-  },
-  {
     "id": "ice_bofa_us_high_yield_spread",
     "name": "ICE BofA US High Yield Index Option-Adjusted Spread",
     "source": "FRED",

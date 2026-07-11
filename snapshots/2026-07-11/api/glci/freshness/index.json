@@ -140,13 +140,6 @@
     "is_stale": false
   },
   {
-    "series_id": "ted_spread",
-    "pillar": "stress",
-    "last_date": "2022-01-21",
-    "days_old": 1632,
-    "is_stale": true
-  },
-  {
     "series_id": "sofr",
     "pillar": "stress",
     "last_date": "2026-07-09",

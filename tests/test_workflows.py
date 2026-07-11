@@ -66,7 +66,9 @@ def test_inline_bash_steps_have_valid_syntax() -> None:
                 )
                 problems: list[str] = []
                 if result.returncode or result.stderr.strip():
-                    problems.append(result.stderr.strip() or f"bash -n exited {result.returncode}")
+                    problems.append(
+                        result.stderr.strip() or f"bash -n exited {result.returncode}"
+                    )
                 problems.extend(
                     f"heredoc delimited by end-of-file (wanted `{delimiter}`)"
                     for delimiter in _unterminated_heredocs(parsed_script)

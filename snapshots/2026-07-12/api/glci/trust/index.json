@@ -4,9 +4,9 @@
   "point_in_time": false,
   "frequency": "W-FRI",
   "snapshots": {
-    "count": 3,
+    "count": 4,
     "first_computed_at": "2026-07-11T04:12:17.432117Z",
-    "last_computed_at": "2026-07-12T01:31:23.052734Z"
+    "last_computed_at": "2026-07-12T12:54:28.112145Z"
   },
   "data_quality": {
     "loaded_components": 18,
@@ -36,7 +36,7 @@
   "pillar_stats": {
     "liquidity": {
       "method": "pca_shrunk",
-      "explained_variance": 0.3774558665090666,
+      "explained_variance": 0.3774558665090667,
       "n_variables": 12,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 20,
@@ -44,11 +44,11 @@
       "max_series_loading_share": 0.20745824386600337,
       "series_loading_shares": {
         "boe_total_assets": 0.20745824386600337,
-        "boj_total_assets": 0.13271159775873284,
-        "ecb_total_assets": 0.1851959300660318,
+        "boj_total_assets": 0.1327115977587328,
+        "ecb_total_assets": 0.18519593006603177,
         "fed_reserve_balances": 0.08652466400478111,
         "fed_total_assets": 0.20652981274564372,
-        "us_m2": 0.18157975155880712
+        "us_m2": 0.1815797515588071
       },
       "data_quality": {
         "total_series": 8,
@@ -92,13 +92,13 @@
       "max_series_loading_share": 0.18727114342992876,
       "series_loading_shares": {
         "bis_credit_eu": 0.08612957232556835,
-        "bis_credit_jp": 0.061976085894501966,
+        "bis_credit_jp": 0.06197608589450196,
         "bis_credit_us": 0.18727114342992876,
         "us_bank_credit_total": 0.17004761636128043,
-        "us_bank_loans_leases": 0.171994709142828,
-        "us_commercial_paper": 0.11947983635064786,
+        "us_bank_loans_leases": 0.17199470914282802,
+        "us_commercial_paper": 0.11947983635064788,
         "us_consumer_credit": 0.14267945357718842,
-        "wb_credit_gdp_us": 0.06042158291805625
+        "wb_credit_gdp_us": 0.060421582918056264
       },
       "data_quality": {
         "total_series": 10,
@@ -147,9 +147,9 @@
       "max_series_loading_share": 0.2717366744482026,
       "series_loading_shares": {
         "ice_bofa_us_high_yield_spread": 0.2717366744482026,
-        "ice_bofa_us_ig_spread": 0.26839907968387644,
+        "ice_bofa_us_ig_spread": 0.2683990796838765,
         "nfci": 0.21196856571908274,
-        "vix": 0.24789568014883817
+        "vix": 0.24789568014883814
       },
       "data_quality": {
         "total_series": 6,

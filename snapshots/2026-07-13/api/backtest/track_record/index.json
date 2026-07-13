@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-13T01:48:25.715160",
+  "computed_at": "2026-07-13T14:04:43.609892",
   "date_range": {
     "start": "2024-04-05",
     "end": "2026-07-10"
@@ -32,716 +32,716 @@
         {
           "date": "2024-04-05",
           "regime": "loose",
-          "zscore": 1.457,
-          "value": 94.6217
+          "zscore": 1.422,
+          "value": 95.2045
         },
         {
           "date": "2024-04-12",
           "regime": "loose",
-          "zscore": 1.352,
-          "value": 94.6085
+          "zscore": 1.309,
+          "value": 95.0932
         },
         {
           "date": "2024-04-19",
           "regime": "neutral",
-          "zscore": 0.081,
-          "value": 86.8969
+          "zscore": 0.108,
+          "value": 87.2509
         },
         {
           "date": "2024-04-26",
           "regime": "neutral",
-          "zscore": 0.345,
-          "value": 88.5148
+          "zscore": 0.351,
+          "value": 88.8601
         },
         {
           "date": "2024-05-03",
           "regime": "neutral",
-          "zscore": 0.853,
-          "value": 91.652
+          "zscore": 0.826,
+          "value": 92.023
         },
         {
           "date": "2024-05-10",
           "regime": "neutral",
-          "zscore": 0.953,
-          "value": 92.4562
+          "zscore": 0.921,
+          "value": 92.831
         },
         {
           "date": "2024-05-17",
           "regime": "loose",
-          "zscore": 1.215,
-          "value": 94.3297
+          "zscore": 1.163,
+          "value": 94.6879
         },
         {
           "date": "2024-05-24",
           "regime": "neutral",
-          "zscore": 0.878,
-          "value": 92.5362
+          "zscore": 0.834,
+          "value": 92.8028
         },
         {
           "date": "2024-05-31",
           "regime": "neutral",
-          "zscore": 0.879,
-          "value": 92.7165
+          "zscore": 0.834,
+          "value": 92.9634
         },
         {
           "date": "2024-06-07",
           "regime": "loose",
-          "zscore": 1.141,
-          "value": 94.5136
+          "zscore": 1.086,
+          "value": 94.794
         },
         {
           "date": "2024-06-14",
           "regime": "neutral",
-          "zscore": 0.779,
-          "value": 92.5284
+          "zscore": 0.739,
+          "value": 92.7603
         },
         {
           "date": "2024-06-21",
           "regime": "neutral",
-          "zscore": 0.845,
-          "value": 93.0526
+          "zscore": 0.811,
+          "value": 93.3387
         },
         {
           "date": "2024-06-28",
           "regime": "neutral",
-          "zscore": 0.796,
-          "value": 92.8902
+          "zscore": 0.761,
+          "value": 93.151
         },
         {
           "date": "2024-07-05",
           "regime": "loose",
-          "zscore": 1.936,
-          "value": 100.3401
+          "zscore": 1.855,
+          "value": 100.6801
         },
         {
           "date": "2024-07-12",
           "regime": "loose",
-          "zscore": 1.875,
-          "value": 100.8235
+          "zscore": 1.8,
+          "value": 101.1304
         },
         {
           "date": "2024-07-19",
           "regime": "loose",
-          "zscore": 1.619,
-          "value": 99.7977
+          "zscore": 1.557,
+          "value": 100.0791
         },
         {
           "date": "2024-07-26",
           "regime": "loose",
-          "zscore": 1.48,
-          "value": 99.356
+          "zscore": 1.429,
+          "value": 99.6519
         },
         {
           "date": "2024-08-02",
           "regime": "neutral",
-          "zscore": 0.492,
-          "value": 92.9163
+          "zscore": 0.464,
+          "value": 93.078
         },
         {
           "date": "2024-08-09",
           "regime": "loose",
-          "zscore": 1.323,
-          "value": 98.652
+          "zscore": 1.265,
+          "value": 98.8348
         },
         {
           "date": "2024-08-16",
           "regime": "loose",
-          "zscore": 1.729,
-          "value": 101.9612
+          "zscore": 1.662,
+          "value": 102.1581
         },
         {
           "date": "2024-08-23",
           "regime": "loose",
-          "zscore": 1.754,
-          "value": 102.7946
+          "zscore": 1.689,
+          "value": 102.9685
         },
         {
           "date": "2024-08-30",
           "regime": "loose",
-          "zscore": 1.421,
-          "value": 100.866
+          "zscore": 1.361,
+          "value": 100.964
         },
         {
           "date": "2024-09-06",
           "regime": "loose",
-          "zscore": 1.109,
-          "value": 98.877
+          "zscore": 1.064,
+          "value": 99.0024
         },
         {
           "date": "2024-09-13",
           "regime": "loose",
-          "zscore": 1.521,
-          "value": 102.2475
+          "zscore": 1.466,
+          "value": 102.3664
         },
         {
           "date": "2024-09-20",
           "regime": "loose",
-          "zscore": 1.247,
-          "value": 100.5431
+          "zscore": 1.188,
+          "value": 100.5526
         },
         {
           "date": "2024-09-27",
           "regime": "loose",
-          "zscore": 1.187,
-          "value": 100.3483
+          "zscore": 1.139,
+          "value": 100.4142
         },
         {
           "date": "2024-10-04",
           "regime": "neutral",
-          "zscore": 0.891,
-          "value": 98.3239
+          "zscore": 0.839,
+          "value": 98.2847
         },
         {
           "date": "2024-10-11",
           "regime": "loose",
-          "zscore": 1.08,
-          "value": 99.8836
+          "zscore": 1.023,
+          "value": 99.832
         },
         {
           "date": "2024-10-18",
           "regime": "loose",
-          "zscore": 1.206,
-          "value": 101.0369
+          "zscore": 1.14,
+          "value": 100.9218
         },
         {
           "date": "2024-10-25",
           "regime": "loose",
-          "zscore": 1.071,
-          "value": 100.2282
+          "zscore": 1.011,
+          "value": 100.1113
         },
         {
           "date": "2024-11-01",
           "regime": "loose",
-          "zscore": 1.368,
-          "value": 102.7173
+          "zscore": 1.31,
+          "value": 102.6369
         },
         {
           "date": "2024-11-08",
           "regime": "loose",
-          "zscore": 1.737,
-          "value": 105.9978
+          "zscore": 1.669,
+          "value": 105.8536
         },
         {
           "date": "2024-11-15",
           "regime": "loose",
-          "zscore": 1.361,
-          "value": 103.4471
+          "zscore": 1.3,
+          "value": 103.278
         },
         {
           "date": "2024-11-22",
           "regime": "loose",
-          "zscore": 1.496,
-          "value": 104.8515
+          "zscore": 1.435,
+          "value": 104.6648
         },
         {
           "date": "2024-11-29",
           "regime": "loose",
-          "zscore": 1.37,
-          "value": 104.1652
+          "zscore": 1.313,
+          "value": 103.9829
         },
         {
           "date": "2024-12-06",
           "regime": "neutral",
-          "zscore": 0.268,
-          "value": 95.5669
+          "zscore": 0.197,
+          "value": 95.1683
         },
         {
           "date": "2024-12-13",
           "regime": "neutral",
-          "zscore": 0.432,
-          "value": 96.8744
+          "zscore": 0.362,
+          "value": 96.4898
         },
         {
           "date": "2024-12-20",
           "regime": "neutral",
-          "zscore": -0.113,
-          "value": 92.6792
+          "zscore": -0.183,
+          "value": 92.2327
         },
         {
           "date": "2024-12-27",
           "regime": "neutral",
-          "zscore": -0.113,
-          "value": 92.6671
+          "zscore": -0.187,
+          "value": 92.1945
         },
         {
           "date": "2025-01-03",
           "regime": "neutral",
-          "zscore": -0.828,
-          "value": 87.1707
+          "zscore": -0.903,
+          "value": 86.6071
         },
         {
           "date": "2025-01-10",
           "regime": "neutral",
-          "zscore": 0.379,
-          "value": 96.3022
+          "zscore": 0.307,
+          "value": 95.8672
         },
         {
           "date": "2025-01-17",
           "regime": "neutral",
-          "zscore": 0.583,
-          "value": 97.8768
+          "zscore": 0.506,
+          "value": 97.4163
         },
         {
           "date": "2025-01-24",
           "regime": "neutral",
-          "zscore": 0.712,
-          "value": 98.9022
+          "zscore": 0.642,
+          "value": 98.4979
         },
         {
           "date": "2025-01-31",
           "regime": "neutral",
-          "zscore": 0.099,
-          "value": 94.3612
+          "zscore": 0.038,
+          "value": 93.9743
         },
         {
           "date": "2025-02-07",
           "regime": "neutral",
-          "zscore": 0.425,
-          "value": 96.7892
+          "zscore": 0.367,
+          "value": 96.4448
         },
         {
           "date": "2025-02-14",
           "regime": "neutral",
-          "zscore": 0.712,
-          "value": 98.9458
+          "zscore": 0.661,
+          "value": 98.6635
         },
         {
           "date": "2025-02-21",
           "regime": "neutral",
-          "zscore": 0.568,
-          "value": 97.941
+          "zscore": 0.526,
+          "value": 97.7133
         },
         {
           "date": "2025-02-28",
           "regime": "neutral",
-          "zscore": 0.584,
-          "value": 98.098
+          "zscore": 0.547,
+          "value": 97.9007
         },
         {
           "date": "2025-03-07",
           "regime": "neutral",
-          "zscore": 0.174,
-          "value": 95.1559
+          "zscore": 0.156,
+          "value": 95.0717
         },
         {
           "date": "2025-03-14",
           "regime": "neutral",
-          "zscore": 0.209,
-          "value": 95.4134
+          "zscore": 0.194,
+          "value": 95.3518
         },
         {
           "date": "2025-03-21",
           "regime": "neutral",
-          "zscore": 0.279,
-          "value": 95.9315
+          "zscore": 0.267,
+          "value": 95.8951
         },
         {
           "date": "2025-03-28",
           "regime": "neutral",
-          "zscore": 0.023,
-          "value": 94.1205
+          "zscore": 0.01,
+          "value": 94.063
         },
         {
           "date": "2025-04-04",
           "regime": "neutral",
-          "zscore": -0.878,
-          "value": 87.7368
+          "zscore": -0.873,
+          "value": 87.7468
         },
         {
           "date": "2025-04-11",
           "regime": "neutral",
-          "zscore": -0.282,
-          "value": 91.8868
+          "zscore": -0.278,
+          "value": 91.9281
         },
         {
           "date": "2025-04-18",
           "regime": "neutral",
-          "zscore": -0.224,
-          "value": 92.2793
+          "zscore": -0.211,
+          "value": 92.392
         },
         {
           "date": "2025-04-25",
           "regime": "neutral",
-          "zscore": -0.012,
-          "value": 93.7421
+          "zscore": -0.0,
+          "value": 93.8592
         },
         {
           "date": "2025-05-02",
           "regime": "neutral",
-          "zscore": -0.356,
-          "value": 91.3651
+          "zscore": -0.34,
+          "value": 91.4904
         },
         {
           "date": "2025-05-09",
           "regime": "neutral",
-          "zscore": 0.374,
-          "value": 96.3646
+          "zscore": 0.382,
+          "value": 96.4731
         },
         {
           "date": "2025-05-16",
           "regime": "loose",
-          "zscore": 1.124,
-          "value": 101.5593
+          "zscore": 1.133,
+          "value": 101.7252
         },
         {
           "date": "2025-05-23",
           "regime": "loose",
-          "zscore": 1.099,
-          "value": 101.4983
+          "zscore": 1.114,
+          "value": 101.7083
         },
         {
           "date": "2025-05-30",
           "regime": "loose",
-          "zscore": 1.264,
-          "value": 102.7592
+          "zscore": 1.277,
+          "value": 102.9696
         },
         {
           "date": "2025-06-06",
           "regime": "loose",
-          "zscore": 1.233,
-          "value": 102.6803
+          "zscore": 1.246,
+          "value": 102.8976
         },
         {
           "date": "2025-06-13",
           "regime": "loose",
-          "zscore": 1.302,
-          "value": 103.3049
+          "zscore": 1.315,
+          "value": 103.53
         },
         {
           "date": "2025-06-20",
           "regime": "neutral",
-          "zscore": 0.947,
-          "value": 100.9401
+          "zscore": 0.958,
+          "value": 101.1313
         },
         {
           "date": "2025-06-27",
           "regime": "loose",
-          "zscore": 1.169,
-          "value": 102.5837
+          "zscore": 1.177,
+          "value": 102.7661
         },
         {
           "date": "2025-07-04",
           "regime": "loose",
-          "zscore": 1.697,
-          "value": 106.503
+          "zscore": 1.677,
+          "value": 106.5181
         },
         {
           "date": "2025-07-11",
           "regime": "loose",
-          "zscore": 1.769,
-          "value": 107.3112
+          "zscore": 1.745,
+          "value": 107.2984
         },
         {
           "date": "2025-07-18",
           "regime": "loose",
-          "zscore": 1.806,
-          "value": 107.9007
+          "zscore": 1.777,
+          "value": 107.8478
         },
         {
           "date": "2025-07-25",
           "regime": "loose",
-          "zscore": 1.794,
-          "value": 108.1328
+          "zscore": 1.763,
+          "value": 108.0545
         },
         {
           "date": "2025-08-01",
           "regime": "loose",
-          "zscore": 1.448,
-          "value": 105.8096
+          "zscore": 1.43,
+          "value": 105.801
         },
         {
           "date": "2025-08-08",
           "regime": "loose",
-          "zscore": 1.661,
-          "value": 107.6295
+          "zscore": 1.636,
+          "value": 107.5768
         },
         {
           "date": "2025-08-15",
           "regime": "loose",
-          "zscore": 1.685,
-          "value": 108.0831
+          "zscore": 1.661,
+          "value": 108.0226
         },
         {
           "date": "2025-08-22",
           "regime": "loose",
-          "zscore": 1.499,
-          "value": 106.8956
+          "zscore": 1.476,
+          "value": 106.8307
         },
         {
           "date": "2025-08-29",
           "regime": "loose",
-          "zscore": 1.225,
-          "value": 104.9627
+          "zscore": 1.206,
+          "value": 104.9129
         },
         {
           "date": "2025-09-05",
           "regime": "neutral",
-          "zscore": 0.432,
-          "value": 99.0064
+          "zscore": 0.411,
+          "value": 98.9102
         },
         {
           "date": "2025-09-12",
           "regime": "neutral",
-          "zscore": 0.502,
-          "value": 99.5597
+          "zscore": 0.481,
+          "value": 99.4626
         },
         {
           "date": "2025-09-19",
           "regime": "neutral",
-          "zscore": 0.182,
-          "value": 97.1795
+          "zscore": 0.162,
+          "value": 97.0714
         },
         {
           "date": "2025-09-26",
           "regime": "neutral",
-          "zscore": 0.086,
-          "value": 96.4631
+          "zscore": 0.059,
+          "value": 96.3057
         },
         {
           "date": "2025-10-03",
           "regime": "neutral",
-          "zscore": 0.765,
-          "value": 101.5356
+          "zscore": 0.74,
+          "value": 101.4134
         },
         {
           "date": "2025-10-10",
           "regime": "neutral",
-          "zscore": 0.438,
-          "value": 99.1418
+          "zscore": 0.412,
+          "value": 98.995
         },
         {
           "date": "2025-10-17",
           "regime": "neutral",
-          "zscore": 0.471,
-          "value": 99.4065
+          "zscore": 0.445,
+          "value": 99.2575
         },
         {
           "date": "2025-10-24",
           "regime": "neutral",
-          "zscore": 0.667,
-          "value": 100.8768
+          "zscore": 0.642,
+          "value": 100.7379
         },
         {
           "date": "2025-10-31",
           "regime": "neutral",
-          "zscore": 0.103,
-          "value": 96.7574
+          "zscore": 0.072,
+          "value": 96.5636
         },
         {
           "date": "2025-11-07",
           "regime": "neutral",
-          "zscore": 0.067,
-          "value": 96.5019
+          "zscore": 0.039,
+          "value": 96.3249
         },
         {
           "date": "2025-11-14",
           "regime": "neutral",
-          "zscore": 0.319,
-          "value": 98.3363
+          "zscore": 0.293,
+          "value": 98.1758
         },
         {
           "date": "2025-11-21",
           "regime": "neutral",
-          "zscore": 0.072,
-          "value": 96.7175
+          "zscore": 0.039,
+          "value": 96.5217
         },
         {
           "date": "2025-11-28",
           "regime": "neutral",
-          "zscore": 0.546,
-          "value": 100.1147
+          "zscore": 0.514,
+          "value": 99.9266
         },
         {
           "date": "2025-12-05",
           "regime": "neutral",
-          "zscore": 0.733,
-          "value": 101.4376
+          "zscore": 0.708,
+          "value": 101.2792
         },
         {
           "date": "2025-12-12",
           "regime": "neutral",
-          "zscore": 0.995,
-          "value": 103.227
+          "zscore": 0.979,
+          "value": 103.0915
         },
         {
           "date": "2025-12-19",
           "regime": "loose",
-          "zscore": 1.101,
-          "value": 103.9829
+          "zscore": 1.093,
+          "value": 103.8645
         },
         {
           "date": "2025-12-26",
           "regime": "loose",
-          "zscore": 1.61,
-          "value": 107.3153
+          "zscore": 1.622,
+          "value": 107.2327
         },
         {
           "date": "2026-01-02",
           "regime": "loose",
-          "zscore": 2.155,
-          "value": 110.6679
+          "zscore": 2.176,
+          "value": 110.5883
         },
         {
           "date": "2026-01-09",
           "regime": "loose",
-          "zscore": 2.88,
-          "value": 115.5504
+          "zscore": 2.934,
+          "value": 115.6348
         },
         {
           "date": "2026-01-16",
           "regime": "loose",
-          "zscore": 3.102,
-          "value": 117.6484
+          "zscore": 3.154,
+          "value": 117.7578
         },
         {
           "date": "2026-01-23",
           "regime": "loose",
-          "zscore": 2.776,
-          "value": 116.1535
+          "zscore": 2.814,
+          "value": 116.2459
         },
         {
           "date": "2026-01-30",
           "regime": "loose",
-          "zscore": 2.285,
-          "value": 113.3236
+          "zscore": 2.304,
+          "value": 113.3488
         },
         {
           "date": "2026-02-06",
           "regime": "loose",
-          "zscore": 2.568,
-          "value": 115.653
+          "zscore": 2.592,
+          "value": 115.7224
         },
         {
           "date": "2026-02-13",
           "regime": "loose",
-          "zscore": 2.268,
-          "value": 114.1402
+          "zscore": 2.287,
+          "value": 114.2126
         },
         {
           "date": "2026-02-20",
           "regime": "loose",
-          "zscore": 2.12,
-          "value": 113.5466
+          "zscore": 2.127,
+          "value": 113.5568
         },
         {
           "date": "2026-02-27",
           "regime": "loose",
-          "zscore": 1.548,
-          "value": 109.9904
+          "zscore": 1.544,
+          "value": 109.9503
         },
         {
           "date": "2026-03-06",
           "regime": "neutral",
-          "zscore": 0.843,
-          "value": 105.455
+          "zscore": 0.836,
+          "value": 105.4095
         },
         {
           "date": "2026-03-13",
           "regime": "neutral",
-          "zscore": 0.559,
-          "value": 103.6704
+          "zscore": 0.548,
+          "value": 103.6052
         },
         {
           "date": "2026-03-20",
           "regime": "neutral",
-          "zscore": 0.385,
-          "value": 102.6021
+          "zscore": 0.367,
+          "value": 102.4824
         },
         {
           "date": "2026-03-27",
           "regime": "neutral",
-          "zscore": 0.068,
-          "value": 100.5881
+          "zscore": 0.043,
+          "value": 100.4162
         },
         {
           "date": "2026-04-03",
           "regime": "loose",
-          "zscore": 1.513,
-          "value": 110.228
+          "zscore": 1.496,
+          "value": 110.1006
         },
         {
           "date": "2026-04-10",
           "regime": "loose",
-          "zscore": 2.318,
-          "value": 116.0824
+          "zscore": 2.311,
+          "value": 116.014
         },
         {
           "date": "2026-04-17",
           "regime": "loose",
-          "zscore": 1.965,
-          "value": 113.957
+          "zscore": 1.96,
+          "value": 113.91
         },
         {
           "date": "2026-04-24",
           "regime": "loose",
-          "zscore": 1.696,
-          "value": 112.35
+          "zscore": 1.686,
+          "value": 112.2773
         },
         {
           "date": "2026-05-01",
           "regime": "loose",
-          "zscore": 2.003,
-          "value": 114.7691
+          "zscore": 1.991,
+          "value": 114.6921
         },
         {
           "date": "2026-05-08",
           "regime": "loose",
-          "zscore": 2.368,
-          "value": 117.8105
+          "zscore": 2.359,
+          "value": 117.7637
         },
         {
           "date": "2026-05-15",
           "regime": "loose",
-          "zscore": 2.591,
-          "value": 120.1211
+          "zscore": 2.583,
+          "value": 120.0833
         },
         {
           "date": "2026-05-22",
           "regime": "loose",
-          "zscore": 2.58,
-          "value": 120.7882
+          "zscore": 2.57,
+          "value": 120.7422
         },
         {
           "date": "2026-05-29",
           "regime": "loose",
-          "zscore": 2.273,
-          "value": 119.1095
+          "zscore": 2.256,
+          "value": 118.9994
         },
         {
           "date": "2026-06-05",
           "regime": "loose",
-          "zscore": 1.818,
-          "value": 116.0863
+          "zscore": 1.799,
+          "value": 115.9433
         },
         {
           "date": "2026-06-12",
           "regime": "loose",
-          "zscore": 2.168,
-          "value": 119.2181
+          "zscore": 2.153,
+          "value": 119.1175
         },
         {
           "date": "2026-06-19",
           "regime": "loose",
-          "zscore": 1.68,
-          "value": 115.7969
+          "zscore": 1.661,
+          "value": 115.6494
         },
         {
           "date": "2026-06-26",
           "regime": "loose",
-          "zscore": 1.477,
-          "value": 114.4744
+          "zscore": 1.458,
+          "value": 114.316
         },
         {
           "date": "2026-07-03",
           "regime": "loose",
-          "zscore": 2.679,
-          "value": 124.6985
+          "zscore": 2.659,
+          "value": 124.5649
         },
         {
           "date": "2026-07-10",
           "regime": "loose",
-          "zscore": 2.565,
-          "value": 124.6985
+          "zscore": 2.566,
+          "value": 124.7358
         }
       ]
     },
@@ -2257,10 +2257,10 @@
             "26": {
               "median": 0.119629,
               "p25": 0.027494,
-              "p75": 0.1818,
+              "p75": 0.181801,
               "hit_rate": 0.82,
               "n": 50,
-              "ci_median_low": 0.010174,
+              "ci_median_low": 0.010175,
               "ci_median_high": 0.174024,
               "ci_hit_rate_low": 0.5333,
               "ci_hit_rate_high": 1.0,
@@ -2273,7 +2273,7 @@
             "4": {
               "median": 0.021739,
               "p25": -0.006302,
-              "p75": 0.053297,
+              "p75": 0.053298,
               "hit_rate": 0.7,
               "n": 60,
               "ci_median_low": 0.003402,
@@ -2410,7 +2410,7 @@
               "p75": 0.037844,
               "hit_rate": 0.5926,
               "n": 54,
-              "ci_median_low": -0.047735,
+              "ci_median_low": -0.047734,
               "ci_median_high": 0.029147,
               "ci_hit_rate_low": 0.3902,
               "ci_hit_rate_high": 0.7727,
@@ -2434,7 +2434,7 @@
             },
             "26": {
               "median": 0.122119,
-              "p25": 0.006084,
+              "p25": 0.006085,
               "p75": 0.178009,
               "hit_rate": 0.766,
               "n": 47,
@@ -4008,7 +4008,7 @@
             },
             "26": {
               "median": -0.000993,
-              "p25": -0.02328,
+              "p25": -0.023281,
               "p75": 0.026076,
               "hit_rate": 0.48,
               "n": 50,

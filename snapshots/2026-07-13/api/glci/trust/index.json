@@ -4,17 +4,14 @@
   "point_in_time": false,
   "frequency": "W-FRI",
   "snapshots": {
-    "count": 5,
+    "count": 6,
     "first_computed_at": "2026-07-11T04:12:17.432117Z",
-    "last_computed_at": "2026-07-13T01:47:43.490481Z"
+    "last_computed_at": "2026-07-13T14:04:18.403262Z"
   },
   "data_quality": {
-    "loaded_components": 17,
+    "loaded_components": 18,
     "total_components": 24,
-    "missing_components": [
-      "wb_credit_gdp_cn",
-      "wb_credit_gdp_us"
-    ],
+    "missing_components": [],
     "stale_components": [
       "bis_credit_cn",
       "bis_credit_eu",
@@ -22,21 +19,24 @@
       "bis_credit_us",
       "boe_total_assets",
       "us_consumer_credit",
-      "us_m2"
+      "us_m2",
+      "wb_credit_gdp_cn",
+      "wb_credit_gdp_us"
     ],
     "excluded_components": [
       "bis_credit_cn",
       "fed_funds_rate",
       "fed_reverse_repo",
       "fed_treasury_general_account",
-      "sofr"
+      "sofr",
+      "wb_credit_gdp_cn"
     ],
     "failed_pillars": []
   },
   "pillar_stats": {
     "liquidity": {
       "method": "pca_shrunk",
-      "explained_variance": 0.3774558665090667,
+      "explained_variance": 0.3774558665090666,
       "n_variables": 12,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 20,
@@ -44,11 +44,11 @@
       "max_series_loading_share": 0.20745824386600337,
       "series_loading_shares": {
         "boe_total_assets": 0.20745824386600337,
-        "boj_total_assets": 0.1327115977587328,
-        "ecb_total_assets": 0.18519593006603177,
+        "boj_total_assets": 0.13271159775873284,
+        "ecb_total_assets": 0.1851959300660318,
         "fed_reserve_balances": 0.08652466400478111,
         "fed_total_assets": 0.20652981274564372,
-        "us_m2": 0.1815797515588071
+        "us_m2": 0.18157975155880712
       },
       "data_quality": {
         "total_series": 8,
@@ -84,25 +84,26 @@
     },
     "credit": {
       "method": "pca_shrunk",
-      "explained_variance": 0.39883540181988475,
-      "n_variables": 14,
+      "explained_variance": 0.3260530855207071,
+      "n_variables": 16,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 19,
-      "constraint_exclusion_share": 0.125,
-      "max_series_loading_share": 0.19695900167821492,
+      "constraint_exclusion_share": 0.2,
+      "max_series_loading_share": 0.18727114342992876,
       "series_loading_shares": {
-        "bis_credit_eu": 0.09564466144171357,
-        "bis_credit_jp": 0.06465352269080527,
-        "bis_credit_us": 0.19695900167821492,
-        "us_bank_credit_total": 0.1803686863592542,
-        "us_bank_loans_leases": 0.18332146689199097,
-        "us_commercial_paper": 0.12390759931531678,
-        "us_consumer_credit": 0.15514506162270433
+        "bis_credit_eu": 0.08612957232556835,
+        "bis_credit_jp": 0.061976085894501966,
+        "bis_credit_us": 0.18727114342992876,
+        "us_bank_credit_total": 0.17004761636128043,
+        "us_bank_loans_leases": 0.171994709142828,
+        "us_commercial_paper": 0.11947983635064786,
+        "us_consumer_credit": 0.14267945357718842,
+        "wb_credit_gdp_us": 0.06042158291805625
       },
       "data_quality": {
         "total_series": 10,
-        "available_series": 8,
-        "loaded_series": 7,
+        "available_series": 10,
+        "loaded_series": 8,
         "used_series": [
           "bis_credit_eu",
           "bis_credit_jp",
@@ -110,42 +111,45 @@
           "us_bank_credit_total",
           "us_bank_loans_leases",
           "us_commercial_paper",
-          "us_consumer_credit"
-        ],
-        "excluded_series": [
-          "bis_credit_cn"
-        ],
-        "missing_series": [
-          "wb_credit_gdp_cn",
+          "us_consumer_credit",
           "wb_credit_gdp_us"
         ],
+        "excluded_series": [
+          "bis_credit_cn",
+          "wb_credit_gdp_cn"
+        ],
+        "missing_series": [],
         "low_coverage": [],
         "stale_series": [
           "bis_credit_cn",
           "bis_credit_eu",
           "bis_credit_jp",
           "bis_credit_us",
-          "us_consumer_credit"
+          "us_consumer_credit",
+          "wb_credit_gdp_cn",
+          "wb_credit_gdp_us"
         ],
         "constraint_excluded_features": [
           "bis_credit_cn_growth",
-          "bis_credit_cn_zscore"
+          "bis_credit_cn_zscore",
+          "wb_credit_gdp_cn_growth",
+          "wb_credit_gdp_cn_zscore"
         ]
       }
     },
     "stress": {
       "method": "pca_shrunk",
-      "explained_variance": 0.5103544903203101,
+      "explained_variance": 0.510192579843409,
       "n_variables": 4,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 15,
       "constraint_exclusion_share": 0.3333333333333333,
-      "max_series_loading_share": 0.2717366744482026,
+      "max_series_loading_share": 0.2717898300357643,
       "series_loading_shares": {
-        "ice_bofa_us_high_yield_spread": 0.2717366744482026,
-        "ice_bofa_us_ig_spread": 0.2683990796838765,
-        "nfci": 0.21196856571908274,
-        "vix": 0.24789568014883814
+        "ice_bofa_us_high_yield_spread": 0.2717898300357643,
+        "ice_bofa_us_ig_spread": 0.26845399716269963,
+        "nfci": 0.21194722536012509,
+        "vix": 0.247808947441411
       },
       "data_quality": {
         "total_series": 6,

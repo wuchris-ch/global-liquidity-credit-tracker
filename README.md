@@ -5,7 +5,7 @@
 
 Track global liquidity and credit metrics from central banks, BIS, World Bank, and market data sources.
 
-**Docs:** [Methodology & formulas](docs/METHODOLOGY.md) · [Data sources](docs/SOURCES.md) · [Operations runbook](docs/OPERATIONS.md) · [Sample output](docs/SAMPLE_OUTPUT.md) · [Claim → evidence map](docs/PROOF.md)
+**Docs:** [Methodology & formulas](docs/METHODOLOGY.md) · [Market flows and sector rotation](docs/MARKET_FLOWS.md) · [Data sources](docs/SOURCES.md) · [Operations runbook](docs/OPERATIONS.md) · [Sample output](docs/SAMPLE_OUTPUT.md) · [Claim → evidence map](docs/PROOF.md)
 
 ## Live Demo
 
@@ -15,7 +15,7 @@ The frontend is organized as a daily research note in six sections:
 
 - [Today](https://global-liquidity-credit-tracker.vercel.app/), the 30-second brief: regime verdict, what changed, what it has meant, plumbing vitals
 - [Index](https://global-liquidity-credit-tracker.vercel.app/glci), the GLCI deep dive: pillar decomposition, regime history, methodology
-- [Flows](https://global-liquidity-credit-tracker.vercel.app/flows), a price-leadership gauge for AI/semis vs crypto vs gold vs small caps vs duration, each scored against its own norm, plus bitcoin priced in semiconductors
+- [Flows](https://global-liquidity-credit-tracker.vercel.app/flows), cross-asset price leadership plus an 11-sector rotation map, State Street net issuance estimates, and non-directional OCC options activity
 - [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns using the production rolling regime classifier, explicit timing, and confidence intervals
 - [Plumbing](https://global-liquidity-credit-tracker.vercel.app/plumbing), net liquidity vs S&P 500, TGA/RRP components, credit spreads, central banks
 - [Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), chart any series against any other, with preset overlays
@@ -31,7 +31,7 @@ Static-first architecture with a scheduled data pipeline:
 | **Frontend** | Next.js, React, Tailwind, shadcn/ui, Recharts | Vercel |
 | **Data Pipeline** | Python, pandas, statsmodels, scipy | GitHub Actions (scheduled) |
 | **Data Storage** | Pre-computed JSON | GitHub Pages |
-| **Data Sources** | FRED, BIS, World Bank, NY Fed, Yahoo Finance | External APIs |
+| **Data Sources** | FRED, BIS, World Bank, NY Fed, Yahoo Finance, State Street, OCC | External APIs and sponsor files |
 
 **How it works:**
 1. GitHub Actions runs every 12 hours.
@@ -73,7 +73,7 @@ python cli.py backtest --save
 Everything below runs offline (no API keys, no network):
 
 ```bash
-make test    # 80+ unit tests: transforms, GLCI factor model, Sharpe/regime
+make test    # 200+ unit tests: transforms, GLCI factor model, Sharpe/regime
              # metrics, backtest timing controls, export validation, and
              # shell-syntax checks on the GitHub Actions workflows
 make smoke   # config integrity + numerics + local artifact validation
@@ -98,7 +98,9 @@ again as a gate before anything is published to `gh-pages`
 | BIS | Credit to non-financial sector | SDMX (no key) |
 | World Bank | Credit-to-GDP ratios | REST (no key) |
 | NY Fed | SOFR, repo operations | REST (no key) |
-| Yahoo Finance | Asset prices (ETFs, crypto) | yfinance (no key) |
+| Yahoo Finance | Selected asset and sector ETF prices | yfinance (no key) |
+| State Street | Select Sector SPDR NAV, shares, net assets | Sponsor workbooks (no key) |
+| OCC | Cleared sector ETF call/put activity | Volume Query (no key) |
 
 ## Configured Series
 
@@ -205,7 +207,7 @@ The Risk by Regime dashboard shows how different asset classes perform under var
 - Crypto: Bitcoin, Ethereum, Zcash
 - Fixed Income: Long Bonds (TLT)
 
-## Flows (Price Leadership)
+## Flows and Sector Rotation
 
 The Flows page shows where liquidity-sensitive prices are leading by ranking
 destinations (AI/semis, megacap tech, crypto, gold, small caps, long Treasuries,
@@ -225,6 +227,15 @@ trailing three-year history.
 
 This is a bid gauge built from prices, not flow-of-funds accounting; the page
 says so explicitly.
+
+The same page separately ranks all 11 Select Sector SPDRs using a price-only
+cross-sectional score: 65% medium-term excess-return percentile versus SPY and
+35% risk-adjusted absolute-trend percentile. It also shows split-adjusted
+State Street net issuance estimates and OCC cleared call/put activity. Those
+two context layers do not change the rank. OCC data does not expose aggressor
+side or open/close position, so it is never labeled directional options flow.
+The full formulas, source review, failure policy, and limitations are in
+[`docs/MARKET_FLOWS.md`](docs/MARKET_FLOWS.md).
 
 ## Track Record Dashboard
 
@@ -265,12 +276,13 @@ global_liquidity_tracker/
 ├── config/
 │   └── series.yml              # Series and index definitions
 ├── src/
-│   ├── data_sources/           # API clients (FRED, BIS, World Bank, NY Fed, yfinance)
+│   ├── data_sources/           # API clients, including State Street and OCC market data
 │   ├── etl/                    # Data fetching and storage
 │   └── indicators/
 │       ├── glci.py             # GLCI index computation
 │       ├── risk_metrics.py     # Risk by Regime metrics
 │       ├── backtest.py         # Track Record rolling-regime backtest
+│       ├── sector_rotation.py  # Sector prices, ETF issuance, options activity
 │       ├── dynamic_factor.py   # DFM latent factor extraction
 │       ├── factors.py          # Feature engineering (FX, real, GDP scaling)
 │       ├── transforms.py       # Data transforms (zscore, growth, impulse, gap)

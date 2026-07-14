@@ -349,6 +349,51 @@ the page discloses that limitation.
 Tests: `tests/test_flows.py` (return arithmetic, z-score vs a manual
 computation, weekly collapse of seven-day data, missing-series resilience).
 
+## 7. Sector rotation, ETF net issuance, and options activity
+
+**Code:** [`src/indicators/sector_rotation.py`](../src/indicators/sector_rotation.py),
+[`src/data_sources/state_street.py`](../src/data_sources/state_street.py), and
+[`src/data_sources/occ.py`](../src/data_sources/occ.py)
+
+The sector feature deliberately separates three evidence layers. The rank is
+price-only; State Street net issuance and OCC cleared options activity are
+context and cannot change the ordering.
+
+For sector adjusted close `P_i`, SPY adjusted close `P_m`, and horizon `h`:
+
+```text
+rs_i,h = ln(P_i,t / P_i,t-h) - ln(P_m,t / P_m,t-h)
+relative_strength_i = 0.5 * rs_i,63 + 0.5 * rs_i,126
+absolute_trend_i = ln(P_i,t / P_i,t-126) / (sigma_i,63 * sqrt(126))
+price_score_i = 0.65 * percentile(relative_strength_i)
+              + 0.35 * percentile(absolute_trend_i)
+```
+
+Complete adjusted-close histories for SPY and all 11 Select Sector SPDRs are
+required. Missing or incomplete Yahoo Finance data fails the price computation
+closed. Sponsor NAV is not substituted because it is not a dividend-adjusted
+total-return series.
+
+Daily Select Sector SPDR issuance uses sponsor-reported NAV and shares
+outstanding, with explicit share-split factor `S`:
+
+```text
+issuance_usd_i,t = (shares_i,t - S_i,t * shares_i,t-1) * NAV_i,t
+```
+
+The output includes 5-session and 20-session sums and a robust 20-session
+issuance z-score against the prior 252 observations. OCC call and put volumes
+are labelled cleared activity. They do not expose aggressor side or open/close
+position and therefore are not described as directional options flow.
+
+Definitions, split handling, source links, limitations, and the research
+survey are in [MARKET_FLOWS.md](MARKET_FLOWS.md). Research sources were checked
+on 2026-07-14. The signal remains `descriptive_not_backtested`.
+
+Tests: [`tests/test_sector_rotation.py`](../tests/test_sector_rotation.py)
+(source parsing, split-adjusted issuance, robust z-score history, complete
+ranking, and proof that fund and options context does not change the score).
+
 ---
 
 ## Verification

@@ -94,6 +94,19 @@ CATEGORY_MAP: Dict[str, str] = {
 }
 
 REGIME_LABELS = {-1: "tight", 0: "neutral", 1: "loose"}
+REQUIRED_SECTOR_TICKERS = {
+    "XLB",
+    "XLC",
+    "XLE",
+    "XLF",
+    "XLI",
+    "XLK",
+    "XLP",
+    "XLRE",
+    "XLU",
+    "XLV",
+    "XLY",
+}
 
 REQUIRED_PRODUCTION_EXPORT_PATHS = (
     "api/series/index.json",
@@ -628,8 +641,86 @@ def validate_required_exports(output_dir: Path) -> list[str]:
             errors.append(f"empty assets in {rel_path}")
         elif rel_path == "api/backtest/track_record/index.json" and not payload.get("assets"):
             errors.append(f"empty assets in {rel_path}")
-        elif rel_path == "api/flows/index.json" and not payload.get("destinations"):
-            errors.append(f"empty destinations in {rel_path}")
+        elif rel_path == "api/flows/index.json":
+            if not payload.get("destinations"):
+                errors.append(f"empty destinations in {rel_path}")
+                continue
+
+            rotation = payload.get("sector_rotation")
+            if not isinstance(rotation, dict):
+                errors.append(f"missing sector rotation in {rel_path}")
+                continue
+
+            sectors = rotation.get("sectors")
+            coverage = rotation.get("coverage", {})
+            if not isinstance(sectors, list):
+                errors.append(f"invalid sector rows in {rel_path}")
+                sectors = []
+            if not isinstance(coverage, dict):
+                errors.append(f"invalid sector coverage in {rel_path}")
+                coverage = {}
+            expected = coverage.get("expected_sectors")
+            tickers = {
+                sector.get("ticker")
+                for sector in sectors
+                if isinstance(sector, dict)
+            }
+            ranks = {
+                sector.get("rank")
+                for sector in sectors
+                if isinstance(sector, dict)
+            }
+            if (
+                expected != 11
+                or len(sectors) != 11
+                or tickers != REQUIRED_SECTOR_TICKERS
+            ):
+                errors.append(f"incomplete sector universe in {rel_path}")
+            elif ranks != set(range(1, 12)):
+                errors.append(f"invalid sector ranks in {rel_path}")
+            if (
+                coverage.get("price") != 11
+                or not coverage.get("complete_price_universe")
+            ):
+                errors.append(f"incomplete sector prices in {rel_path}")
+            if (
+                coverage.get("fund_flows") != 11
+                or not coverage.get("complete_fund_flow_universe")
+            ):
+                errors.append(f"incomplete sector fund flows in {rel_path}")
+            if (
+                coverage.get("options") != 11
+                or coverage.get("options_status") != "complete"
+            ):
+                errors.append(f"incomplete sector options activity in {rel_path}")
+
+            if (
+                rotation.get("status") != "complete"
+                or rotation.get("signal_status") != "descriptive_not_backtested"
+                or rotation.get("price_basis") != "yahoo_adjusted_close"
+            ):
+                errors.append(f"invalid sector signal status in {rel_path}")
+
+            for sector in sectors:
+                if not isinstance(sector, dict):
+                    continue
+                flow = sector.get("fund_flow") or {}
+                if not flow.get("as_of") or "flow_20d_pct_aum" not in flow:
+                    errors.append(
+                        f"incomplete fund-flow evidence for "
+                        f"{sector.get('ticker', '<unknown>')} in {rel_path}"
+                    )
+                options = sector.get("options_activity") or {}
+                if (
+                    options.get("evidence_level") != "cleared_activity"
+                    or options.get("direction") is not None
+                    or options.get("trade_side") != "unavailable"
+                    or options.get("open_close") != "unavailable"
+                ):
+                    errors.append(
+                        f"invalid options evidence label for "
+                        f"{sector.get('ticker', '<unknown>')} in {rel_path}"
+                    )
 
     return errors
 

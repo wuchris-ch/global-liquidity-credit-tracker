@@ -380,6 +380,128 @@ export interface FlowsPair {
   ratio: DataPoint[];
 }
 
+export type SectorRotationPhase = "leading" | "weakening" | "improving" | "lagging";
+export type SectorFlowConfirmation = "supports" | "diverges" | "neutral";
+export type SectorOptionsStatus = "complete" | "partial" | "unavailable" | "disabled";
+
+export interface SectorFundFlow {
+  as_of: string;
+  aum_usd: number | null;
+  flow_1d_usd: number | null;
+  flow_5d_usd: number | null;
+  flow_20d_usd: number | null;
+  flow_5d_pct_aum: number | null;
+  flow_20d_pct_aum: number | null;
+  flow_20d_z: number | null;
+  history_observations: number;
+  split_adjustments: number;
+}
+
+/** OCC volume is cleared activity only; the source does not identify trade direction. */
+export interface SectorOptionsActivity {
+  evidence_level: "cleared_activity";
+  direction: null;
+  trade_side: "unavailable";
+  open_close: "unavailable";
+  as_of: string;
+  week_start: string;
+  week_end: string;
+  sessions: number;
+  call_volume: number;
+  put_volume: number;
+  total_volume: number;
+  put_call_ratio: number | null;
+  prior_month_daily_average: number | null;
+  activity_ratio: number | null;
+  excluded_adjusted_roots: string[];
+}
+
+export interface SectorRotationRow {
+  id: string;
+  ticker: string;
+  name: string;
+  rank: number;
+  price_as_of: string;
+  return_21d: number | null;
+  return_63d: number | null;
+  return_126d: number | null;
+  excess_21d: number | null;
+  excess_63d: number | null;
+  excess_126d: number | null;
+  relative_strength: number | null;
+  acceleration: number | null;
+  absolute_trend: number | null;
+  above_200d: boolean;
+  phase: SectorRotationPhase;
+  price_score: number | null;
+  fund_flow: SectorFundFlow;
+  options_activity: SectorOptionsActivity | null;
+  flow_confirmation: SectorFlowConfirmation;
+}
+
+export interface SectorRotationResponse {
+  schema_version: string;
+  computed_at: string;
+  status: "complete" | "partial" | "unavailable";
+  signal_status: "descriptive_not_backtested";
+  universe: "select_sector_spdr_11";
+  benchmark: string;
+  price_as_of: string;
+  fund_flow_as_of: string;
+  options_as_of: string | null;
+  price_basis: "yahoo_adjusted_close";
+  coverage: {
+    expected_sectors: number;
+    price: number;
+    fund_flows: number;
+    options: number;
+    complete_price_universe: boolean;
+    complete_fund_flow_universe: boolean;
+    options_status: SectorOptionsStatus;
+    options_errors: Record<string, string>;
+  };
+  methodology: {
+    price_score: string;
+    phase: string;
+    fund_flow: string;
+    flow_z: string;
+    options: string;
+    score_inputs: string[];
+    excluded_from_score: string[];
+  };
+  sources: {
+    fund_flows: {
+      provider: string;
+      url_template: string;
+      point_in_time_history: boolean;
+      revision_policy: string;
+    };
+    prices: {
+      provider: string;
+      basis: string;
+      point_in_time_history: boolean;
+    };
+    options: {
+      provider: string;
+      url: string;
+      documentation: string;
+      evidence_level: "cleared_activity";
+      trade_direction: "unavailable";
+      open_close: "unavailable";
+      standard_roots_only: boolean;
+      baseline_month: string | null;
+    };
+  };
+  opportunities: {
+    leaders: string[];
+    laggards: string[];
+    improving: string[];
+    strongest_inflows: string[];
+    most_active_options: string[];
+  };
+  sectors: SectorRotationRow[];
+}
+
 export interface FlowsResponse {
   computed_at: string;
   as_of: string;
@@ -388,6 +510,8 @@ export interface FlowsResponse {
   glci_corr_window_weeks: number;
   destinations: FlowDestination[];
   pair: FlowsPair | null;
+  /** Optional while static deployments roll forward to the sector-rotation schema. */
+  sector_rotation?: SectorRotationResponse | null;
 }
 
 class ApiClient {

@@ -12,7 +12,9 @@ source mapping is [`config/series.yml`](../config/series.yml).
 | [BIS SDMX](https://stats.bis.org/api-doc/v1/) | `bis.py` | none | be polite | Credit to non-financial sector (quarterly) |
 | [World Bank](https://datahelpdesk.worldbank.org/knowledgebase/articles/889392) | `worldbank.py` | none | none documented | Credit-to-GDP ratios (annual) |
 | [NY Fed Markets API](https://markets.newyorkfed.org/static/docs/markets-api.html) | `nyfed.py` | none | none documented | SOFR, repo operations |
-| Yahoo Finance | `yfinance_client.py` (yfinance) | none | unofficial, throttled | ETF & crypto prices |
+| [Yahoo Finance via yfinance](https://ranaroussi.github.io/yfinance/) | `yfinance_client.py` | none | unofficial; best-effort research use | Adjusted ETF and selected crypto prices |
+| [State Street Investment Management](https://www.ssga.com/us/en/intermediary/etfs/state-street-communication-services-select-sector-spdr-etf-xlc) | `state_street.py` | none | sponsor workbook availability | Select Sector SPDR NAV, shares outstanding, and net assets |
+| [OCC Volume Query](https://marketdata.theocc.com/volume-query) | `occ.py` | none | public batch endpoint | Cleared sector ETF options activity |
 
 ## Series inventory
 
@@ -75,9 +77,41 @@ IG OAS, VIX, and NFCI. The separate USD Credit Stress composite uses HY OAS
 | `russell2000_price` | Yahoo | IWM |
 | `gold_price` | Yahoo | GLD |
 | `silver_price` | Yahoo | SLV |
-| `bitcoin_price` | Yahoo | BTC-USD |
-| `ethereum_price` | Yahoo | ETH-USD |
+| `bitcoin_price` | FRED | CBBTCUSD |
+| `ethereum_price` | FRED | CBETHUSD |
 | `long_bond_price` | Yahoo | TLT |
+
+### Sector rotation and market-flow evidence
+
+Sources in this section were checked on **2026-07-14**.
+
+| Evidence | Primary source | Used fields | Limitation |
+|----------|----------------|-------------|------------|
+| Select Sector SPDR net issuance | State Street [NAV-history workbook](https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-xlc.xlsx) and [product page](https://www.ssga.com/us/en/intermediary/etfs/state-street-communication-services-select-sector-spdr-etf-xlc) | Date, NAV, shares outstanding, total net assets | Current sponsor workbook, not a point-in-time archive; covers one ETF family |
+| Sector price rotation | [Yahoo Finance via yfinance](https://github.com/ranaroussi/yfinance) | Adjusted close for SPY and 11 sector ETFs | Unofficial source; complete cross-section is required and failures stop the score |
+| Sector options activity | OCC [Volume Query](https://marketdata.theocc.com/volume-query) and [batch documentation](https://www.theocc.com/market-data/market-data-reports/other-market-data-info/batch-processing/volume-query-batch-processing) | Account-side call and put quantities by underlying and option root | Cleared activity only; no aggressor direction or open/close position |
+
+State Street workbook URLs follow the same official ticker pattern as the XLC
+example. They supply fund issuance inputs only. They are not used as a fallback
+for price ranking because NAV histories are not dividend-adjusted total-return
+series.
+
+The `yfinance` project states that it is not affiliated with or vetted by
+Yahoo, is intended for research and education, and directs users to Yahoo's
+terms for rights to downloaded data. Its README describes the Yahoo Finance
+API as intended for personal use. Treat the data as best-effort research input,
+not as a licensed redistribution feed, and review usage rights before
+commercial use or redistribution.
+
+OCC reports contract activity, not a directional options-flow signal. Cboe's
+licensed [Open-Close Volume Summary](https://datashop.cboe.com/cboe-options-open-close-volume-summary)
+provides buy/sell and open/close classifications for Cboe exchanges, but its
+page states that the dataset is proprietary, raw data is licensed for internal
+use, and external distribution of derived data requires additional fees and
+approval. This project does not ingest it.
+
+Full definitions and source boundaries are in
+[MARKET_FLOWS.md](MARKET_FLOWS.md).
 
 ## Failure handling
 

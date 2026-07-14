@@ -8,6 +8,7 @@ import pytest
 import scripts.export_to_json as export_module
 from scripts.export_to_json import (
     REQUIRED_PRODUCTION_EXPORT_PATHS,
+    REQUIRED_SECTOR_TICKERS,
     export_glci,
     export_glci_freshness,
     export_glci_trust,
@@ -176,6 +177,69 @@ class TestValidateRequiredExports:
         write_json(path, {"as_of": "2026-01-02", "destinations": []})
         errors = validate_required_exports(tmp_path)
         assert any("empty destinations in api/flows/index.json" in e for e in errors)
+
+    @staticmethod
+    def _complete_flows_payload() -> dict:
+        sectors = []
+        for rank, ticker in enumerate(sorted(REQUIRED_SECTOR_TICKERS), start=1):
+            sectors.append(
+                {
+                    "ticker": ticker,
+                    "rank": rank,
+                    "fund_flow": {
+                        "as_of": "2026-07-13",
+                        "flow_20d_pct_aum": 0.01,
+                    },
+                    "options_activity": {
+                        "evidence_level": "cleared_activity",
+                        "direction": None,
+                        "trade_side": "unavailable",
+                        "open_close": "unavailable",
+                    },
+                }
+            )
+        return {
+            "destinations": [{"id": "sp500"}],
+            "sector_rotation": {
+                "status": "complete",
+                "signal_status": "descriptive_not_backtested",
+                "price_basis": "yahoo_adjusted_close",
+                "coverage": {
+                    "expected_sectors": 11,
+                    "price": 11,
+                    "fund_flows": 11,
+                    "options": 11,
+                    "complete_price_universe": True,
+                    "complete_fund_flow_universe": True,
+                    "options_status": "complete",
+                },
+                "sectors": sectors,
+            },
+        }
+
+    def test_complete_sector_evidence_passes_flows_validation(self, tmp_path):
+        path = tmp_path / "api" / "flows" / "index.json"
+        write_json(path, self._complete_flows_payload())
+
+        flow_errors = [
+            error
+            for error in validate_required_exports(tmp_path)
+            if "api/flows/index.json" in error
+        ]
+
+        assert flow_errors == []
+
+    def test_directional_options_claim_is_rejected(self, tmp_path):
+        path = tmp_path / "api" / "flows" / "index.json"
+        payload = self._complete_flows_payload()
+        payload["sector_rotation"]["sectors"][0]["options_activity"][
+            "direction"
+        ] = "bullish"
+        write_json(path, payload)
+
+        errors = validate_required_exports(tmp_path)
+
+        assert any("invalid options evidence label" in error for error in errors)
 
     def test_valid_local_export_passes(self):
         """If a full local export exists (after a pipeline run), it must validate.

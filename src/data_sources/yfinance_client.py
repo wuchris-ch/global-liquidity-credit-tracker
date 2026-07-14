@@ -97,6 +97,79 @@ class YFinanceClient(BaseClient):
                 print(f"Warning: Could not fetch {ticker}: {e}")
         return results
 
+    def get_adjusted_histories(
+        self,
+        tickers: list[str],
+        start_date: str | None = None,
+        end_date: str | None = None,
+    ) -> dict[str, pd.DataFrame]:
+        """Fetch adjusted closes for multiple tickers in one upstream request.
+
+        This is used by the sector-rotation cross-section so every sector is
+        sampled from the same download. The returned frames use the tracker's
+        standard ``date``/``value`` shape and retain volume for diagnostics.
+        """
+        normalized = list(dict.fromkeys(ticker.strip().upper() for ticker in tickers))
+        if not normalized:
+            return {}
+        if not start_date:
+            start_date = (datetime.now() - timedelta(days=365 * 6)).strftime("%Y-%m-%d")
+        if not end_date:
+            end_date = datetime.now().strftime("%Y-%m-%d")
+
+        try:
+            downloaded = self._yf.download(
+                tickers=normalized,
+                start=start_date,
+                end=end_date,
+                auto_adjust=True,
+                progress=False,
+                group_by="ticker",
+                threads=True,
+            )
+        except Exception as exc:
+            raise RuntimeError(f"Failed to fetch Yahoo Finance market histories: {exc}") from exc
+
+        results: dict[str, pd.DataFrame] = {}
+        for ticker in normalized:
+            try:
+                if isinstance(downloaded.columns, pd.MultiIndex):
+                    level_zero = downloaded.columns.get_level_values(0)
+                    level_one = downloaded.columns.get_level_values(1)
+                    if ticker in level_zero:
+                        history = downloaded[ticker].copy()
+                    elif ticker in level_one:
+                        history = downloaded.xs(ticker, axis=1, level=1).copy()
+                    else:
+                        continue
+                else:
+                    if len(normalized) != 1:
+                        continue
+                    history = downloaded.copy()
+
+                if "Close" not in history or history["Close"].dropna().empty:
+                    continue
+                dates = pd.to_datetime(history.index)
+                if getattr(dates, "tz", None) is not None:
+                    dates = dates.tz_localize(None)
+                frame = pd.DataFrame(
+                    {
+                        "date": dates,
+                        "value": pd.to_numeric(history["Close"], errors="coerce").values,
+                        "volume": pd.to_numeric(
+                            history.get("Volume", pd.Series(index=history.index, dtype=float)),
+                            errors="coerce",
+                        ).values,
+                    }
+                ).dropna(subset=["value"])
+                if not frame.empty:
+                    results[ticker] = self._standardize_output(frame, ticker).merge(
+                        frame[["date", "volume"]], on="date", how="left"
+                    )
+            except (KeyError, TypeError, ValueError):
+                continue
+        return results
+
     def get_ticker_info(self, ticker: str) -> dict:
         """Get metadata about a ticker.
 

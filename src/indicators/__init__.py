@@ -39,6 +39,7 @@ from .glci import (
     GLCIPillarResult,
     compute_glci,
 )
+from .sector_rotation import SectorRotationComputer, compute_sector_rotation
 
 __all__ = [
     # Core aggregation
@@ -77,4 +78,7 @@ __all__ = [
     "GLCIResult",
     "GLCIPillarResult",
     "compute_glci",
+    # Sector flows and rotation
+    "SectorRotationComputer",
+    "compute_sector_rotation",
 ]

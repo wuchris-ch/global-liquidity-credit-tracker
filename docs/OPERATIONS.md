@@ -2,7 +2,8 @@
 
 How data gets to production, how to force a refresh, and how to verify what is
 actually being served. For formulas and methodology see
-[METHODOLOGY.md](METHODOLOGY.md).
+[METHODOLOGY.md](METHODOLOGY.md) and
+[MARKET_FLOWS.md](MARKET_FLOWS.md).
 
 ## How a change reaches the site
 
@@ -80,7 +81,11 @@ python scripts/smoke.py --live
 The pipeline aborts before publishing if any production-critical series fails
 to fetch, so a bad upstream day leaves the last good publish intact. Asset
 prices (gold, crypto, ETFs) are best effort: a failed fetch skips that asset
-and prints a warning in the run log instead of blocking the publish.
+and prints a warning in the run log instead of blocking the publish. The new
+11-sector payload is stricter: complete adjusted prices, State Street fund
+histories, and OCC activity summaries are required by the static export gate.
+If any sector is missing or mislabeled, the workflow stops before publication
+and retains the last good JSON.
 All three configured GLCI pillars are also required. A pillar-model failure
 aborts before save or publication; the pipeline never substitutes a partial,
 reweighted composite.

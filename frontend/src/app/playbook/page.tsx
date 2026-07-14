@@ -20,6 +20,7 @@ import type {
   BacktestAssetResult,
   BacktestBaseRate,
   BacktestHorizon,
+  BacktestLiveEvaluation,
   BacktestStats,
   Regime,
 } from "@/lib/api";
@@ -84,6 +85,18 @@ function num(v: number | null | undefined, decimals = 1): string {
   return v < 0 ? `−${fixed}` : fixed;
 }
 
+/** Format a scheduled date without clamping future dates to today. */
+function scheduledDate(date: string): string {
+  const [year, month, day] = date.slice(0, 10).split("-").map(Number);
+  if (![year, month, day].every(Number.isFinite)) return "unknown";
+  const parsed = new Date(year, month - 1, day);
+  return parsed.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(year === new Date().getFullYear() ? {} : { year: "numeric" }),
+  });
+}
+
 const REGIME_ORDER: Regime[] = ["loose", "neutral", "tight"];
 const HORIZON_ORDER: BacktestHorizon[] = ["4", "13", "26"];
 
@@ -119,21 +132,29 @@ function baseRate(
   return asset.base_rates?.[horizon] ?? null;
 }
 
-/** The edge is distinguishable from zero only when its paired CI excludes zero. */
-function edgeSignificant(
+/** Only multiplicity-controlled cells qualify as supported evidence. */
+function edgeSupported(
   stats: BacktestStats | null,
-  pairedInference: boolean
+  pairedInference: boolean,
+  fdrInference: boolean,
+  inferenceReady: boolean
 ): boolean | null {
   if (
     !pairedInference ||
+    !fdrInference ||
+    !inferenceReady ||
     !stats ||
     stats.edge == null ||
-    stats.ci_edge_low == null ||
-    stats.ci_edge_high == null
+    typeof stats.fdr_significant !== "boolean"
   ) {
     return null;
   }
-  return stats.ci_edge_low > 0 || stats.ci_edge_high < 0;
+  return stats.fdr_significant;
+}
+
+function qValue(v: number | null | undefined): string {
+  if (v == null || !Number.isFinite(v)) return "q unavailable";
+  return v < 0.001 ? "q < 0.001" : `q ${v.toFixed(3)}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -181,23 +202,32 @@ function MedianCell({
 }
 
 /**
- * Edge vs base rate: colored only when the paired edge CI excludes zero,
- * otherwise muted with an "n.s." marker. Paired CI shown underneath.
+ * Edge vs base rate: colored only when it survives the published FDR
+ * procedure. The nominal paired interval remains visible underneath.
  */
 function EdgeCell({
   stats,
   pairedInference,
+  fdrInference,
+  inferenceReady,
   className = "",
 }: {
   stats: BacktestStats | null;
   pairedInference: boolean;
+  fdrInference: boolean;
+  inferenceReady: boolean;
   className?: string;
 }) {
-  const sig = edgeSignificant(stats, pairedInference);
+  const supported = edgeSupported(
+    stats,
+    pairedInference,
+    fdrInference,
+    inferenceReady
+  );
   const edge = stats?.edge ?? null;
   const tone =
-    sig && edge != null && stats?.ci_edge_low != null
-      ? stats.ci_edge_low > 0
+    supported && edge != null
+      ? edge > 0
         ? "text-positive"
         : "text-negative"
       : "text-muted-foreground";
@@ -205,21 +235,31 @@ function EdgeCell({
     <td className={`py-3 pl-5 text-right align-top ${className}`}>
       <span className={`font-mono text-sm tabular-nums ${tone}`}>
         {edgePp(edge)}
-        {sig === false && (
+        {supported === false && (
           <>
             {" "}
-            <span className="font-mono text-[0.625rem] text-muted-foreground">n.s.</span>
+            <span className="font-mono text-[0.625rem] text-muted-foreground">FDR n.s.</span>
           </>
         )}
       </span>
+      {fdrInference && stats?.q_value != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          BY {qValue(stats.q_value)}
+        </span>
+      )}
+      {fdrInference && !inferenceReady && edge != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          evidence-readiness gate not met
+        </span>
+      )}
       {pairedInference && stats?.ci_edge_low != null && stats?.ci_edge_high != null && (
         <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
           paired CI {edgePp(stats.ci_edge_low)} to {edgePp(stats.ci_edge_high)}
         </span>
       )}
-      {pairedInference && sig == null && edge != null && (
+      {pairedInference && supported == null && edge != null && !(fdrInference && !inferenceReady) && (
         <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
-          CI unavailable
+          FDR decision unavailable
         </span>
       )}
     </td>
@@ -234,11 +274,15 @@ function ForwardReturnsTable({
   assets,
   regime,
   pairedInference,
+  fdrInference,
+  inferenceReady,
   focusHorizon,
 }: {
   assets: BacktestAssetResult[];
   regime: Regime;
   pairedInference: boolean;
+  fdrInference: boolean;
+  inferenceReady: boolean;
   focusHorizon: BacktestHorizon;
 }) {
   const groupHead = "pb-1 pl-5 text-left font-sans text-[0.6875rem] font-semibold uppercase tracking-wider";
@@ -324,6 +368,8 @@ function ForwardReturnsTable({
                         <EdgeCell
                           stats={stats}
                           pairedInference={pairedInference}
+                          fdrInference={fdrInference}
+                          inferenceReady={inferenceReady}
                           className={wash}
                         />
                       )}
@@ -418,18 +464,27 @@ function ClassifierEdgeCell({
   classifier,
   regime,
   pairedInference,
+  fdrInference,
+  inferenceReady,
 }: {
   asset: BacktestAssetResult;
   classifier: string;
   regime: Regime;
   pairedInference: boolean;
+  fdrInference: boolean;
+  inferenceReady: boolean;
 }) {
   const stats = cellStats(asset, classifier, regime, "13");
-  const sig = edgeSignificant(stats, pairedInference);
+  const supported = edgeSupported(
+    stats,
+    pairedInference,
+    fdrInference,
+    inferenceReady
+  );
   const edge = stats?.edge ?? null;
   const tone =
-    sig && edge != null && stats?.ci_edge_low != null
-      ? stats.ci_edge_low > 0
+    supported && edge != null
+      ? edge > 0
         ? "text-positive"
         : "text-negative"
       : "text-muted-foreground";
@@ -437,24 +492,34 @@ function ClassifierEdgeCell({
     <td className="py-2.5 pl-6 text-right align-baseline">
       <span className={`font-mono text-sm tabular-nums ${tone}`}>
         {edgePp(edge)}
-        {sig === false && (
+        {supported === false && (
           <>
             {" "}
-            <span className="font-mono text-[0.625rem] text-muted-foreground">n.s.</span>
+            <span className="font-mono text-[0.625rem] text-muted-foreground">FDR n.s.</span>
           </>
         )}
       </span>
       <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
         n {stats?.n ?? "–"}
       </span>
+      {fdrInference && stats?.q_value != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          BY {qValue(stats.q_value)}
+        </span>
+      )}
+      {fdrInference && !inferenceReady && edge != null && (
+        <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+          evidence-readiness gate not met
+        </span>
+      )}
       {pairedInference && stats?.ci_edge_low != null && stats?.ci_edge_high != null && (
         <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
           paired CI {edgePp(stats.ci_edge_low)} to {edgePp(stats.ci_edge_high)}
         </span>
       )}
-      {pairedInference && sig == null && edge != null && (
+      {pairedInference && supported == null && edge != null && !(fdrInference && !inferenceReady) && (
         <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
-          CI unavailable
+          FDR decision unavailable
         </span>
       )}
     </td>
@@ -465,10 +530,14 @@ function ClassifierComparisonTable({
   assets,
   regime,
   pairedInference,
+  fdrInference,
+  inferenceReady,
 }: {
   assets: BacktestAssetResult[];
   regime: Regime;
   pairedInference: boolean;
+  fdrInference: boolean;
+  inferenceReady: boolean;
 }) {
   const headline = HEADLINE_ASSETS.map((id) => assets.find((a) => a.id === id))
     .filter((a): a is BacktestAssetResult => a != null)
@@ -499,12 +568,16 @@ function ClassifierComparisonTable({
               classifier="glci"
               regime={regime}
               pairedInference={pairedInference}
+              fdrInference={fdrInference}
+              inferenceReady={inferenceReady}
             />
             <ClassifierEdgeCell
               asset={asset}
               classifier="nfci"
               regime={regime}
               pairedInference={pairedInference}
+              fdrInference={fdrInference}
+              inferenceReady={inferenceReady}
             />
           </tr>
         ))}
@@ -550,6 +623,151 @@ function RiskRow({ asset }: { asset: AssetRiskMetrics }) {
         ))}
       </dl>
     </div>
+  );
+}
+
+function LiveHorizonCell({
+  result,
+  minObservations,
+}: {
+  result: BacktestLiveEvaluation["assets"][number]["horizons"][string] | undefined;
+  minObservations: number;
+}) {
+  if (!result) {
+    return <td className="py-3 pl-5 text-right font-mono text-sm text-muted-foreground">–</td>;
+  }
+
+  const reportableRegimes = (["tight", "neutral", "loose"] as const)
+    .map((regime) => ({ regime, stats: result.by_regime?.[regime] }))
+    .filter(
+      (item) =>
+        item.stats?.status === "reportable" &&
+        item.stats.median != null &&
+        item.stats.hit_rate != null
+    );
+  return (
+    <td className="py-3 pl-5 text-right align-top">
+      {reportableRegimes.length > 0 ? (
+        <>
+          {reportableRegimes.map(({ regime, stats }) => (
+            <span key={regime} className="block font-mono text-sm tabular-nums">
+              {regimeLabel(regime)} {hitPct(stats?.hit_rate)} hit · {medPct(stats?.median)} median
+              <span className="block text-[0.625rem] leading-4 text-muted-foreground">
+                n {stats?.matured ?? 0}
+              </span>
+            </span>
+          ))}
+          <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+            all signals {result.matured} matured · {result.pending} pending
+            {result.unavailable > 0 ? ` · ${result.unavailable} unavailable` : ""}
+          </span>
+        </>
+      ) : (
+        <>
+          <span className="block font-mono text-sm tabular-nums text-muted-foreground">
+            {result.matured}/{minObservations} matured
+          </span>
+          <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+            {result.pending} pending of {result.issued} issued
+            {result.unavailable > 0 ? ` · ${result.unavailable} unavailable` : ""}
+          </span>
+          {result.next_maturity_date && (
+            <span className="block font-mono text-[0.625rem] leading-4 text-muted-foreground">
+              next {scheduledDate(result.next_maturity_date)}
+            </span>
+          )}
+        </>
+      )}
+    </td>
+  );
+}
+
+function ObservedLiveRecord({ evaluation }: { evaluation: BacktestLiveEvaluation }) {
+  const { ledger, methodology } = evaluation;
+  const statusLabel =
+    evaluation.status === "reportable"
+      ? "Reportable"
+      : evaluation.status === "collecting"
+        ? "Collecting evidence"
+        : "Unavailable";
+
+  return (
+    <section className="mt-8" aria-labelledby="observed-live-record-title">
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h2 id="observed-live-record-title" className="text-sm font-semibold tracking-tight">
+          Observed live record
+        </h2>
+        <span className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-muted-foreground">
+          {statusLabel}
+        </span>
+      </div>
+      {evaluation.status === "unavailable" ? (
+        <p className="mt-3 max-w-[70ch] font-serif text-[0.9375rem] italic leading-relaxed text-muted-foreground">
+          The published payload cannot evaluate recorded signals against later returns yet.
+        </p>
+      ) : (
+        <>
+          <p className="mt-3 max-w-[75ch] font-serif text-[1.0625rem] leading-relaxed">
+            The ledger contains {ledger.unique_signal_dates} unique signal {ledger.unique_signal_dates === 1 ? "date" : "dates"} across {ledger.vintage_count} recorded {ledger.vintage_count === 1 ? "vintage" : "vintages"}
+            {ledger.duplicate_vintages > 0
+              ? `, including ${ledger.duplicate_vintages} later recomputations`
+              : ""}.
+            {evaluation.status === "collecting"
+              ? ` Regime-conditioned outcomes stay hidden until at least ${methodology.min_observations} have matured for an asset, horizon, and regime.`
+              : " At least one asset, horizon, and regime now clears the reporting minimum."}
+          </p>
+          {(ledger.first_signal_date || ledger.latest_signal_date) && (
+            <p className="mt-1.5 font-mono text-xs text-muted-foreground">
+              Recorded signal dates {formatShortDate(ledger.first_signal_date)} to {formatShortDate(ledger.latest_signal_date)}
+            </p>
+          )}
+          {evaluation.assets.length > 0 && (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[46rem] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="pb-2 text-xs font-medium text-muted-foreground">Asset</th>
+                    {HORIZON_ORDER.map((horizon) => (
+                      <th
+                        key={horizon}
+                        className="pb-2 pl-5 text-right text-xs font-medium text-muted-foreground"
+                      >
+                        {horizon} weeks
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {evaluation.assets.map((asset) => (
+                    <tr key={asset.id} className="border-b border-border/60 last:border-b-0">
+                      <th scope="row" className="py-3 pr-5 align-top text-sm font-medium">
+                        {asset.name}
+                        <span className="block text-[0.6875rem] font-normal leading-4 text-muted-foreground">
+                          {asset.category}
+                        </span>
+                      </th>
+                      {HORIZON_ORDER.map((horizon) => (
+                        <LiveHorizonCell
+                          key={horizon}
+                          result={asset.horizons?.[horizon]}
+                          minObservations={methodology.min_observations}
+                        />
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="mt-4 max-w-[75ch] font-serif text-sm leading-relaxed text-muted-foreground">
+            One signal per date is frozen at its first publication, before the evaluated outcome,
+            and entry waits for the first complete Friday bar after publication. This record is
+            forward-safe, but the underlying source series and realized adjusted-price outcomes
+            are not yet stored as complete immutable vintages.
+          </p>
+        </>
+      )}
+    </section>
   );
 }
 
@@ -636,6 +854,11 @@ export default function PlaybookPage() {
   const data = productionBacktest;
   const legacyBacktestPayload = Boolean(backtest.data && !productionBacktest);
   const pairedInference = data?.bootstrap_method === PAIRED_BOOTSTRAP_METHOD;
+  const fdrInference =
+    data?.inference?.multiple_testing_method === "benjamini_yekutieli";
+  const fdrAlpha = data?.inference?.multiple_testing_alpha ?? null;
+  const inferenceReadiness = data?.inference?.readiness;
+  const inferenceReady = inferenceReadiness?.ready === true;
   const focusHorizon = outlook?.horizon ?? "13";
 
   return (
@@ -655,8 +878,8 @@ export default function PlaybookPage() {
         <p className="mt-5 max-w-[70ch] font-serif text-lg leading-relaxed text-muted-foreground sm:text-xl">
           Start with the preferred reportable horizon: 13 weeks when available, then 4, then 26.
           Current price leadership is a separate confirmation check. The highlighted horizon shows
-          hit rate, median, base rate, edge, paired edge CI, and sample size. Other horizons keep hit
-          rate, median, and sample size visible for comparison.
+          hit rate, median, base rate, edge, paired edge CI, adjusted q-value, and sample size. Other
+          horizons keep hit rate, median, and sample size visible for comparison.
         </p>
         <p className="mt-4 max-w-[80ch] font-serif text-[0.9375rem] leading-relaxed text-muted-foreground">
           These are conditional forward returns from reconstructed, current-vintage history, not a
@@ -703,6 +926,13 @@ export default function PlaybookPage() {
             </div>
           </section>
 
+          {data.live_evaluation && (
+            <>
+              <div className="rule mt-10" />
+              <ObservedLiveRecord evaluation={data.live_evaluation} />
+            </>
+          )}
+
           {/* Forward returns table */}
           <div className="rule mt-10" />
           <section className="mt-8">
@@ -711,7 +941,11 @@ export default function PlaybookPage() {
             </h2>
             <p className="mt-0.5 max-w-[70ch] font-serif text-[0.9375rem] italic leading-snug text-muted-foreground">
               {pairedInference
-                ? "Hit rate is the share of signals followed by a gain. Base rate is the asset's usual hit rate over the same eligible weeks. Edge is hit rate minus base rate; color appears only when the paired 95% CI excludes zero."
+                ? fdrInference
+                  ? inferenceReady
+                    ? "Hit rate is the share of signals followed by a gain. Base rate is the asset's usual hit rate over the same eligible weeks. Edge is hit rate minus base rate; color appears only when that edge survives Benjamini-Yekutieli false-discovery-rate control."
+                    : "Hit rate, edge, intervals, and q-values remain visible, but supported labels are withheld until point-in-time history and the sample-coverage gate are both available."
+                  : "Hit rate is the share of signals followed by a gain. Base rate is the asset's usual hit rate over the same eligible weeks. This payload has paired intervals but no multiple-testing adjustment, so every edge remains descriptive."
                 : "Hit rate is the share of signals followed by a gain. Base rate is the asset's usual hit rate, and edge is hit rate minus base rate. This older payload has no paired confidence intervals, so every edge is descriptive."}
             </p>
             <div className="mt-5">
@@ -719,12 +953,15 @@ export default function PlaybookPage() {
                 assets={data.assets}
                 regime={regime}
                 pairedInference={pairedInference}
+                fdrInference={fdrInference}
+                inferenceReady={inferenceReady}
                 focusHorizon={focusHorizon}
               />
             </div>
             <p className="mt-3 font-mono text-[0.6875rem] text-muted-foreground/80">
               Median = middle forward return · CI = confidence interval · n = sample size
-              {pairedInference ? " · n.s. = paired 95% edge CI includes zero" : ""} · cells
+              {fdrInference ? " · FDR n.s. = edge does not clear the adjusted threshold" : ""}
+              {fdrInference && !inferenceReady ? " · evidence gate = support withheld" : ""} · cells
               use the signal-date GLCI regime
               {data.entry_lag_weeks === 1
                 ? " · returns enter on the next weekly bar"
@@ -780,7 +1017,29 @@ export default function PlaybookPage() {
                 the edge CI. Sample sizes stay visible because a 100% hit rate on 20 observations
                 is a curiosity, not a strategy.
               </p>
-              {!pairedInference && (
+              {fdrInference ? (
+                <>
+                  <p>
+                    <span className="font-medium">Multiple comparisons.</span> The table tests many
+                    classifier, asset, regime, and horizon combinations. Benjamini-Yekutieli control
+                    is applied to the full family of {data.inference?.tests_in_family ?? "finite"}
+                    {" "}tests at a {fdrAlpha == null ? "published" : `${Math.round(fdrAlpha * 100)}%`}
+                    {" "}false-discovery-rate threshold. The q-value is the adjusted evidence measure;
+                    a nominal paired interval by itself is not labeled supported.
+                  </p>
+                  <p>
+                    <span className="font-medium">Evidence readiness.</span>{" "}
+                    {inferenceReady
+                      ? `The backtest is point-in-time, the primary GLCI classifier clears the ${inferenceReadiness?.minimum_classified_weeks ?? 260}-week history floor, and every regime has at least ${inferenceReadiness?.minimum_observations_per_regime ?? 20} observations.`
+                      : `Support is withheld. Point-in-time source history is ${inferenceReadiness?.point_in_time_history ? "available" : "unavailable"}. The primary GLCI classifier has ${inferenceReadiness?.observed_classified_weeks ?? "an unavailable number of"} classified weeks versus a ${inferenceReadiness?.minimum_classified_weeks ?? 260}-week floor, with regime counts of tight ${inferenceReadiness?.regime_observations.tight ?? 0}, neutral ${inferenceReadiness?.regime_observations.neutral ?? 0}, and loose ${inferenceReadiness?.regime_observations.loose ?? 0}. The sample floor is a disclosed governance policy, not proof of a complete cycle.`}
+                  </p>
+                </>
+              ) : pairedInference ? (
+                <p>
+                  This payload includes paired intervals but no multiple-testing adjustment. The
+                  page therefore leaves every edge uncolored and makes no supported-edge claim.
+                </p>
+              ) : (
                 <p>
                   The current payload does not identify that paired method, so this page
                   deliberately withholds its older intervals and all significance markers. Paired
@@ -792,8 +1051,12 @@ export default function PlaybookPage() {
                 <span className="font-medium">Benchmark.</span> The Chicago Fed&apos;s NFCI retains an
                 expanding one-year classifier as an independent baseline. The comparison below shows each
                 classifier&apos;s 13-week edge
-                {pairedInference ? " with its own paired CI" : " descriptively"}. It does not
-                estimate a CI for the difference between GLCI and NFCI.
+                {fdrInference
+                  ? " with its paired CI and family-adjusted q-value"
+                  : pairedInference
+                    ? " with its own paired CI"
+                    : " descriptively"}. It does not estimate a CI for the difference between GLCI
+                and NFCI.
               </p>
             </div>
             <div className="mt-5">
@@ -801,11 +1064,17 @@ export default function PlaybookPage() {
                 assets={data.assets}
                 regime={regime}
                 pairedInference={pairedInference}
+                fdrInference={fdrInference}
+                inferenceReady={inferenceReady}
               />
             </div>
             <p className="mt-4 max-w-[70ch] font-serif text-[1.0625rem] leading-relaxed">
-              {pairedInference
-                ? "Read the n.s. markers literally: where they appear, the paired interval does not establish a nonzero edge at the 95% level. "
+              {fdrInference
+                ? inferenceReady
+                  ? "Read FDR n.s. literally: the cell does not clear the Benjamini-Yekutieli adjusted threshold. "
+                  : "Q-values are shown, but no cell is labeled supported until the point-in-time and sample-readiness gate is met. "
+                : pairedInference
+                  ? "The paired intervals are shown descriptively because this payload has no multiple-testing control. "
                 : "No inferential claim is shown for this transitional payload. "}
               This is a backtest on one historical sample; past regimes may not repeat.
             </p>

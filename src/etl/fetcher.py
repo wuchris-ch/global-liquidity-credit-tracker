@@ -2,12 +2,15 @@
 import time
 
 import pandas as pd
-from datetime import datetime
 from typing import Literal
 
 from ..config import get_series_config, get_all_series, RAW_DATA_PATH
 from ..data_sources import FredClient, BISClient, WorldBankClient, NYFedClient, YFinanceClient
 from ..data_sources.base import BaseClient
+
+
+class SourceContractError(ValueError):
+    """Raised when configured source identity metadata does not match."""
 
 
 class DataFetcher:
@@ -16,6 +19,7 @@ class DataFetcher:
     def __init__(self, fred_api_key: str | None = None) -> None:
         self._clients: dict[str, BaseClient] = {}
         self._fred_api_key = fred_api_key
+        self._source_metadata_cache: dict[tuple[str, str], dict] = {}
 
     def _get_client(self, source: str) -> BaseClient:
         """Get or create a client for the given source."""
@@ -60,6 +64,7 @@ class DataFetcher:
         source_id = config["source_id"]
         
         client = self._get_client(source)
+        self._validate_source_contract(series_id, config, client)
 
         # Handle source-specific fetching
         if source == "worldbank" and isinstance(client, WorldBankClient):
@@ -76,6 +81,67 @@ class DataFetcher:
         df["unit"] = config.get("unit", "")
         
         return df
+
+    def _validate_source_contract(
+        self,
+        series_id: str,
+        config: dict,
+        client: BaseClient,
+    ) -> None:
+        """Fail closed when a configured FRED series no longer matches its identity."""
+        contract = config.get("source_contract")
+        if contract is None:
+            return
+        if not isinstance(contract, dict) or not contract:
+            raise SourceContractError(
+                f"Series '{series_id}' has an invalid source_contract"
+            )
+
+        source = config.get("source")
+        source_id = config.get("source_id")
+        if source != "fred":
+            raise SourceContractError(
+                f"Series '{series_id}' declares a source_contract for unsupported "
+                f"source '{source}'"
+            )
+
+        get_series_info = getattr(client, "get_series_info", None)
+        if not callable(get_series_info):
+            raise SourceContractError(
+                f"FRED client cannot validate source_contract for '{series_id}'"
+            )
+
+        cache_key = (source, str(source_id))
+        if cache_key not in self._source_metadata_cache:
+            self._source_metadata_cache[cache_key] = get_series_info(source_id)
+        metadata = self._source_metadata_cache[cache_key]
+        if not isinstance(metadata, dict):
+            raise SourceContractError(
+                f"FRED returned invalid metadata for '{series_id}' ({source_id})"
+            )
+
+        mismatches = []
+        for field, expected in contract.items():
+            actual = metadata.get(field)
+            expected_normalized = self._normalize_contract_value(expected)
+            actual_normalized = self._normalize_contract_value(actual)
+            if not expected_normalized or actual_normalized != expected_normalized:
+                mismatches.append(
+                    f"{field}: expected {expected!r}, received {actual!r}"
+                )
+
+        if mismatches:
+            raise SourceContractError(
+                f"FRED source_contract mismatch for '{series_id}' ({source_id}): "
+                + "; ".join(mismatches)
+            )
+
+    @staticmethod
+    def _normalize_contract_value(value: object) -> str:
+        """Normalize source metadata without weakening exact semantic matching."""
+        if value is None:
+            return ""
+        return " ".join(str(value).split()).casefold()
     
     def fetch_multiple(self, series_ids: list[str], start_date: str | None = None,
                        end_date: str | None = None,
@@ -101,6 +167,8 @@ class DataFetcher:
                     break
                 except Exception as e:
                     last_error = e
+                    if isinstance(e, SourceContractError):
+                        break
                     if attempt < retries:
                         delay = 2 * (attempt + 1)
                         print(f"Warning: fetch {series_id} failed ({e}), retrying in {delay}s")

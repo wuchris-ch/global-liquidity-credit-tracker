@@ -13,13 +13,23 @@ from src.indicators.backtest import (
     BOOTSTRAP_ITERATIONS,
     BOOTSTRAP_METHOD,
     BURN_IN_PERIODS,
+    EDGE_P_VALUE_METHOD,
+    EDGE_STANDARD_ERROR_METHOD,
     ENTRY_LAG_WEEKS,
     GLCI_REGIME_METHOD,
     GLCI_REGIME_MIN_PERIODS,
     GLCI_REGIME_WINDOW,
     MIN_OBS_PER_REGIME,
+    MIN_CLASSIFIED_WEEKS_FOR_SUPPORT,
+    MULTIPLE_TESTING_ALPHA,
+    MULTIPLE_TESTING_FAMILY,
+    MULTIPLE_TESTING_METHOD,
+    AssetBacktestResult,
     BacktestComputer,
     BacktestResult,
+    _apply_multiple_testing,
+    _benjamini_yekutieli_qvalues,
+    _inference_readiness,
     _moving_block_indices,
     _paired_regime_stats,
     _sanitize_json,
@@ -194,6 +204,8 @@ class TestPairedCalendarBootstrap:
         assert stats["edge"] == pytest.approx(0.0)
         assert stats["ci_edge_low"] == pytest.approx(0.0)
         assert stats["ci_edge_high"] == pytest.approx(0.0)
+        assert stats["edge_standard_error"] == pytest.approx(0.0)
+        assert stats["p_value"] == pytest.approx(1.0)
 
     def test_moving_blocks_preserve_adjacency(self):
         block_size = 4
@@ -261,6 +273,8 @@ class TestPairedCalendarBootstrap:
         assert stats["edge"] == pytest.approx(0.6667)
         assert stats["ci_edge_low"] > 0
         assert stats["ci_edge_high"] > stats["ci_edge_low"]
+        assert stats["edge_standard_error"] > 0
+        assert stats["p_value"] < 0.001
 
     def test_calendar_gap_rows_are_not_compressed_before_sampling(self, monkeypatch):
         returns = np.resize(np.array([0.01, -0.01]), 120)
@@ -343,6 +357,97 @@ class TestPairedCalendarBootstrap:
         assert stats["edge"] is not None
         assert stats["ci_hit_rate_low"] is None
         assert stats["ci_edge_low"] is None
+        assert stats["edge_standard_error"] is None
+        assert stats["p_value"] is None
+
+
+class TestMultipleTesting:
+    def test_by_qvalues_match_hand_calculation_and_preserve_missing_cells(self):
+        adjusted = _benjamini_yekutieli_qvalues(
+            [0.01, 0.04, 0.03, 0.002, None]
+        )
+
+        assert adjusted[0] == pytest.approx(0.0416666667)
+        assert adjusted[1] == pytest.approx(0.0833333333)
+        assert adjusted[2] == pytest.approx(0.0833333333)
+        assert adjusted[3] == pytest.approx(0.0166666667)
+        assert adjusted[4] is None
+
+    @pytest.mark.parametrize("p_value", [-0.01, 1.01, float("nan")])
+    def test_by_rejects_invalid_p_values(self, p_value):
+        with pytest.raises(ValueError, match="between zero and one"):
+            _benjamini_yekutieli_qvalues([p_value])
+
+    def test_one_family_spans_assets_and_classifiers(self):
+        glci_cell = {"p_value": 0.01}
+        nfci_cell = {"p_value": 0.04}
+        second_asset_cell = {"p_value": 0.20}
+        untested_cell = {"p_value": None}
+        assets = [
+            AssetBacktestResult(
+                asset_id="asset_a",
+                name="Asset A",
+                category="risk",
+                base_rates={},
+                results={
+                    "glci": {"loose": {4: glci_cell}},
+                    "nfci": {"loose": {4: nfci_cell}},
+                },
+            ),
+            AssetBacktestResult(
+                asset_id="asset_b",
+                name="Asset B",
+                category="risk",
+                base_rates={},
+                results={
+                    "glci": {
+                        "tight": {13: second_asset_cell},
+                        "neutral": {13: untested_cell},
+                    }
+                },
+            ),
+        ]
+
+        test_count = _apply_multiple_testing(assets, alpha=0.10)
+
+        assert test_count == 3
+        assert glci_cell["q_value"] == pytest.approx(0.055)
+        assert glci_cell["fdr_significant"] is True
+        assert nfci_cell["q_value"] == pytest.approx(0.11)
+        assert nfci_cell["fdr_significant"] is False
+        assert second_asset_cell["q_value"] == pytest.approx(0.3666666667)
+        assert second_asset_cell["fdr_significant"] is False
+        assert untested_cell["q_value"] is None
+        assert untested_cell["fdr_significant"] is None
+
+    def test_support_readiness_requires_history_and_every_regime(self):
+        not_ready = _inference_readiness(
+            {
+                "glci": {
+                    "n_per_regime": {"tight": 1, "neutral": 65, "loose": 53}
+                }
+            }
+        )
+
+        assert not_ready["ready"] is False
+        assert not_ready["observed_classified_weeks"] == 119
+        assert not_ready["minimum_classified_weeks"] == MIN_CLASSIFIED_WEEKS_FOR_SUPPORT
+        assert not_ready["reasons"] == [
+            "point_in_time_history_unavailable",
+            "classified_history_below_260_weeks",
+            "tight_regime_below_20_observations",
+        ]
+
+        ready = _inference_readiness(
+            {
+                "glci": {
+                    "n_per_regime": {"tight": 80, "neutral": 120, "loose": 80}
+                }
+            },
+            point_in_time=True,
+        )
+        assert ready["ready"] is True
+        assert ready["reasons"] == []
 
 
 class TestSanitizeJson:
@@ -378,6 +483,55 @@ class TestBacktestMetadata:
         assert payload["bootstrap_method"] == BOOTSTRAP_METHOD
         assert payload["bootstrap_iterations"] == BOOTSTRAP_ITERATIONS
         assert payload["min_obs_per_regime"] == MIN_OBS_PER_REGIME
+        assert payload["inference"] == {
+            "edge_standard_error_method": EDGE_STANDARD_ERROR_METHOD,
+            "p_value_method": EDGE_P_VALUE_METHOD,
+            "multiple_testing_method": MULTIPLE_TESTING_METHOD,
+            "multiple_testing_alpha": MULTIPLE_TESTING_ALPHA,
+            "multiple_testing_family": MULTIPLE_TESTING_FAMILY,
+            "tests_in_family": 0,
+            "readiness": {
+                "ready": False,
+                "policy": "point_in_time_minimum_history_and_all_regimes",
+                "classifier": "glci",
+                "point_in_time_history_required": True,
+                "point_in_time_history": False,
+                "minimum_classified_weeks": 260,
+                "observed_classified_weeks": 0,
+                "minimum_observations_per_regime": 20,
+                "regime_observations": {
+                    "tight": 0,
+                    "neutral": 0,
+                    "loose": 0,
+                },
+                "reasons": [
+                    "point_in_time_history_unavailable",
+                    "classified_history_below_260_weeks",
+                    "tight_regime_below_20_observations",
+                    "neutral_regime_below_20_observations",
+                    "loose_regime_below_20_observations",
+                ],
+            },
+        }
+        assert "live_evaluation" not in payload
+
+    def test_payload_includes_observed_live_evaluation_when_computed(self):
+        live_evaluation = {
+            "status": "collecting",
+            "methodology": {"signal_recorded_before_outcome": True},
+            "ledger": {"unique_signal_dates": 1},
+            "assets": [],
+        }
+        payload = BacktestResult(
+            computed_at="2026-07-14T00:00:00",
+            date_range=("2026-07-10", "2026-07-10"),
+            horizons=[4, 13, 26],
+            classifiers={},
+            assets=[],
+            live_evaluation=live_evaluation,
+        ).to_dict()
+
+        assert payload["live_evaluation"] == live_evaluation
 
     def test_classifier_metadata_discloses_distinct_clocks(self):
         computer = BacktestComputer(fetcher=object(), storage=object())

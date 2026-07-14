@@ -64,6 +64,7 @@ class FeatureMetadata:
     source_frequency: str  # Original data frequency
     data_quality: float  # Fraction of non-missing values
     last_updated: str  # Date of most recent observation
+    availability_lag_days: int = 0  # Delay from period end to signal eligibility
 
 
 @dataclass
@@ -149,13 +150,32 @@ class FeatureMatrixBuilder:
                 series_config = get_series_config(series_id)
                 unit = series_config.get("unit", "unknown")
                 source_freq = series_config.get("frequency", "monthly")
+                availability_lag_days = series_config.get(
+                    "availability_lag_days",
+                    0,
+                )
+                if (
+                    isinstance(availability_lag_days, bool)
+                    or not isinstance(availability_lag_days, int)
+                    or availability_lag_days < 0
+                ):
+                    raise ValueError(
+                        f"Series '{series_id}' has invalid availability_lag_days: "
+                        f"{availability_lag_days!r}"
+                    )
                 
                 # Calculate data quality metrics
                 last_date = df["date"].max()
                 # Put raw observations on the target clock before applying any
                 # row-based transform. This makes a 52-period growth transform
                 # mean 52 calendar weeks even for monthly or quarterly inputs.
-                df = self._regularize_series(df, source_freq, target_freq)
+                df = self._regularize_series(
+                    df,
+                    source_freq,
+                    target_freq,
+                    availability_lag_days=availability_lag_days,
+                    as_of_date=end_date or pd.Timestamp.now().normalize(),
+                )
                 if df.empty:
                     print(f"Warning: No completed {target_freq} periods for {series_id}")
                     continue
@@ -266,7 +286,8 @@ class FeatureMatrixBuilder:
                         sign=1,  # component orientation has already been consumed
                         source_frequency=source_freq,
                         data_quality=coverage,
-                        last_updated=str(last_date)[:10] if pd.notna(last_date) else "unknown"
+                        last_updated=str(last_date)[:10] if pd.notna(last_date) else "unknown",
+                        availability_lag_days=availability_lag_days,
                     ))
         
         if not all_features:
@@ -433,10 +454,20 @@ class FeatureMatrixBuilder:
         df: pd.DataFrame,
         source_frequency: str,
         target_freq: str,
+        availability_lag_days: int = 0,
+        as_of_date: str | pd.Timestamp | None = None,
     ) -> pd.DataFrame:
-        """Aggregate and bounded-fill raw values on the target period grid."""
+        """Put values on their availability clock, then bounded-fill target periods."""
         if target_freq not in _TARGET_FREQUENCIES:
             raise ValueError(f"Unsupported target frequency: {target_freq}")
+        if (
+            isinstance(availability_lag_days, bool)
+            or not isinstance(availability_lag_days, int)
+            or availability_lag_days < 0
+        ):
+            raise ValueError(
+                "availability_lag_days must be a non-negative integer"
+            )
         if df.empty:
             return pd.DataFrame(columns=["date", "value"])
 
@@ -448,24 +479,57 @@ class FeatureMatrixBuilder:
         if values.empty:
             return pd.DataFrame(columns=["date", "value"])
 
-        max_observation_date = values["date"].max().normalize()
+        # FRED and several macro APIs label monthly or quarterly observations
+        # with the first day of the period even when the value describes its
+        # end. Such a value cannot be signal-eligible before that period ends.
+        period_frequency = {
+            "monthly": "M",
+            "quarterly": "Q",
+            "annual": "Y",
+        }.get(source_frequency.lower())
+        if period_frequency is not None:
+            values["date"] = (
+                values["date"]
+                .dt.to_period(period_frequency)
+                .dt.end_time
+                .dt.normalize()
+            )
+
+        values["date"] = values["date"] + pd.Timedelta(
+            days=availability_lag_days
+        )
+        cutoff = pd.Timestamp(
+            as_of_date if as_of_date is not None else values["date"].max()
+        )
+        if cutoff.tzinfo is not None:
+            cutoff = cutoff.tz_localize(None)
+        cutoff = cutoff.normalize()
+        values = values.loc[values["date"] <= cutoff]
+        if values.empty:
+            return pd.DataFrame(columns=["date", "value"])
+
         series = values.set_index("date")["value"]
         regularized = series.resample(_TARGET_FREQUENCIES[target_freq]).last()
+        grid_end = regularized.index.max()
 
         if target_freq == "W":
-            # A Monday through Thursday observation belongs to an incomplete
-            # week. Do not publish it under a future Friday signal date.
+            # A value is eligible only on a completed Friday signal date. An
+            # explicit as-of date lets lower-frequency releases carry forward
+            # after their release week without creating a future observation.
+            # A Friday cutoff is not assumed complete because scheduled runs
+            # occur before the US market close; it becomes eligible Saturday.
             last_completed_friday = pd.offsets.Week(weekday=4).rollback(
-                max_observation_date
+                cutoff - pd.Timedelta(days=1)
             )
             regularized = regularized.loc[regularized.index <= last_completed_friday]
+            grid_end = last_completed_friday
 
         if regularized.empty:
             return pd.DataFrame(columns=["date", "value"])
 
         grid = pd.date_range(
             regularized.index.min(),
-            regularized.index.max(),
+            grid_end,
             freq=_TARGET_FREQUENCIES[target_freq],
         )
         regularized = regularized.reindex(grid)

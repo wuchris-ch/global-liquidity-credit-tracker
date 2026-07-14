@@ -17,6 +17,7 @@ from scripts.export_to_json import (
     write_json,
 )
 from src.config import get_all_indices, get_all_series, get_index_config
+from src.data_quality import _snapshot_summary
 from src.etl.storage import DataStorage
 
 
@@ -191,6 +192,32 @@ class TestValidateRequiredExports:
 
 
 class TestExportGlciTrust:
+    def test_snapshot_summary_detects_a_regime_change_that_later_reverts(
+        self, tmp_path
+    ):
+        storage = DataStorage(
+            raw_path=tmp_path / "raw",
+            curated_path=tmp_path / "curated",
+        )
+        for computed_at, regime in (
+            ("2026-07-10T12:00:00Z", 0),
+            ("2026-07-10T15:00:00Z", 1),
+            ("2026-07-10T18:00:00Z", 0),
+        ):
+            storage.append_signal_snapshot(
+                {
+                    "signal_date": "2026-07-10",
+                    "computed_at": computed_at,
+                    "glci": 101.0,
+                    "regime": regime,
+                }
+            )
+
+        revision = _snapshot_summary(storage)["latest_signal_revision"]
+        assert revision["first_regime"] == "neutral"
+        assert revision["latest_regime"] == "neutral"
+        assert revision["regime_changed"] is True
+
     def test_default_payload_has_stable_honest_schema(self, tmp_path):
         storage = DataStorage(
             raw_path=tmp_path / "raw",
@@ -217,8 +244,13 @@ class TestExportGlciTrust:
         assert payload["frequency"] == "W-FRI"
         assert payload["snapshots"] == {
             "count": 0,
+            "unique_signal_dates": 0,
+            "duplicate_vintages": 0,
+            "first_signal_date": None,
+            "latest_signal_date": None,
             "first_computed_at": None,
             "last_computed_at": None,
+            "latest_signal_revision": None,
         }
 
         configured_pillars = get_index_config(
@@ -343,12 +375,20 @@ class TestExportGlciTrust:
             "point_in_time": False,
             "frequency": "W-FRI",
             "glci": 101.0,
+            "zscore": 0.3,
+            "regime": 0,
         }
         storage.append_signal_snapshot(
             {**base_snapshot, "computed_at": "2026-07-10T12:00:00Z"}
         )
         storage.append_signal_snapshot(
-            {**base_snapshot, "computed_at": "2026-07-10T18:00:00Z"}
+            {
+                **base_snapshot,
+                "computed_at": "2026-07-10T18:00:00Z",
+                "glci": 102.0,
+                "zscore": 0.5,
+                "regime": 1,
+            }
         )
 
         output_dir = tmp_path / "export"
@@ -362,6 +402,24 @@ class TestExportGlciTrust:
         assert payload["as_of"] == "2026-07-10"
         assert payload["snapshots"] == {
             "count": 2,
+            "unique_signal_dates": 1,
+            "duplicate_vintages": 1,
+            "first_signal_date": "2026-07-10",
+            "latest_signal_date": "2026-07-10",
             "first_computed_at": "2026-07-10T12:00:00Z",
             "last_computed_at": "2026-07-10T18:00:00Z",
+            "latest_signal_revision": {
+                "vintage_count": 2,
+                "first_glci": 101,
+                "latest_glci": 102,
+                "glci_change": 1,
+                "glci_min": 101,
+                "glci_max": 102,
+                "first_zscore": 0.3,
+                "latest_zscore": 0.5,
+                "zscore_change": 0.2,
+                "first_regime": "neutral",
+                "latest_regime": "loose",
+                "regime_changed": True,
+            },
         }

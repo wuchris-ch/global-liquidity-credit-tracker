@@ -80,6 +80,25 @@ For each pillar *p* ∈ {liquidity, credit, stress}:
    estimator scale from changing the effective pillar weights. Asserted by
    `tests/test_dynamic_factor.py` sign-constraint tests.
 
+BIS quarterly and World Bank annual periods are dated at period end. Inside the
+feature matrix, every configured monthly, quarterly, or annual observation is
+also normalized to its period end before it can reach a signal. This prevents
+first-of-period source labels, including FRED monthly labels, from making an
+end-of-period value appear early. It establishes the earliest possible
+availability, not the source's actual historical release timestamp.
+
+A configured `availability_lag_days` then moves an observation onto a more
+conservative release clock before weekly resampling. BIS quarterly credit uses
+a 90-calendar-day lag, so a quarter-end value cannot affect a signal during the
+quarter it describes. Annual World Bank credit-to-GDP series remain available
+for contextual exploration but are not predictive GLCI inputs because the
+pipeline does not yet retain their historical releases. Critical FRED inputs
+may also declare a `source_contract`; a title, unit, or frequency mismatch
+fails the fetch rather than silently accepting a semantically different series.
+W-FRI labels are emitted only after the Friday period is complete. A pipeline
+run on Friday uses the prior Friday; the new Friday becomes eligible on
+Saturday, preventing a Thursday observation from acquiring a future close date.
+
 ### 3.2 Composite
 
 ```
@@ -245,10 +264,57 @@ reproducibility):
    finite, using their 2.5th and 97.5th percentiles.
 
 This preserves weekly adjacency before regime filtering. The hit-rate CI is a
-subgroup interval; the edge CI is a separate paired interval and is significant
-only when it excludes zero. Implementation and deterministic null/effect tests
-are in [`src/indicators/backtest.py`](../src/indicators/backtest.py) and
+subgroup interval and the edge CI is a separate paired interval. These nominal
+intervals are retained for estimation context, but are not used by the product
+to declare support across a table containing many comparisons.
+
+### 5.4 Multiple-testing control
+
+For every cell with enough finite bootstrap draws, the sample standard
+deviation of the paired edge draws is reported as the bootstrap standard error.
+A two-sided normal approximation converts the point edge and that standard
+error to a p-value. This approximation is disclosed in the payload rather than
+presented as an exact finite-sample test.
+
+All finite p-values across classifier x asset x regime x horizon form one
+family. The Benjamini-Yekutieli procedure adjusts that complete family at a
+10% false-discovery-rate threshold. It is deliberately conservative because
+the horizons, regimes, assets, and classifiers are dependent. The product
+calls an edge supported only when its adjusted q-value is at or below 0.10;
+otherwise the result remains descriptive even when its nominal 95% interval
+excludes zero.
+
+A q-value is necessary but not sufficient for the product's supported label.
+The historical input must be point-in-time, and the primary GLCI classifier
+must have at least 260 classified weekly observations and at least 20
+observations in each of tight, neutral, and loose. Until every policy check
+passes, q-values remain visible but all directional claims are marked
+descriptive. The five-year weekly floor is an explicit model-governance
+minimum; it is not represented as proof that the sample contains a complete
+liquidity or business cycle.
+
+Implementation and deterministic null, effect, and multiplicity tests are in
+[`src/indicators/backtest.py`](../src/indicators/backtest.py) and
 [`tests/test_backtest.py`](../tests/test_backtest.py).
+
+### 5.5 Observed live record
+
+The backtest payload also contains a forward-only record sourced from the
+append-only publication ledger. For each weekly signal date it selects the
+earliest recorded `computed_at` vintage. Entry is the first complete W-FRI bar
+whose date is strictly after that computation date; exit is exactly 4, 13, or
+26 weekly bars later. No reconstructed pre-ledger signal is admitted.
+
+Issued, matured, pending, and unavailable outcomes are reported separately.
+The evidence unit is asset x horizon x published regime. Regime-conditioned
+return summaries remain null until at least 20 outcomes mature in that exact
+cell; all-signal counts are operational context, not evidence that the regime
+classifier predicts returns. The clock is forward-safe because signals are
+fixed before evaluated outcomes. Realized returns are still recomputed from
+the current adjusted-price files, however, rather than read from an immutable
+outcome ledger. The record therefore does not make source or outcome history
+vintage-complete, and it begins with the introduction of the signal ledger
+rather than backfilling simulated history.
 
 ## 6. Price leadership (liquidity-sensitive destinations)
 

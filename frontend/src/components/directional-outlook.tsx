@@ -14,16 +14,30 @@ function listNames(assets: AssetOutlook[]): string {
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
 
-function evidenceNote(asset: AssetOutlook): string {
+function qLabel(value: number | null | undefined): string | null {
+  if (value == null || !Number.isFinite(value)) return null;
+  return value < 0.001 ? "q < 0.001" : `q = ${value.toFixed(3)}`;
+}
+
+function evidenceNote(
+  asset: AssetOutlook,
+  alpha: number | null,
+  inferenceReady: boolean
+): string {
+  if (!inferenceReady) {
+    return "The point-in-time and sample-readiness gate is not yet met; this remains descriptive.";
+  }
+  const q = qLabel(asset.stats.q_value);
+  const threshold = alpha == null ? "the published threshold" : `${Math.round(alpha * 100)}% FDR`;
   switch (asset.edgeEvidence) {
     case "positive":
-      return "The paired 95% edge CI is above zero.";
+      return `The positive edge survives Benjamini-Yekutieli control${q ? ` (${q})` : ""}.`;
     case "negative":
-      return "The paired 95% edge CI is below zero.";
+      return `The negative edge survives Benjamini-Yekutieli control${q ? ` (${q})` : ""}.`;
     case "unclear":
-      return "The paired 95% edge CI includes zero.";
+      return `The edge does not clear ${threshold}${q ? ` (${q})` : ""}.`;
     case "unavailable":
-      return "The paired 95% edge CI is unavailable for this sample.";
+      return "A multiplicity-controlled edge decision is unavailable for this sample.";
     case "descriptive":
       return "Descriptive only; this payload does not include paired edge inference.";
   }
@@ -46,10 +60,14 @@ function DirectionalRow({
   asset,
   regime,
   horizon,
+  multipleTestingAlpha,
+  inferenceReady,
 }: {
   asset: AssetOutlook;
   regime: string;
   horizon: string;
+  multipleTestingAlpha: number | null;
+  inferenceReady: boolean;
 }) {
   const price = priceLine(asset);
   return (
@@ -64,7 +82,7 @@ function DirectionalRow({
         {historicalLine(asset, regime, horizon)}
       </p>
       <p className="mt-1 font-serif text-sm leading-relaxed text-muted-foreground">
-        {evidenceNote(asset)}
+        {evidenceNote(asset, multipleTestingAlpha, inferenceReady)}
         {price ? ` ${price}` : " Current price confirmation is unavailable."}
       </p>
     </li>
@@ -105,12 +123,16 @@ export function DirectionalOutlookView({
 
       <p className="mt-2 font-serif text-sm leading-relaxed text-muted-foreground">
         {outlook.hasPositiveSupportedTilt && outlook.hasNegativeSupportedTilt
-          ? "Paired 95% CIs establish positive regime edges for some assets and negative edges for others. Current price leadership is shown separately."
+          ? "Benjamini-Yekutieli control supports positive regime edges for some assets and negative edges for others. Current price leadership is shown separately."
           : outlook.hasPositiveSupportedTilt
-            ? "At least one asset has a positive historical regime edge with a paired 95% CI above zero. Current price leadership is shown separately."
+            ? "At least one positive historical regime edge survives false-discovery-rate control. Current price leadership is shown separately."
             : outlook.hasNegativeSupportedTilt
-              ? "At least one asset has a negative historical regime edge with a paired 95% CI below zero. Positive returns and regime support are kept separate."
-              : "No statistically supported asset tilt is available, so these are directional watchpoints, not a forecast."}
+              ? "At least one negative historical regime edge survives false-discovery-rate control. Positive returns and regime support are kept separate."
+              : outlook.fdrInference && !outlook.inferenceReady
+                ? "No asset tilt is labeled supported because the point-in-time and sample-readiness gate is not yet met. These are directional watchpoints, not a forecast."
+                : outlook.fdrInference
+                  ? "No asset tilt survives false-discovery-rate control, so these are directional watchpoints, not a forecast."
+                : "Multiplicity-controlled evidence is unavailable, so these are directional watchpoints, not a forecast."}
         {outlook.regimeAgreement === false
           ? " The published regime and the backtest payload disagree, so no combined tilt is shown."
           : outlook.regimeAgreement == null
@@ -134,6 +156,8 @@ export function DirectionalOutlookView({
               asset={asset}
               regime={outlook.regime}
               horizon={horizon}
+              multipleTestingAlpha={outlook.multipleTestingAlpha}
+              inferenceReady={outlook.inferenceReady}
             />
           ))}
         </ol>
@@ -142,8 +166,12 @@ export function DirectionalOutlookView({
       {!compact && (
         <p className="mt-3 font-mono text-[0.6875rem] leading-relaxed text-muted-foreground/80">
           A positive historical direction requires a positive median forward return and at least a 55% hit rate. A negative direction requires a negative median and a hit rate of 45% or less. Price leadership is trailing and confirms current strength or weakness; it does not prove continuation.
-          {outlook.pairedInference
-            ? " Paired CIs apply to one asset and horizon at a time and are not adjusted for multiple testing."
+          {outlook.fdrInference
+            ? outlook.inferenceReady
+              ? " Supported labels require the edge to survive Benjamini-Yekutieli false-discovery-rate control across the published test family."
+              : " Supported labels are withheld until point-in-time history and the published sample-coverage policy are both available."
+            : outlook.pairedInference
+              ? " Paired CIs apply to one asset and horizon at a time, but this payload has no multiple-testing adjustment."
             : ""}
         </p>
       )}

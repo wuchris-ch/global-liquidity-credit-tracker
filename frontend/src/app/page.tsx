@@ -10,7 +10,7 @@ import { useGLCITrust } from "@/hooks/use-glci-trust";
 import { GlciChart } from "@/components/glci-chart";
 import { ChartSection } from "@/components/chart-section";
 import { RangeTabs } from "@/components/range-tabs";
-import { RegimeStamp } from "@/components/regime-stamp";
+import { RegimeStamp, regimeLabel } from "@/components/regime-stamp";
 import { Sparkline } from "@/components/sparkline";
 import { DataLoadError } from "@/components/data-load-error";
 import { DirectionalOutlookView } from "@/components/directional-outlook";
@@ -23,6 +23,7 @@ import {
   currentRegimeStanding,
   invalidationSentence,
   ordinal,
+  signed,
   standingSentence,
   transitionView,
   verdictHeadline,
@@ -31,7 +32,7 @@ import {
 } from "@/lib/brief";
 import { flowsTeaserSentence } from "@/lib/flows-brief";
 import { buildDirectionalOutlook } from "@/lib/outlook";
-import type { DataPoint } from "@/lib/api";
+import type { DataPoint, GLCITrustResponse } from "@/lib/api";
 
 const VITALS_RANGE = getDateRange("6m");
 
@@ -67,6 +68,55 @@ function componentList(items: string[]): string {
   const shown = items.slice(0, 3).map((item) => item.replaceAll("_", " "));
   const remainder = items.length - shown.length;
   return remainder > 0 ? `${shown.join(", ")} and ${remainder} more` : shown.join(", ");
+}
+
+type SignalRevision = NonNullable<
+  GLCITrustResponse["snapshots"]["latest_signal_revision"]
+>;
+
+function revisionSummary(signalDate: string | null | undefined, revision: SignalRevision): string {
+  const parts: string[] = [];
+  if (signalDate) parts.push(`Latest signal ${formatShortDate(signalDate)}.`);
+
+  if (revision.vintage_count <= 1) {
+    parts.push("Only one vintage is recorded, so revision stability cannot be assessed.");
+    return parts.join(" ");
+  }
+
+  if (
+    revision.regime_changed === true &&
+    revision.first_regime &&
+    revision.latest_regime
+  ) {
+    parts.push(revision.first_regime === revision.latest_regime
+      ? `The regime changed within ${revision.vintage_count} recorded vintages and later returned to ${regimeLabel(revision.latest_regime)}.`
+      : `The regime changed from ${regimeLabel(revision.first_regime)} to ${regimeLabel(revision.latest_regime)} across ${revision.vintage_count} recorded vintages.`
+    );
+  } else if (revision.regime_changed === false && revision.latest_regime) {
+    parts.push(
+      `${regimeLabel(revision.latest_regime)} remained stable across ${revision.vintage_count} recorded vintages.`
+    );
+  }
+
+  if (revision.first_glci != null && revision.latest_glci != null) {
+    const change = revision.glci_change == null ? "" : ` (${signed(revision.glci_change, 2)})`;
+    parts.push(
+      `GLCI moved from ${revision.first_glci.toFixed(2)} to ${revision.latest_glci.toFixed(2)}${change}.`
+    );
+  }
+  if (revision.glci_min != null && revision.glci_max != null) {
+    parts.push(
+      `Recorded range ${revision.glci_min.toFixed(2)} to ${revision.glci_max.toFixed(2)}.`
+    );
+  }
+  if (revision.first_zscore != null && revision.latest_zscore != null) {
+    const change =
+      revision.zscore_change == null ? "" : ` (${signed(revision.zscore_change, 2)})`;
+    parts.push(
+      `Z-score moved from ${revision.first_zscore.toFixed(2)} to ${revision.latest_zscore.toFixed(2)}${change}.`
+    );
+  }
+  return parts.join(" ");
 }
 
 interface VitalProps {
@@ -208,7 +258,11 @@ export default function TodayPage() {
     excludedComponents.length > 0 ? `Excluded from fit: ${componentList(excludedComponents)}.` : null,
   ].filter((issue): issue is string => issue !== null);
   const trustFrequency = trust.data?.frequency || "Weekly";
-  const snapshotCount = trust.data?.snapshots.count ?? 0;
+  const snapshotSummary = trust.data?.snapshots;
+  const snapshotCount = snapshotSummary?.count ?? 0;
+  const uniqueSignalDates = snapshotSummary?.unique_signal_dates;
+  const duplicateVintages = snapshotSummary?.duplicate_vintages;
+  const latestSignalRevision = snapshotSummary?.latest_signal_revision;
   const reconstructedHistory = trust.data?.point_in_time !== true;
 
   return (
@@ -324,6 +378,16 @@ export default function TodayPage() {
                 {snapshotCount} recorded {snapshotCount === 1 ? "vintage" : "vintages"}
               </span>
             )}
+            {uniqueSignalDates != null && uniqueSignalDates > 0 && (
+              <span className="font-mono text-xs text-muted-foreground">
+                {uniqueSignalDates} unique signal {uniqueSignalDates === 1 ? "date" : "dates"}
+              </span>
+            )}
+            {duplicateVintages != null && duplicateVintages > 0 && (
+              <span className="font-mono text-xs text-muted-foreground">
+                {duplicateVintages} later {duplicateVintages === 1 ? "recomputation" : "recomputations"}
+              </span>
+            )}
           </div>
           {integrityIssues.length > 0 && (
             <p className="mt-2 font-mono text-xs text-negative">
@@ -336,6 +400,14 @@ export default function TodayPage() {
               <span className="text-muted-foreground">
                 Historical readings use the current data vintage and are not point-in-time. Source
                 revisions and factor re-estimation can change past values and regime labels.
+              </span>
+            </p>
+          )}
+          {latestSignalRevision && (
+            <p className="mt-2 max-w-[90ch] font-serif text-sm leading-relaxed">
+              <span className="font-medium">Recorded revision behavior.</span>{" "}
+              <span className="text-muted-foreground">
+                {revisionSummary(snapshotSummary?.latest_signal_date, latestSignalRevision)}
               </span>
             </p>
           )}

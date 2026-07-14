@@ -58,6 +58,9 @@ export interface DirectionalOutlook {
   hasPositiveSupportedTilt: boolean;
   hasNegativeSupportedTilt: boolean;
   pairedInference: boolean;
+  fdrInference: boolean;
+  inferenceReady: boolean;
+  multipleTestingAlpha: number | null;
   regimeAgreement: boolean | null;
   signalFresh: boolean;
   datesAligned: boolean;
@@ -113,11 +116,19 @@ function historicalDirection(stats: BacktestStats): HistoricalDirection {
   return "mixed";
 }
 
-function edgeEvidence(stats: BacktestStats, pairedInference: boolean): EdgeEvidence {
+function edgeEvidence(
+  stats: BacktestStats,
+  pairedInference: boolean,
+  fdrInference: boolean,
+  inferenceReady: boolean
+): EdgeEvidence {
   if (!pairedInference) return "descriptive";
-  if (stats.ci_edge_low == null || stats.ci_edge_high == null) return "unavailable";
-  if (stats.ci_edge_low > 0) return "positive";
-  if (stats.ci_edge_high < 0) return "negative";
+  if (!fdrInference) return "unavailable";
+  if (!inferenceReady) return "unavailable";
+  if (stats.fdr_significant == null || stats.edge == null) return "unavailable";
+  if (!stats.fdr_significant) return "unclear";
+  if (stats.edge > 0) return "positive";
+  if (stats.edge < 0) return "negative";
   return "unclear";
 }
 
@@ -200,6 +211,13 @@ export function buildDirectionalOutlook(
 
   const horizon = selectHorizon(backtest, regime);
   const pairedInference = backtest.bootstrap_method === PAIRED_BOOTSTRAP_METHOD;
+  const fdrInference =
+    backtest.inference?.multiple_testing_method === "benjamini_yekutieli";
+  const inferenceReady =
+    fdrInference && backtest.inference?.readiness?.ready === true;
+  const multipleTestingAlpha = fdrInference
+    ? (backtest.inference?.multiple_testing_alpha ?? null)
+    : null;
   const classifierRegime = backtest.classifiers?.glci?.current_regime ?? null;
   const regimeAgreement = classifierRegime == null ? null : classifierRegime === regime;
   const signalFresh = datesWithinWeek(signalDate, evaluationDate);
@@ -231,6 +249,9 @@ export function buildDirectionalOutlook(
       hasPositiveSupportedTilt: false,
       hasNegativeSupportedTilt: false,
       pairedInference,
+      fdrInference,
+      inferenceReady,
+      multipleTestingAlpha,
       regimeAgreement,
       signalFresh,
       datesAligned,
@@ -247,7 +268,12 @@ export function buildDirectionalOutlook(
       const stats = statsFor(asset, regime, horizon);
       if (!isReportable(stats)) return null;
       const history = historicalDirection(stats);
-      const edge = edgeEvidence(stats, pairedInference);
+      const edge = edgeEvidence(
+        stats,
+        pairedInference,
+        fdrInference,
+        inferenceReady
+      );
       const candidateFlow = flowBySeries.get(asset.id) ?? null;
       const flowFresh = candidateFlow && signalDate
         ? datesWithinWeek(candidateFlow.last_date, signalDate) &&
@@ -307,6 +333,9 @@ export function buildDirectionalOutlook(
       (asset) => asset.edgeEvidence === "negative"
     ),
     pairedInference,
+    fdrInference,
+    inferenceReady,
+    multipleTestingAlpha,
     regimeAgreement,
     signalFresh,
     datesAligned,

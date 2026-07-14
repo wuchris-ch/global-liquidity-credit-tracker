@@ -170,7 +170,6 @@ CATEGORY_MAP = {
     "fed_total_assets": "Central Banks",
     "ecb_total_assets": "Central Banks",
     "boj_total_assets": "Central Banks",
-    "boe_total_assets": "Central Banks",
     "pboc_total_assets": "Central Banks",
     "fed_treasury_general_account": "Central Banks",
     "fed_reverse_repo": "Central Banks",

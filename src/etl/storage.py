@@ -95,6 +95,24 @@ class DataStorage:
                 + ", ".join(missing_identity)
             )
 
+        if {"computed_at", "signal_date"}.issubset(snapshot):
+            computed_at = pd.to_datetime(
+                snapshot["computed_at"], errors="coerce", utc=True
+            )
+            signal_date = pd.to_datetime(
+                snapshot["signal_date"], errors="coerce", utc=True
+            )
+            if pd.isna(computed_at) or pd.isna(signal_date):
+                raise ValueError(
+                    "Signal snapshot has an unparseable computed_at or signal_date"
+                )
+            computed_date = computed_at.tz_convert(None).normalize()
+            signal_date = signal_date.tz_convert(None).normalize()
+            if computed_date < signal_date:
+                raise ValueError(
+                    "Signal snapshot computed_at cannot precede signal_date"
+                )
+
         incoming = pd.DataFrame([snapshot])
         existing = self.load_curated(category, name)
         if existing is not None and not existing.empty:

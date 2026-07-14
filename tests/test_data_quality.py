@@ -86,4 +86,6 @@ def test_trust_coverage_counts_fitted_components_and_reports_exclusions(tmp_path
 
 
 def test_live_api_registers_glci_trust_route():
-    assert "/api/glci/trust" in {route.path for route in app.routes}
+    routes = {route.path for route in app.routes}
+    assert "/api/glci/trust" in routes
+    assert "/api/flows" in routes

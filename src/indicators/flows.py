@@ -25,9 +25,10 @@ from datetime import datetime
 
 import pandas as pd
 
-from ..config import CURATED_DATA_PATH
+from ..config import CURATED_DATA_PATH, get_series_config
 from ..etl.fetcher import DataFetcher
 from ..etl.storage import DataStorage
+from .sector_rotation import compute_sector_rotation
 
 # Destinations, in display order. Group is editorial, not computational.
 FLOW_DESTINATIONS = [
@@ -77,12 +78,16 @@ class FlowsComputer:
     # -- data loading -------------------------------------------------------
 
     def _load_weekly_prices(self, series_id: str) -> pd.Series | None:
-        """Fetch a price series and collapse it to Friday-stamped weekly closes."""
-        try:
-            df = self.fetcher.fetch_series(series_id)
-        except Exception as e:
-            print(f"  Warning: could not fetch {series_id}: {e}")
-            return None
+        """Load a persisted price snapshot, then fall back to an upstream fetch."""
+        config = get_series_config(series_id)
+        source = config.get("source")
+        df = self.storage.load_raw(source, series_id) if source else None
+        if df is None or df.empty:
+            try:
+                df = self.fetcher.fetch_series(series_id)
+            except Exception as e:
+                print(f"  Warning: could not fetch {series_id}: {e}")
+                return None
         if df is None or df.empty:
             return None
 
@@ -251,6 +256,28 @@ class FlowsComputer:
         return payload
 
 
-def compute_flows(save: bool = False, verbose: bool = True) -> dict:
-    """Convenience entry point used by the scheduled pipeline."""
-    return FlowsComputer().compute(save_output=save, verbose=verbose)
+def compute_flows(
+    save: bool = False,
+    verbose: bool = True,
+    include_sector_rotation: bool = True,
+    include_options: bool = True,
+) -> dict:
+    """Compute the combined leadership, issuance, options, and rotation payload."""
+    payload = FlowsComputer().compute(save_output=False, verbose=verbose)
+    payload["schema_version"] = "2.0"
+    if include_sector_rotation:
+        payload["sector_rotation"] = compute_sector_rotation(
+            include_options=include_options,
+            verbose=verbose,
+        )
+
+    if save:
+        out_dir = CURATED_DATA_PATH / "flows"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / "flows.json"
+        with open(out_path, "w") as f:
+            json.dump(payload, f, indent=2)
+        if verbose:
+            print(f"  Saved {out_path}")
+
+    return payload

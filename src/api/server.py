@@ -1,4 +1,5 @@
 """FastAPI server exposing liquidity data."""
+import json
 import os
 from datetime import datetime, timedelta
 import warnings
@@ -8,7 +9,13 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from ..config import get_all_series, get_all_indices, get_series_config, get_index_config
+from ..config import (
+    CURATED_DATA_PATH,
+    get_all_indices,
+    get_all_series,
+    get_index_config,
+    get_series_config,
+)
 from ..data_quality import build_glci_trust_payload
 from ..etl import DataFetcher, DataStorage
 from ..indicators import Aggregator, GLCIComputer, GLCIResult
@@ -215,6 +222,19 @@ CATEGORY_MAP = {
 @app.get("/")
 async def root():
     return {"status": "ok", "service": "Global Liquidity Tracker API", "version": "0.2.0"}
+
+
+@app.get("/api/flows")
+async def get_flows():
+    """Serve the same saved flows payload used by the static production export."""
+    path = CURATED_DATA_PATH / "flows" / "flows.json"
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Flows data has not been computed")
+    try:
+        with open(path, "r") as file:
+            return json.load(file)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=500, detail="Saved flows data is invalid") from exc
 
 
 @app.get("/api/series", response_model=list[SeriesInfo])

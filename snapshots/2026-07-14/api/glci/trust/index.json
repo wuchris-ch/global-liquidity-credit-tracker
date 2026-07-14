@@ -4,9 +4,9 @@
   "point_in_time": false,
   "frequency": "W-FRI",
   "snapshots": {
-    "count": 7,
+    "count": 8,
     "first_computed_at": "2026-07-11T04:12:17.432117Z",
-    "last_computed_at": "2026-07-14T01:21:42.912186Z"
+    "last_computed_at": "2026-07-14T13:06:14.896765Z"
   },
   "data_quality": {
     "loaded_components": 18,

@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-14T01:22:23.291587",
+  "computed_at": "2026-07-14T13:06:57.999340",
   "date_range": {
     "start": "2024-04-05",
     "end": "2026-07-10"
@@ -2243,7 +2243,7 @@
             "13": {
               "median": 0.056228,
               "p25": -0.023285,
-              "p75": 0.104578,
+              "p75": 0.104579,
               "hit_rate": 0.7222,
               "n": 54,
               "ci_median_low": -0.067885,
@@ -2276,7 +2276,7 @@
               "p75": 0.053297,
               "hit_rate": 0.7,
               "n": 60,
-              "ci_median_low": 0.003402,
+              "ci_median_low": 0.003401,
               "ci_median_high": 0.038009,
               "ci_hit_rate_low": 0.5333,
               "ci_hit_rate_high": 0.8413,
@@ -2410,7 +2410,7 @@
               "p75": 0.037844,
               "hit_rate": 0.5926,
               "n": 54,
-              "ci_median_low": -0.047734,
+              "ci_median_low": -0.047735,
               "ci_median_high": 0.029147,
               "ci_hit_rate_low": 0.3902,
               "ci_hit_rate_high": 0.7727,
@@ -3999,7 +3999,7 @@
               "hit_rate": 0.5556,
               "n": 54,
               "ci_median_low": -0.015468,
-              "ci_median_high": 0.042474,
+              "ci_median_high": 0.042473,
               "ci_hit_rate_low": 0.3333,
               "ci_hit_rate_high": 0.8125,
               "edge": 0.0223,
@@ -4037,13 +4037,13 @@
               "ci_edge_high": 0.113
             },
             "13": {
-              "median": 0.000529,
+              "median": 0.000528,
               "p25": -0.038764,
               "p75": 0.039611,
               "hit_rate": 0.5098,
               "n": 51,
               "ci_median_low": -0.030251,
-              "ci_median_high": 0.040984,
+              "ci_median_high": 0.040983,
               "ci_hit_rate_low": 0.2681,
               "ci_hit_rate_high": 0.8923,
               "edge": -0.0235,
@@ -4051,7 +4051,7 @@
               "ci_edge_high": 0.2535
             },
             "26": {
-              "median": -0.010532,
+              "median": -0.010533,
               "p25": -0.046925,
               "p75": 0.039792,
               "hit_rate": 0.4762,
@@ -4177,7 +4177,7 @@
               "hit_rate": 0.5556,
               "n": 54,
               "ci_median_low": -0.01159,
-              "ci_median_high": 0.036483,
+              "ci_median_high": 0.036484,
               "ci_hit_rate_low": 0.3661,
               "ci_hit_rate_high": 0.787,
               "edge": 0.0214,

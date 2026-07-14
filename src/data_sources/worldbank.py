@@ -99,7 +99,7 @@ class WorldBankClient(BaseClient):
         for record in records:
             if record.get("value") is not None:
                 rows.append({
-                    "date": pd.Timestamp(f"{record['date']}-01-01"),
+                    "date": pd.Timestamp(f"{record['date']}-12-31"),
                     "value": float(record["value"]),
                     "country": record.get("countryiso3code", record.get("country", {}).get("id", ""))
                 })

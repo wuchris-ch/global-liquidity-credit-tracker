@@ -7,6 +7,10 @@
 #   frequency:   daily | weekly | monthly | quarterly | annual
 #   type:        stock | flow | rate | spread | price | index | ratio
 #   unit:        e.g. millions_usd, billions_usd, percent, usd
+#   availability_lag_days: conservative delay from observation period end until
+#               the value may enter a signal (optional, defaults to zero)
+#   source_contract: source metadata fields that must match before data is used
+#               (optional; currently enforced for FRED series)
 #   description: human-readable label, shown in exports and the UI
 #
 # Registering a series here only makes it fetchable. Asset prices also need
@@ -70,17 +74,12 @@ series:
     country: JP
     frequency: monthly
     type: stock
-    unit: millions_jpy
+    unit: hundred_millions_jpy
     description: "Bank of Japan Total Assets"
-
-  boe_total_assets:
-    source: fred
-    source_id: BOGZ1FL714090005Q
-    country: GB
-    frequency: quarterly
-    type: stock
-    unit: millions_gbp
-    description: "Bank of England Total Assets"
+    source_contract:
+      title: "Bank of Japan: Total Assets for Japan"
+      units: "100 Million Yen"
+      frequency: "Monthly, End of Period"
 
   # Note: PBoC balance sheet data not available on FRED
   # Using China M2 as proxy for Chinese liquidity conditions
@@ -347,6 +346,7 @@ series:
     source_id: "Q.US.P.A.M.XDC.A"
     country: US
     frequency: quarterly
+    availability_lag_days: 90
     type: stock
     unit: local_currency
     description: "BIS Credit to Private Non-Financial Sector - US"
@@ -356,6 +356,7 @@ series:
     source_id: "Q.XM.P.A.M.XDC.A"
     country: EU
     frequency: quarterly
+    availability_lag_days: 90
     type: stock
     unit: local_currency
     description: "BIS Credit to Private Non-Financial Sector - Euro Area"
@@ -365,6 +366,7 @@ series:
     source_id: "Q.CN.P.A.M.XDC.A"
     country: CN
     frequency: quarterly
+    availability_lag_days: 90
     type: stock
     unit: local_currency
     description: "BIS Credit to Private Non-Financial Sector - China"
@@ -374,6 +376,7 @@ series:
     source_id: "Q.JP.P.A.M.XDC.A"
     country: JP
     frequency: quarterly
+    availability_lag_days: 90
     type: stock
     unit: local_currency
     description: "BIS Credit to Private Non-Financial Sector - Japan"
@@ -558,7 +561,9 @@ indices:
       - series: ecb_total_assets
         weight: 1.1  # Approx EUR/USD
       - series: boj_total_assets
-        weight: 0.0067  # Approx JPY/USD
+        # JPNASSETS is reported in 100 million JPY. At roughly 149 JPY/USD,
+        # each raw unit is about 0.67 million USD.
+        weight: 0.67
 
   global_liquidity_credit_index:
     description: "Tri-pillar Global Liquidity & Credit Index (GLCI)"
@@ -597,10 +602,6 @@ indices:
           - series: boj_total_assets
             country: JP
             sign: 1
-          # BoE
-          - series: boe_total_assets
-            country: GB
-            sign: 1
           # Monetary Aggregates
           - series: us_m2
             country: US
@@ -635,13 +636,6 @@ indices:
             sign: 1
           - series: bis_credit_jp
             country: JP
-            sign: 1
-          # World Bank Credit to GDP
-          - series: wb_credit_gdp_us
-            country: US
-            sign: 1
-          - series: wb_credit_gdp_cn
-            country: CN
             sign: 1
       stress:
         weight: 0.25

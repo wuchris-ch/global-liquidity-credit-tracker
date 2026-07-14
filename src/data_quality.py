@@ -18,6 +18,7 @@ STALENESS_ALLOWANCE_DAYS = {
     "annual": 450,
 }
 DEFAULT_STALENESS_ALLOWANCE_DAYS = 45
+REGIME_LABELS = {-1: "tight", 0: "neutral", 1: "loose"}
 
 
 def staleness_allowance_days(frequency: str | None) -> int:
@@ -85,10 +86,16 @@ def _snapshot_summary(storage: DataStorage) -> dict:
     if snapshots_df is None or snapshots_df.empty:
         return {
             "count": 0,
+            "unique_signal_dates": 0,
+            "duplicate_vintages": 0,
+            "first_signal_date": None,
+            "latest_signal_date": None,
             "first_computed_at": None,
             "last_computed_at": None,
+            "latest_signal_revision": None,
         }
 
+    snapshots_df = snapshots_df.copy()
     computed = [
         timestamp
         for timestamp in (
@@ -97,14 +104,107 @@ def _snapshot_summary(storage: DataStorage) -> dict:
         )
         if timestamp is not None
     ]
+
+    signal_dates = pd.to_datetime(
+        snapshots_df.get("signal_date", pd.Series(dtype=object)),
+        errors="coerce",
+        utc=True,
+    ).dt.tz_convert(None).dt.normalize()
+    valid_signal_dates = signal_dates.dropna()
+    unique_signal_dates = int(valid_signal_dates.nunique())
+    first_signal_date = (
+        valid_signal_dates.min().strftime("%Y-%m-%d")
+        if not valid_signal_dates.empty
+        else None
+    )
+    latest_signal_date = (
+        valid_signal_dates.max().strftime("%Y-%m-%d")
+        if not valid_signal_dates.empty
+        else None
+    )
+
+    latest_signal_revision = None
+    if latest_signal_date is not None:
+        latest_rows = snapshots_df.loc[
+            signal_dates == pd.Timestamp(latest_signal_date)
+        ].copy()
+        latest_rows["_computed_at"] = pd.to_datetime(
+            latest_rows.get("computed_at", pd.Series(index=latest_rows.index)),
+            errors="coerce",
+            utc=True,
+        )
+        latest_rows = latest_rows.sort_values("_computed_at", na_position="last")
+
+        def numeric_values(column: str) -> pd.Series:
+            if column not in latest_rows:
+                return pd.Series(dtype=float)
+            return pd.to_numeric(latest_rows[column], errors="coerce").dropna()
+
+        glci_values = numeric_values("glci")
+        zscore_values = numeric_values("zscore")
+        regime_values = numeric_values("regime")
+
+        first_glci = _safe_number(glci_values.iloc[0]) if not glci_values.empty else None
+        latest_glci = _safe_number(glci_values.iloc[-1]) if not glci_values.empty else None
+        first_zscore = (
+            _safe_number(zscore_values.iloc[0]) if not zscore_values.empty else None
+        )
+        latest_zscore = (
+            _safe_number(zscore_values.iloc[-1]) if not zscore_values.empty else None
+        )
+        first_regime_code = (
+            _safe_number(regime_values.iloc[0]) if not regime_values.empty else None
+        )
+        latest_regime_code = (
+            _safe_number(regime_values.iloc[-1]) if not regime_values.empty else None
+        )
+        first_regime = REGIME_LABELS.get(first_regime_code)
+        latest_regime = REGIME_LABELS.get(latest_regime_code)
+
+        latest_signal_revision = {
+            "vintage_count": int(len(latest_rows)),
+            "first_glci": first_glci,
+            "latest_glci": latest_glci,
+            "glci_change": (
+                _safe_number(latest_glci - first_glci)
+                if first_glci is not None and latest_glci is not None
+                else None
+            ),
+            "glci_min": (
+                _safe_number(glci_values.min()) if not glci_values.empty else None
+            ),
+            "glci_max": (
+                _safe_number(glci_values.max()) if not glci_values.empty else None
+            ),
+            "first_zscore": first_zscore,
+            "latest_zscore": latest_zscore,
+            "zscore_change": (
+                _safe_number(latest_zscore - first_zscore)
+                if first_zscore is not None and latest_zscore is not None
+                else None
+            ),
+            "first_regime": first_regime,
+            "latest_regime": latest_regime,
+            "regime_changed": (
+                bool(regime_values.nunique() > 1)
+                if not regime_values.empty
+                else None
+            ),
+        }
+
     return {
         "count": int(len(snapshots_df)),
+        "unique_signal_dates": unique_signal_dates,
+        "duplicate_vintages": max(0, int(len(snapshots_df)) - unique_signal_dates),
+        "first_signal_date": first_signal_date,
+        "latest_signal_date": latest_signal_date,
         "first_computed_at": (
             min(computed).isoformat().replace("+00:00", "Z") if computed else None
         ),
         "last_computed_at": (
             max(computed).isoformat().replace("+00:00", "Z") if computed else None
         ),
+        "latest_signal_revision": latest_signal_revision,
     }
 
 

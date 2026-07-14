@@ -1,5 +1,7 @@
 """Tests for append-only signal-vintage storage."""
 
+import pytest
+
 from src.etl.storage import DataStorage
 
 
@@ -53,3 +55,22 @@ def test_signal_snapshot_exact_identity_is_idempotent_and_immutable(tmp_path):
     assert saved is not None
     assert len(saved) == 1
     assert saved.iloc[0]["glci"] == 101.0
+
+
+@pytest.mark.parametrize(
+    ("computed_at", "signal_date", "message"),
+    [
+        ("not-a-date", "2026-07-10", "unparseable"),
+        ("2026-07-11T12:00:00Z", "not-a-date", "unparseable"),
+        ("2026-07-09T23:59:00Z", "2026-07-10", "cannot precede"),
+    ],
+)
+def test_signal_snapshot_rejects_invalid_identity_dates(
+    tmp_path, computed_at, signal_date, message
+):
+    storage = _storage(tmp_path)
+    snapshot = _snapshot(computed_at, 101.0)
+    snapshot["signal_date"] = signal_date
+
+    with pytest.raises(ValueError, match=message):
+        storage.append_signal_snapshot(snapshot)

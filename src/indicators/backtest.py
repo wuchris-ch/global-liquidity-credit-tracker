@@ -15,6 +15,7 @@ Outputs:
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -24,6 +25,7 @@ import pandas as pd
 from ..config import CURATED_DATA_PATH
 from ..etl.fetcher import DataFetcher
 from ..etl.storage import DataStorage
+from .live_evaluation import compute_live_evaluation
 from .risk_metrics import ASSET_CONFIG
 
 
@@ -38,6 +40,17 @@ BOOTSTRAP_ITERATIONS = 5000
 BOOTSTRAP_METHOD = "paired_full_calendar_moving_block"
 MIN_FINITE_BOOTSTRAP_DRAWS = 100
 MIN_FINITE_BOOTSTRAP_FRACTION = 0.80
+EDGE_STANDARD_ERROR_METHOD = (
+    "sample_standard_deviation_of_paired_moving_block_bootstrap_edge_draws"
+)
+EDGE_P_VALUE_METHOD = "two_sided_normal_approximation_from_bootstrap_standard_error"
+MULTIPLE_TESTING_METHOD = "benjamini_yekutieli"
+MULTIPLE_TESTING_ALPHA = 0.10
+MULTIPLE_TESTING_FAMILY = (
+    "all_classifier_asset_regime_horizon_edge_tests_with_finite_p_values"
+)
+EVIDENCE_READINESS_POLICY = "point_in_time_minimum_history_and_all_regimes"
+MIN_CLASSIFIED_WEEKS_FOR_SUPPORT = 260
 RNG_SEED = 42
 FREQUENCY = "W-FRI"
 ENTRY_LAG_WEEKS = 1
@@ -88,9 +101,11 @@ class BacktestResult:
     bootstrap_iterations: int = BOOTSTRAP_ITERATIONS
     min_obs_per_regime: int = MIN_OBS_PER_REGIME
     regime_threshold_method: str = GLCI_REGIME_METHOD
+    inference_test_count: int = 0
+    live_evaluation: dict | None = None
 
     def to_dict(self) -> dict:
-        return {
+        payload = {
             "computed_at": self.computed_at,
             "date_range": {"start": self.date_range[0], "end": self.date_range[1]},
             "horizons": self.horizons,
@@ -102,9 +117,24 @@ class BacktestResult:
             "bootstrap_method": self.bootstrap_method,
             "bootstrap_iterations": self.bootstrap_iterations,
             "min_obs_per_regime": self.min_obs_per_regime,
+            "inference": {
+                "edge_standard_error_method": EDGE_STANDARD_ERROR_METHOD,
+                "p_value_method": EDGE_P_VALUE_METHOD,
+                "multiple_testing_method": MULTIPLE_TESTING_METHOD,
+                "multiple_testing_alpha": MULTIPLE_TESTING_ALPHA,
+                "multiple_testing_family": MULTIPLE_TESTING_FAMILY,
+                "tests_in_family": self.inference_test_count,
+                "readiness": _inference_readiness(
+                    self.classifiers,
+                    point_in_time=self.point_in_time,
+                ),
+            },
             "classifiers": self.classifiers,
             "assets": [a.to_dict() for a in self.assets],
         }
+        if self.live_evaluation is not None:
+            payload["live_evaluation"] = self.live_evaluation
+        return payload
 
 
 def expanding_zscore_regime(
@@ -266,6 +296,42 @@ def _sanitize_json(obj):
     return obj
 
 
+def _benjamini_yekutieli_qvalues(
+    p_values: list[float | None],
+) -> list[float | None]:
+    """Return dependence-robust adjusted p-values in the original order.
+
+    ``None`` entries represent hypotheses that could not be tested and are not
+    included in the multiplicity family. All finite p-values supplied in one
+    call are corrected together.
+    """
+    finite: list[tuple[int, float]] = []
+    adjusted: list[float | None] = [None] * len(p_values)
+    for index, raw_value in enumerate(p_values):
+        if raw_value is None:
+            continue
+        value = float(raw_value)
+        if not np.isfinite(value) or not 0.0 <= value <= 1.0:
+            raise ValueError("p-values must be finite and between zero and one")
+        finite.append((index, value))
+
+    m = len(finite)
+    if m == 0:
+        return adjusted
+
+    finite.sort(key=lambda item: item[1])
+    harmonic_m = sum(1.0 / rank for rank in range(1, m + 1))
+    running_min = 1.0
+    for position in range(m - 1, -1, -1):
+        original_index, p_value = finite[position]
+        rank = position + 1
+        candidate = p_value * m * harmonic_m / rank
+        running_min = min(running_min, candidate)
+        adjusted[original_index] = min(1.0, max(0.0, running_min))
+
+    return adjusted
+
+
 def _empty_regime_stats(n: int) -> dict:
     """Return the stable payload shape for an unreportable regime cell."""
     return {
@@ -281,6 +347,10 @@ def _empty_regime_stats(n: int) -> dict:
         "edge": None,
         "ci_edge_low": None,
         "ci_edge_high": None,
+        "edge_standard_error": None,
+        "p_value": None,
+        "q_value": None,
+        "fdr_significant": None,
     }
 
 
@@ -341,9 +411,10 @@ def _paired_regime_stats(
     classified_returns = valid_returns & np.isfinite(regimes)
     all_clean = returns[classified_returns]
     if base_hit_rate is None and len(all_clean) >= min_subgroup_obs:
-        base_hit_rate = round(float(np.mean(all_clean > 0)), 4)
+        base_hit_rate = float(np.mean(all_clean > 0))
 
     stats_by_regime: dict[int, dict] = {}
+    point_edges: dict[int, float] = {}
     eligible_codes: list[int] = []
     for regime_code in REGIME_LABELS:
         group_mask = classified_returns & (regimes == regime_code)
@@ -352,7 +423,10 @@ def _paired_regime_stats(
         stats = _empty_regime_stats(n)
         if n >= min_subgroup_obs:
             median = float(np.median(clean))
-            hit_rate = round(float(np.mean(clean > 0)), 4)
+            raw_hit_rate = float(np.mean(clean > 0))
+            hit_rate = round(raw_hit_rate, 4)
+            if base_hit_rate is not None:
+                point_edges[regime_code] = raw_hit_rate - base_hit_rate
             stats.update(
                 {
                     "median": round(median, 6),
@@ -360,7 +434,7 @@ def _paired_regime_stats(
                     "p75": round(float(np.quantile(clean, 0.75)), 6),
                     "hit_rate": hit_rate,
                     "edge": (
-                        round(hit_rate - base_hit_rate, 4)
+                        round(point_edges[regime_code], 4)
                         if base_hit_rate is not None
                         else None
                     ),
@@ -418,6 +492,16 @@ def _paired_regime_stats(
         median_low, median_high = interval("median", 6)
         hit_low, hit_high = interval("hit_rate", 4)
         edge_low, edge_high = interval("edge", 4)
+        edge_draws = np.asarray(draws["edge"], dtype=float)
+        edge_standard_error = float(np.std(edge_draws, ddof=1))
+        point_edge = point_edges.get(regime_code)
+        if point_edge is None or not np.isfinite(edge_standard_error):
+            p_value = None
+        elif edge_standard_error == 0:
+            p_value = 1.0 if point_edge == 0 else 0.0
+        else:
+            z_score = abs(point_edge) / edge_standard_error
+            p_value = math.erfc(z_score / math.sqrt(2.0))
         stats_by_regime[regime_code].update(
             {
                 "ci_median_low": median_low,
@@ -426,10 +510,92 @@ def _paired_regime_stats(
                 "ci_hit_rate_high": hit_high,
                 "ci_edge_low": edge_low,
                 "ci_edge_high": edge_high,
+                "edge_standard_error": round(edge_standard_error, 6),
+                "p_value": round(float(p_value), 10)
+                if p_value is not None
+                else None,
             }
         )
 
     return stats_by_regime
+
+
+def _apply_multiple_testing(
+    assets: list[AssetBacktestResult],
+    *,
+    alpha: float = MULTIPLE_TESTING_ALPHA,
+) -> int:
+    """Apply one BY correction across every reportable edge in the payload."""
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must be between zero and one")
+
+    tested_cells: list[dict] = []
+    p_values: list[float] = []
+    for asset in assets:
+        for by_regime in asset.results.values():
+            for by_horizon in by_regime.values():
+                for stats in by_horizon.values():
+                    stats["q_value"] = None
+                    stats["fdr_significant"] = None
+                    p_value = stats.get("p_value")
+                    if p_value is None:
+                        continue
+                    tested_cells.append(stats)
+                    p_values.append(float(p_value))
+
+    q_values = _benjamini_yekutieli_qvalues(p_values)
+    for stats, q_value in zip(tested_cells, q_values, strict=True):
+        if q_value is None:
+            continue
+        stats["q_value"] = round(q_value, 10)
+        stats["fdr_significant"] = bool(q_value <= alpha)
+
+    return len(tested_cells)
+
+
+def _inference_readiness(
+    classifiers: dict[str, dict],
+    *,
+    point_in_time: bool = POINT_IN_TIME_HISTORY,
+) -> dict:
+    """Apply an explicit product gate before calling a backtest edge supported.
+
+    A q-value is a property of the tested family, not proof that the historical
+    inputs were available in real time or that the primary classifier has seen
+    enough history and every state it is meant to compare.
+    The weekly floor is a disclosed model-governance policy, not a claim that
+    five calendar years guarantee a complete liquidity cycle.
+    """
+    glci = classifiers.get("glci", {}) if isinstance(classifiers, dict) else {}
+    raw_counts = glci.get("n_per_regime", {}) if isinstance(glci, dict) else {}
+    counts = {
+        label: int(raw_counts.get(label, 0) or 0)
+        for label in REGIME_LABELS.values()
+    }
+    observed = int(sum(counts.values()))
+    reasons = []
+    if not point_in_time:
+        reasons.append("point_in_time_history_unavailable")
+    if observed < MIN_CLASSIFIED_WEEKS_FOR_SUPPORT:
+        reasons.append(
+            f"classified_history_below_{MIN_CLASSIFIED_WEEKS_FOR_SUPPORT}_weeks"
+        )
+    for label, count in counts.items():
+        if count < MIN_OBS_PER_REGIME:
+            reasons.append(f"{label}_regime_below_{MIN_OBS_PER_REGIME}_observations")
+
+    return {
+        "ready": not reasons,
+        "policy": EVIDENCE_READINESS_POLICY,
+        "classifier": "glci",
+        "point_in_time_history_required": True,
+        "point_in_time_history": bool(point_in_time),
+        "minimum_classified_weeks": MIN_CLASSIFIED_WEEKS_FOR_SUPPORT,
+        "observed_classified_weeks": observed,
+        "minimum_observations_per_regime": MIN_OBS_PER_REGIME,
+        "regime_observations": counts,
+        "reasons": reasons,
+    }
 
 
 class BacktestComputer:
@@ -537,6 +703,13 @@ class BacktestComputer:
                 min_periods=BURN_IN_PERIODS,
             )
 
+        inference_test_count = _apply_multiple_testing(asset_results)
+        live_evaluation = compute_live_evaluation(
+            self.storage,
+            ASSET_CONFIG,
+            horizons=HORIZONS,
+        )
+
         first_classified = glci_regime["regime"].first_valid_index()
         last_obs = glci_series.index.max()
 
@@ -555,6 +728,8 @@ class BacktestComputer:
             entry_lag_weeks=ENTRY_LAG_WEEKS,
             historical_mode=HISTORICAL_MODE,
             point_in_time=POINT_IN_TIME_HISTORY,
+            inference_test_count=inference_test_count,
+            live_evaluation=live_evaluation,
         )
 
         if save_output:
@@ -672,11 +847,10 @@ class BacktestComputer:
                     regimes,
                     block_size=h,
                     rng=rng,
-                    base_hit_rate=(
-                        base_rates[h].get("hit_rate")
-                        if clf_name == "glci"
-                        else None
-                    ),
+                    # Compute the comparison rate from this classifier's exact
+                    # eligible rows. The separately displayed base rate is
+                    # rounded for presentation and must not enter inference.
+                    base_hit_rate=None,
                 )
                 for regime_code, regime_label in REGIME_LABELS.items():
                     results[clf_name][regime_label][h] = stats_by_code[regime_code]
@@ -736,6 +910,10 @@ class BacktestComputer:
         }
 
     def _save(self, result: BacktestResult) -> None:
+        readiness = _inference_readiness(
+            result.classifiers,
+            point_in_time=result.point_in_time,
+        )
         rows = []
         for asset in result.assets:
             for clf, by_regime in asset.results.items():
@@ -771,6 +949,32 @@ class BacktestComputer:
                 "bootstrap_iterations": result.bootstrap_iterations,
                 "bootstrap_method": result.bootstrap_method,
                 "bootstrap_min_finite_draw_fraction": MIN_FINITE_BOOTSTRAP_FRACTION,
+                "edge_standard_error_method": EDGE_STANDARD_ERROR_METHOD,
+                "p_value_method": EDGE_P_VALUE_METHOD,
+                "multiple_testing_method": MULTIPLE_TESTING_METHOD,
+                "multiple_testing_alpha": MULTIPLE_TESTING_ALPHA,
+                "multiple_testing_family": MULTIPLE_TESTING_FAMILY,
+                "multiple_testing_tests_in_family": result.inference_test_count,
+                "inference_evidence_ready": readiness["ready"],
+                "inference_readiness_policy": readiness["policy"],
+                "inference_minimum_classified_weeks": readiness[
+                    "minimum_classified_weeks"
+                ],
+                "inference_observed_classified_weeks": readiness[
+                    "observed_classified_weeks"
+                ],
+                "live_evaluation_status": (
+                    result.live_evaluation.get("status")
+                    if result.live_evaluation is not None
+                    else None
+                ),
+                "live_unique_signal_dates": (
+                    result.live_evaluation.get("ledger", {}).get(
+                        "unique_signal_dates"
+                    )
+                    if result.live_evaluation is not None
+                    else 0
+                ),
                 # Legacy key describes the primary GLCI classifier.
                 "burn_in_periods": GLCI_REGIME_MIN_PERIODS,
                 "regime_window_periods": GLCI_REGIME_WINDOW,

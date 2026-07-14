@@ -25,8 +25,7 @@ source mapping is [`config/series.yml`](../config/series.yml).
 | `fed_reverse_repo` | RRPONTSYD | daily | **billions** USD — converted ×1000 in the net-liquidity formula |
 | `fed_reserve_balances` | WRBWFRBL | weekly | millions USD |
 | `ecb_total_assets` | ECBASSETSW | weekly | millions EUR |
-| `boj_total_assets` | JPNASSETS | monthly | millions JPY |
-| `boe_total_assets` | BOGZ1FL714090005Q | quarterly | millions GBP |
+| `boj_total_assets` | JPNASSETS | monthly | 100 million JPY; title, units, and frequency are contract-checked before use |
 
 ### Funding rates & stress (FRED)
 
@@ -48,7 +47,7 @@ IG OAS, VIX, and NFCI. The separate USD Credit Stress composite uses HY OAS
 (weight 1.0) and IG OAS (weight 0.5); its API ID remains
 `usd_funding_stress` for compatibility.
 
-### Money & credit (FRED + BIS + World Bank, liquidity/credit pillars)
+### Money & credit (FRED + BIS + World Bank)
 
 | Series ID | Source ID | Frequency |
 |-----------|-----------|-----------|
@@ -59,8 +58,8 @@ IG OAS, VIX, and NFCI. The separate USD Credit Stress composite uses HY OAS
 | `us_bank_loans_leases` | TOTLL | weekly |
 | `us_consumer_credit` | TOTALSL | monthly |
 | `us_commercial_paper` | COMPOUT | weekly |
-| `bis_credit_us/eu/cn/jp` | `Q.{cc}.P.A.M.XDC.A` (BIS SDMX) | quarterly |
-| `wb_credit_gdp_us/eu/cn/jp` | FS.AST.PRVT.GD.ZS (World Bank) | annual |
+| `bis_credit_us/eu/cn/jp` | `Q.{cc}.P.A.M.XDC.A` (BIS SDMX) | quarterly; predictive inputs enter 90 days after period end |
+| `wb_credit_gdp_us/eu/cn/jp` | FS.AST.PRVT.GD.ZS (World Bank) | annual; Explorer/context only, not a predictive GLCI input |
 
 ### FX & inflation (FRED, normalization)
 

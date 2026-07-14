@@ -123,9 +123,7 @@ class BISClient(BaseClient):
         """Convert BIS period string to timestamp."""
         # Handle quarterly format (e.g., '2023-Q1')
         if "-Q" in period:
-            year, quarter = period.split("-Q")
-            month = (int(quarter) - 1) * 3 + 1
-            return pd.Timestamp(f"{year}-{month:02d}-01")
+            return pd.Period(period, freq="Q").end_time.normalize()
         # Handle monthly format (e.g., '2023-01')
         elif len(period) == 7:
             return pd.Timestamp(f"{period}-01")

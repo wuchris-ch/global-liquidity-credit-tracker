@@ -179,6 +179,13 @@ vintage and factor estimates. It is not a point-in-time vintage history.
 Append-only publication snapshots preserve what the model said on each run
 from the snapshot feature's introduction onward.
 
+Monthly, quarterly, and annual observations are normalized to period end before
+they can enter a signal. BIS credit is then held back 90 calendar days after
+quarter end. Annual World Bank credit-to-GDP data remains available for context
+but is not used as a predictive GLCI component without historical release
+vintages. Critical FRED inputs can carry metadata contracts so a source identity
+or unit change fails closed.
+
 ## Risk by Regime Dashboard
 
 The Risk by Regime dashboard shows how different asset classes perform under various GLCI liquidity regimes.
@@ -228,6 +235,8 @@ The Track Record dashboard backtests the GLCI regime classifier against forward 
 - Friday-to-Friday data grid, next-week entry, and 4, 13, and 26-week forward return horizons
 - Compares GLCI regime classifier against an NFCI baseline
 - Paired moving-block 95% confidence intervals over the full weekly row sequence
+- Benjamini-Yekutieli q-values over the complete classifier x asset x regime x horizon family
+- A forward-only outcome record based on the first immutable publication for each signal date
 
 The rolling classifier uses no composite observations after the signal week.
 It does not make the upstream GLCI point-in-time: source revisions and factor
@@ -238,7 +247,16 @@ re-estimation can still change reconstructed history. NFCI retains an expanding
 - Hit rate and median forward return within each reconstructed regime
 - Edge: regime-subgroup hit rate minus the unconditional hit rate
 - Subgroup hit-rate CIs and paired edge CIs computed separately in each resample
-- An edge is highlighted only when its paired 95% CI excludes zero
+- Bootstrap edge standard errors and explicitly labeled approximate p-values
+- An edge is highlighted only when its q-value clears the published 10% FDR threshold, the historical inputs are point-in-time, and the primary classifier has at least 260 classified weeks with 20 observations in every regime
+
+The observed live record waits until after each signal's recorded computation
+time to start its return clock and withholds regime-conditioned summaries until
+20 outcomes have matured for the same asset, horizon, and published regime. It
+is intentionally marked as collecting evidence while the immutable ledger is
+young. Signals are immutable; adjusted entry and exit prices are still
+recomputed from the current price history until a separate outcome ledger is
+added.
 
 ## Project Structure
 

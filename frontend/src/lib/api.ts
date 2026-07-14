@@ -130,6 +130,25 @@ export interface GLCITrustResponse {
     count: number;
     first_computed_at: string | null;
     last_computed_at: string | null;
+    /** Optional until the richer vintage summary reaches every deployment. */
+    unique_signal_dates?: number;
+    duplicate_vintages?: number;
+    first_signal_date?: string | null;
+    latest_signal_date?: string | null;
+    latest_signal_revision?: {
+      vintage_count: number;
+      first_glci: number | null;
+      latest_glci: number | null;
+      glci_change: number | null;
+      glci_min: number | null;
+      glci_max: number | null;
+      first_zscore: number | null;
+      latest_zscore: number | null;
+      zscore_change: number | null;
+      first_regime: Regime | null;
+      latest_regime: Regime | null;
+      regime_changed: boolean | null;
+    } | null;
   };
   data_quality: {
     loaded_components: number;
@@ -205,6 +224,12 @@ export interface BacktestStats {
   edge: number | null;
   ci_edge_low: number | null;
   ci_edge_high: number | null;
+  edge_standard_error?: number | null;
+  /** Normal-approximation p-value from bootstrap standard error, plus adjusted q-value. */
+  p_value?: number | null;
+  q_value?: number | null;
+  /** True only when the edge survives the published FDR procedure. */
+  fdr_significant?: boolean | null;
 }
 
 export interface BacktestBaseRate {
@@ -243,6 +268,72 @@ export interface BacktestClassifierMeta {
   timeline: BacktestTimelineEntry[];
 }
 
+export interface BacktestLiveHorizonStats {
+  issued: number;
+  matured: number;
+  pending: number;
+  unavailable: number;
+  median: number | null;
+  hit_rate: number | null;
+  next_maturity_date: string | null;
+  status: "collecting" | "reportable";
+}
+
+export interface BacktestLiveHorizon extends BacktestLiveHorizonStats {
+  by_regime?: Partial<Record<Regime, BacktestLiveHorizonStats>>;
+}
+
+export interface BacktestLiveAsset {
+  id: string;
+  name: string;
+  category: string;
+  horizons: Record<string, BacktestLiveHorizon>;
+}
+
+export interface BacktestLiveEvaluation {
+  status: "collecting" | "reportable" | "unavailable";
+  methodology: {
+    signal_selection: "first_publication_per_signal_date";
+    entry_rule: "first_complete_W-FRI_bar_after_computed_at";
+    evidence_unit: "asset_horizon_regime";
+    source_vintage_complete: false;
+    outcome_vintage_complete: false;
+    signal_recorded_before_outcome: true;
+    min_observations: number;
+  };
+  ledger: {
+    vintage_count: number;
+    unique_signal_dates: number;
+    duplicate_vintages: number;
+    first_signal_date: string | null;
+    latest_signal_date: string | null;
+  };
+  assets: BacktestLiveAsset[];
+}
+
+export interface BacktestInference {
+  edge_standard_error_method:
+    "sample_standard_deviation_of_paired_moving_block_bootstrap_edge_draws";
+  p_value_method: "two_sided_normal_approximation_from_bootstrap_standard_error";
+  multiple_testing_method: "benjamini_yekutieli";
+  multiple_testing_alpha: number;
+  multiple_testing_family:
+    "all_classifier_asset_regime_horizon_edge_tests_with_finite_p_values";
+  tests_in_family: number;
+  readiness?: {
+    ready: boolean;
+    policy: "point_in_time_minimum_history_and_all_regimes";
+    classifier: "glci";
+    point_in_time_history_required: true;
+    point_in_time_history: boolean;
+    minimum_classified_weeks: number;
+    observed_classified_weeks: number;
+    minimum_observations_per_regime: number;
+    regime_observations: Record<Regime, number>;
+    reasons: string[];
+  };
+}
+
 export interface BacktestResponse {
   computed_at: string;
   date_range: { start: string; end: string };
@@ -256,6 +347,8 @@ export interface BacktestResponse {
   bootstrap_method?: string;
   bootstrap_iterations?: number;
   min_obs_per_regime?: number;
+  inference?: BacktestInference;
+  live_evaluation?: BacktestLiveEvaluation;
   classifiers: Record<string, BacktestClassifierMeta>;
   assets: BacktestAssetResult[];
 }

@@ -42,6 +42,7 @@ export const UNIT_SCALES: Record<string, number> = {
   millions_eur: 1e6,
   millions_gbp: 1e6,
   millions_jpy: 1e6,
+  hundred_millions_jpy: 1e8,
   billions_usd: 1e9,
   billions_eur: 1e9,
   // Index/percent/rate values don't need scaling

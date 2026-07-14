@@ -37,7 +37,7 @@
     "source": "FRED",
     "category": "Central Banks",
     "frequency": "monthly",
-    "unit": "millions_jpy"
+    "unit": "hundred_millions_jpy"
   },
   {
     "id": "sofr",

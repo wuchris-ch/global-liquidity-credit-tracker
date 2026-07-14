@@ -1,6 +1,6 @@
 {
-  "computed_at": "2026-07-14T13:07:13.238389",
-  "current_regime": "loose",
+  "computed_at": "2026-07-14T21:03:57.009926",
+  "current_regime": "neutral",
   "assets": [
     {
       "id": "sp500_price",
@@ -12,15 +12,15 @@
       "max_drawdown": -33.92,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 0.29,
-        "loose": 1.7
+        "neutral": 0.63,
+        "loose": 1.62
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 10.14,
-        "loose": 24.76
+        "neutral": 13.97,
+        "loose": 24.56
       },
-      "correlation_with_glci": 0.484,
+      "correlation_with_glci": 0.424,
       "rolling_sharpe": [
         {
           "date": "2017-07-14",
@@ -9074,15 +9074,15 @@
       "max_drawdown": -82.9,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 0.57,
-        "loose": 1.35
+        "neutral": 0.72,
+        "loose": 1.32
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 18.56,
-        "loose": 28.95
+        "neutral": 18.67,
+        "loose": 29.54
       },
-      "correlation_with_glci": 0.43,
+      "correlation_with_glci": 0.412,
       "rolling_sharpe": [
         {
           "date": "1986-12-31",
@@ -48932,15 +48932,15 @@
       "max_drawdown": -45.3,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 1.06,
-        "loose": 1.35
+        "neutral": 0.94,
+        "loose": 1.57
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 47.89,
-        "loose": 54.27
+        "neutral": 37.49,
+        "loose": 64.81
       },
-      "correlation_with_glci": 0.448,
+      "correlation_with_glci": 0.44,
       "rolling_sharpe": [
         {
           "date": "2017-07-18",
@@ -52092,7 +52092,7 @@
         },
         {
           "date": "2020-09-01",
-          "value": 1.312
+          "value": 1.313
         },
         {
           "date": "2020-09-02",
@@ -55904,7 +55904,7 @@
         },
         {
           "date": "2024-06-17",
-          "value": 2.049
+          "value": 2.05
         },
         {
           "date": "2024-06-18",
@@ -57986,15 +57986,15 @@
       "max_drawdown": -41.13,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": -0.2,
-        "loose": 1.62
+        "neutral": -0.07,
+        "loose": 2.1
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": -0.32,
-        "loose": 36.39
+        "neutral": 2.99,
+        "loose": 45.25
       },
-      "correlation_with_glci": 0.412,
+      "correlation_with_glci": 0.355,
       "rolling_sharpe": [
         {
           "date": "2017-07-18",
@@ -67040,15 +67040,15 @@
       "max_drawdown": -26.21,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 1.41,
-        "loose": 0.69
+        "neutral": 1.37,
+        "loose": 0.43
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 34.22,
-        "loose": 21.06
+        "neutral": 32.96,
+        "loose": 14.8
       },
-      "correlation_with_glci": 0.167,
+      "correlation_with_glci": 0.079,
       "rolling_sharpe": [
         {
           "date": "2017-07-18",
@@ -76094,15 +76094,15 @@
       "max_drawdown": -50.97,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 1.32,
-        "loose": 0.66
+        "neutral": 1.64,
+        "loose": 0.23
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 50.04,
-        "loose": 40.44
+        "neutral": 65.06,
+        "loose": 17.46
       },
-      "correlation_with_glci": 0.246,
+      "correlation_with_glci": 0.199,
       "rolling_sharpe": [
         {
           "date": "2017-07-18",
@@ -85148,15 +85148,15 @@
       "max_drawdown": -83.8,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": -0.63,
-        "loose": 0.65
+        "neutral": -0.58,
+        "loose": 0.71
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": -25.67,
-        "loose": 32.75
+        "neutral": -20.99,
+        "loose": 37.41
       },
-      "correlation_with_glci": 0.192,
+      "correlation_with_glci": 0.121,
       "rolling_sharpe": [
         {
           "date": "2016-01-04",
@@ -100542,15 +100542,15 @@
       "max_drawdown": -94.01,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": -1.29,
-        "loose": 0.97
+        "neutral": -0.14,
+        "loose": -0.01
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": -89.63,
-        "loose": 67.11
+        "neutral": -5.18,
+        "loose": 3.58
       },
-      "correlation_with_glci": 0.201,
+      "correlation_with_glci": 0.113,
       "rolling_sharpe": [
         {
           "date": "2017-05-20",
@@ -113928,15 +113928,15 @@
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 2.0,
-        "loose": 1.14
+        "neutral": 2.35,
+        "loose": 0.65
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 287.05,
-        "loose": 132.62
+        "neutral": 314.4,
+        "loose": 82.93
       },
-      "correlation_with_glci": 0.103,
+      "correlation_with_glci": 0.02,
       "rolling_sharpe": [
         {
           "date": "2018-11-09",
@@ -125166,15 +125166,15 @@
       "max_drawdown": -48.35,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": -0.54,
-        "loose": -0.07
+        "neutral": 0.7,
+        "loose": -0.85
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": -2.74,
-        "loose": 3.53
+        "neutral": 12.93,
+        "loose": -5.27
       },
-      "correlation_with_glci": -0.085,
+      "correlation_with_glci": -0.098,
       "rolling_sharpe": [
         {
           "date": "2017-07-18",
@@ -126054,7 +126054,7 @@
         },
         {
           "date": "2018-05-31",
-          "value": -0.099
+          "value": -0.1
         },
         {
           "date": "2018-06-01",
@@ -126122,7 +126122,7 @@
         },
         {
           "date": "2018-06-25",
-          "value": -0.42
+          "value": -0.419
         },
         {
           "date": "2018-06-26",
@@ -126326,7 +126326,7 @@
         },
         {
           "date": "2018-09-06",
-          "value": -0.526
+          "value": -0.525
         },
         {
           "date": "2018-09-07",
@@ -127478,7 +127478,7 @@
         },
         {
           "date": "2019-10-29",
-          "value": 1.678
+          "value": 1.679
         },
         {
           "date": "2019-10-30",
@@ -128458,7 +128458,7 @@
         },
         {
           "date": "2020-10-19",
-          "value": 0.81
+          "value": 0.809
         },
         {
           "date": "2020-10-20",
@@ -129478,7 +129478,7 @@
         },
         {
           "date": "2021-10-22",
-          "value": -0.476
+          "value": -0.477
         },
         {
           "date": "2021-10-25",
@@ -134232,105 +134232,105 @@
     "sharpe_data": [
       [
         null,
-        0.29,
-        1.7
-      ],
-      [
-        null,
-        0.57,
-        1.35
-      ],
-      [
-        null,
-        1.06,
-        1.35
-      ],
-      [
-        null,
-        -0.2,
+        0.63,
         1.62
       ],
       [
         null,
-        1.41,
-        0.69
+        0.72,
+        1.32
       ],
       [
         null,
-        1.32,
-        0.66
+        0.94,
+        1.57
       ],
       [
         null,
-        -0.63,
+        -0.07,
+        2.1
+      ],
+      [
+        null,
+        1.37,
+        0.43
+      ],
+      [
+        null,
+        1.64,
+        0.23
+      ],
+      [
+        null,
+        -0.58,
+        0.71
+      ],
+      [
+        null,
+        -0.14,
+        -0.01
+      ],
+      [
+        null,
+        2.35,
         0.65
       ],
       [
         null,
-        -1.29,
-        0.97
-      ],
-      [
-        null,
-        2.0,
-        1.14
-      ],
-      [
-        null,
-        -0.54,
-        -0.07
+        0.7,
+        -0.85
       ]
     ],
     "return_data": [
       [
         null,
-        10.14,
-        24.76
+        13.97,
+        24.56
       ],
       [
         null,
-        18.56,
-        28.95
+        18.67,
+        29.54
       ],
       [
         null,
-        47.89,
-        54.27
+        37.49,
+        64.81
       ],
       [
         null,
-        -0.32,
-        36.39
+        2.99,
+        45.25
       ],
       [
         null,
-        34.22,
-        21.06
+        32.96,
+        14.8
       ],
       [
         null,
-        50.04,
-        40.44
+        65.06,
+        17.46
       ],
       [
         null,
-        -25.67,
-        32.75
+        -20.99,
+        37.41
       ],
       [
         null,
-        -89.63,
-        67.11
+        -5.18,
+        3.58
       ],
       [
         null,
-        287.05,
-        132.62
+        314.4,
+        82.93
       ],
       [
         null,
-        -2.74,
-        3.53
+        12.93,
+        -5.27
       ]
     ]
   }

@@ -16,8 +16,8 @@
   {
     "series_id": "fed_reverse_repo",
     "pillar": "liquidity",
-    "last_date": "2026-07-13",
-    "days_old": 1,
+    "last_date": "2026-07-14",
+    "days_old": 0,
     "is_stale": false
   },
   {
@@ -30,8 +30,8 @@
   {
     "series_id": "ecb_total_assets",
     "pillar": "liquidity",
-    "last_date": "2026-07-03",
-    "days_old": 11,
+    "last_date": "2026-07-10",
+    "days_old": 4,
     "is_stale": false
   },
   {
@@ -40,13 +40,6 @@
     "last_date": "2026-06-01",
     "days_old": 43,
     "is_stale": false
-  },
-  {
-    "series_id": "boe_total_assets",
-    "pillar": "liquidity",
-    "last_date": "unknown",
-    "days_old": -1,
-    "is_stale": true
   },
   {
     "series_id": "us_m2",
@@ -112,31 +105,17 @@
     "is_stale": true
   },
   {
-    "series_id": "wb_credit_gdp_us",
-    "pillar": "credit",
-    "last_date": "unknown",
-    "days_old": -1,
-    "is_stale": true
-  },
-  {
-    "series_id": "wb_credit_gdp_cn",
-    "pillar": "credit",
-    "last_date": "unknown",
-    "days_old": -1,
-    "is_stale": true
-  },
-  {
     "series_id": "ice_bofa_us_high_yield_spread",
     "pillar": "stress",
-    "last_date": "2026-07-10",
-    "days_old": 4,
+    "last_date": "2026-07-13",
+    "days_old": 1,
     "is_stale": false
   },
   {
     "series_id": "ice_bofa_us_ig_spread",
     "pillar": "stress",
-    "last_date": "2026-07-10",
-    "days_old": 4,
+    "last_date": "2026-07-13",
+    "days_old": 1,
     "is_stale": false
   },
   {
@@ -149,8 +128,8 @@
   {
     "series_id": "fed_funds_rate",
     "pillar": "stress",
-    "last_date": "2026-07-10",
-    "days_old": 4,
+    "last_date": "2026-07-13",
+    "days_old": 1,
     "is_stale": false
   },
   {

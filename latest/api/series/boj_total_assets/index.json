@@ -2,7 +2,7 @@
   "id": "boj_total_assets",
   "name": "Bank of Japan Total Assets",
   "source": "FRED",
-  "unit": "millions_jpy",
+  "unit": "hundred_millions_jpy",
   "data": [
     {
       "date": "1998-04-01",

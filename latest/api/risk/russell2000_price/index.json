@@ -3,20 +3,20 @@
   "name": "Russell 2000",
   "category": "Small Cap Equities",
   "current_sharpe": 0.46,
-  "annualized_return": 12.94,
+  "annualized_return": 12.91,
   "annualized_volatility": 23.01,
   "max_drawdown": -41.13,
   "sharpe_by_regime": {
     "tight": null,
-    "neutral": -0.05,
+    "neutral": -0.07,
     "loose": 2.1
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 3.27,
+    "neutral": 2.99,
     "loose": 45.25
   },
-  "correlation_with_glci": 0.355,
+  "correlation_with_glci": 0.354,
   "rolling_sharpe": [
     {
       "date": "2017-07-18",
@@ -452,7 +452,7 @@
     },
     {
       "date": "2017-12-19",
-      "value": 1.038
+      "value": 1.039
     },
     {
       "date": "2017-12-20",
@@ -1352,7 +1352,7 @@
     },
     {
       "date": "2018-11-09",
-      "value": 0.358
+      "value": 0.359
     },
     {
       "date": "2018-11-12",
@@ -1536,7 +1536,7 @@
     },
     {
       "date": "2019-01-18",
-      "value": -0.281
+      "value": -0.28
     },
     {
       "date": "2019-01-22",
@@ -2068,7 +2068,7 @@
     },
     {
       "date": "2019-07-31",
-      "value": -0.228
+      "value": -0.229
     },
     {
       "date": "2019-08-01",
@@ -4996,7 +4996,7 @@
     },
     {
       "date": "2022-06-27",
-      "value": -0.955
+      "value": -0.954
     },
     {
       "date": "2022-06-28",
@@ -9049,10 +9049,6 @@
     {
       "date": "2026-07-13",
       "value": 1.316
-    },
-    {
-      "date": "2026-07-14",
-      "value": 1.408
     }
   ]
 }

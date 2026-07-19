@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-19T01:30:26.833268",
+  "computed_at": "2026-07-19T12:53:10.300661",
   "date_range": {
     "start": "2024-04-12",
     "end": "2026-07-17"
@@ -2419,7 +2419,7 @@
           "n": 105
         },
         "26": {
-          "median": 0.114785,
+          "median": 0.114784,
           "hit_rate": 0.7391,
           "n": 92
         }
@@ -2751,7 +2751,7 @@
               "p75": 0.178009,
               "hit_rate": 0.7872,
               "n": 47,
-              "ci_median_low": -0.020243,
+              "ci_median_low": -0.020244,
               "ci_median_high": 0.173557,
               "ci_hit_rate_low": 0.25,
               "ci_hit_rate_high": 1.0,
@@ -4603,7 +4603,7 @@
           "n": 105
         },
         "26": {
-          "median": -0.005169,
+          "median": -0.00517,
           "hit_rate": 0.4674,
           "n": 92
         }
@@ -4674,7 +4674,7 @@
               "hit_rate": 0.6349,
               "n": 63,
               "ci_median_low": -0.008016,
-              "ci_median_high": 0.016636,
+              "ci_median_high": 0.016635,
               "ci_hit_rate_low": 0.473,
               "ci_hit_rate_high": 0.7937,
               "edge": 0.0647,
@@ -4706,7 +4706,7 @@
             "26": {
               "median": 0.004893,
               "p25": -0.022238,
-              "p75": 0.048289,
+              "p75": 0.04829,
               "hit_rate": 0.5517,
               "n": 58,
               "ci_median_low": -0.028238,
@@ -4729,7 +4729,7 @@
               "p75": 0.024682,
               "hit_rate": 0.48,
               "n": 50,
-              "ci_median_low": -0.012682,
+              "ci_median_low": -0.012683,
               "ci_median_high": 0.020721,
               "ci_hit_rate_low": 0.318,
               "ci_hit_rate_high": 0.675,
@@ -4856,7 +4856,7 @@
               "fdr_significant": false
             },
             "13": {
-              "median": -0.002591,
+              "median": -0.00259,
               "p25": -0.018645,
               "p75": 0.014347,
               "hit_rate": 0.45,
@@ -4894,8 +4894,8 @@
           },
           "loose": {
             "4": {
-              "median": 0.005385,
-              "p25": -0.012682,
+              "median": 0.005384,
+              "p25": -0.012683,
               "p75": 0.020721,
               "hit_rate": 0.6038,
               "n": 53,
@@ -4930,12 +4930,12 @@
               "fdr_significant": false
             },
             "26": {
-              "median": -0.000772,
+              "median": -0.000771,
               "p25": -0.017449,
               "p75": 0.024205,
               "hit_rate": 0.4894,
               "n": 47,
-              "ci_median_low": -0.007199,
+              "ci_median_low": -0.0072,
               "ci_median_high": 0.030311,
               "ci_hit_rate_low": 0.3824,
               "ci_hit_rate_high": 0.7843,
@@ -4964,9 +4964,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 16,
+      "vintage_count": 17,
       "unique_signal_dates": 2,
-      "duplicate_vintages": 14,
+      "duplicate_vintages": 15,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-07-17"
     },

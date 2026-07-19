@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-19T01:30:29.092027",
+  "computed_at": "2026-07-19T12:53:12.441997",
   "as_of": "2026-07-17",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1800,7 +1800,7 @@
         },
         {
           "date": "2025-08-08",
-          "value": 83.8046
+          "value": 83.8047
         },
         {
           "date": "2025-08-15",
@@ -1884,7 +1884,7 @@
         },
         {
           "date": "2026-01-02",
-          "value": 85.1002
+          "value": 85.1003
         },
         {
           "date": "2026-01-09",
@@ -1904,7 +1904,7 @@
         },
         {
           "date": "2026-02-06",
-          "value": 85.9263
+          "value": 85.9264
         },
         {
           "date": "2026-02-13",
@@ -1924,7 +1924,7 @@
         },
         {
           "date": "2026-03-13",
-          "value": 85.2272
+          "value": 85.2273
         },
         {
           "date": "2026-03-20",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-07-19T01:30:47.455507Z",
+    "computed_at": "2026-07-19T12:53:29.865446Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",

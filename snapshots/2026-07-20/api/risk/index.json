@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-20T03:09:53.418463",
+  "computed_at": "2026-07-20T13:47:53.915712",
   "current_regime": "neutral",
   "assets": [
     {
@@ -9090,7 +9090,7 @@
         "neutral": 16.58,
         "loose": 29.54
       },
-      "correlation_with_glci": 0.413,
+      "correlation_with_glci": 0.414,
       "rolling_sharpe": [
         {
           "date": "1986-12-31",
@@ -48964,7 +48964,7 @@
         "neutral": 33.01,
         "loose": 64.81
       },
-      "correlation_with_glci": 0.439,
+      "correlation_with_glci": 0.441,
       "rolling_sharpe": [
         {
           "date": "2017-07-24",
@@ -49252,7 +49252,7 @@
         },
         {
           "date": "2017-11-01",
-          "value": 2.515
+          "value": 2.516
         },
         {
           "date": "2017-11-02",
@@ -55912,7 +55912,7 @@
         },
         {
           "date": "2024-06-17",
-          "value": 2.05
+          "value": 2.049
         },
         {
           "date": "2024-06-18",
@@ -59842,7 +59842,7 @@
         },
         {
           "date": "2019-05-15",
-          "value": -0.156
+          "value": -0.155
         },
         {
           "date": "2019-05-16",
@@ -62982,7 +62982,7 @@
         },
         {
           "date": "2022-06-27",
-          "value": -0.954
+          "value": -0.955
         },
         {
           "date": "2022-06-28",
@@ -67072,7 +67072,7 @@
         "neutral": 32.85,
         "loose": 14.8
       },
-      "correlation_with_glci": 0.081,
+      "correlation_with_glci": 0.082,
       "rolling_sharpe": [
         {
           "date": "2017-07-24",
@@ -76126,7 +76126,7 @@
         "neutral": 62.14,
         "loose": 17.46
       },
-      "correlation_with_glci": 0.199,
+      "correlation_with_glci": 0.2,
       "rolling_sharpe": [
         {
           "date": "2017-07-24",
@@ -113995,17 +113995,17 @@
       "name": "Zcash",
       "category": "Crypto",
       "current_sharpe": 0.61,
-      "annualized_return": 71.6,
-      "annualized_volatility": 112.8,
+      "annualized_return": 71.35,
+      "annualized_volatility": 112.79,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 2.4,
+        "neutral": 2.38,
         "loose": 0.65
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 321.65,
+        "neutral": 319.35,
         "loose": 82.93
       },
       "correlation_with_glci": 0.02,
@@ -125245,6 +125245,10 @@
         {
           "date": "2026-07-18",
           "value": 2.314
+        },
+        {
+          "date": "2026-07-19",
+          "value": 2.294
         }
       ]
     },
@@ -134364,7 +134368,7 @@
       ],
       [
         null,
-        2.4,
+        2.38,
         0.65
       ],
       [
@@ -134416,7 +134420,7 @@
       ],
       [
         null,
-        321.65,
+        319.35,
         82.93
       ],
       [

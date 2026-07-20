@@ -16,7 +16,7 @@
     "neutral": 33.01,
     "loose": 64.81
   },
-  "correlation_with_glci": 0.439,
+  "correlation_with_glci": 0.441,
   "rolling_sharpe": [
     {
       "date": "2017-07-24",
@@ -304,7 +304,7 @@
     },
     {
       "date": "2017-11-01",
-      "value": 2.515
+      "value": 2.516
     },
     {
       "date": "2017-11-02",
@@ -6964,7 +6964,7 @@
     },
     {
       "date": "2024-06-17",
-      "value": 2.05
+      "value": 2.049
     },
     {
       "date": "2024-06-18",

@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-23T01:48:14.800424",
+  "computed_at": "2026-07-23T13:23:26.015646",
   "date_range": {
     "start": "2024-04-19",
     "end": "2026-07-17"
@@ -4591,7 +4591,7 @@
           "n": 104
         },
         "26": {
-          "median": -0.007199,
+          "median": -0.0072,
           "hit_rate": 0.4615,
           "n": 91
         }
@@ -4693,12 +4693,12 @@
             },
             "26": {
               "median": 0.004893,
-              "p25": -0.022238,
+              "p25": -0.022237,
               "p75": 0.04829,
               "hit_rate": 0.5517,
               "n": 58,
               "ci_median_low": -0.028238,
-              "ci_median_high": 0.04678,
+              "ci_median_high": 0.046779,
               "ci_hit_rate_low": 0.3636,
               "ci_hit_rate_high": 0.7606,
               "edge": 0.0902,
@@ -4753,7 +4753,7 @@
               "p75": 0.009775,
               "hit_rate": 0.2812,
               "n": 32,
-              "ci_median_low": -0.042411,
+              "ci_median_low": -0.04241,
               "ci_median_high": 0.023092,
               "ci_hit_rate_low": 0.0956,
               "ci_hit_rate_high": 0.6667,
@@ -4952,9 +4952,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 24,
+      "vintage_count": 25,
       "unique_signal_dates": 2,
-      "duplicate_vintages": 22,
+      "duplicate_vintages": 23,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-07-17"
     },

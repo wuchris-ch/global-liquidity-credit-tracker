@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-26T01:46:10.351346",
+  "computed_at": "2026-07-26T12:57:22.828720",
   "date_range": {
     "start": "2024-04-19",
     "end": "2026-07-24"
@@ -2577,7 +2577,7 @@
             },
             "26": {
               "median": -0.026212,
-              "p25": -0.099068,
+              "p25": -0.099067,
               "p75": 0.111016,
               "hit_rate": 0.3636,
               "n": 33,
@@ -4593,7 +4593,7 @@
       "category": "Fixed Income",
       "base_rates": {
         "4": {
-          "median": 0.003744,
+          "median": 0.003743,
           "hit_rate": 0.5614,
           "n": 114
         },
@@ -4900,7 +4900,7 @@
               "hit_rate": 0.6154,
               "n": 52,
               "ci_median_low": -0.008016,
-              "ci_median_high": 0.014711,
+              "ci_median_high": 0.014712,
               "ci_hit_rate_low": 0.4286,
               "ci_hit_rate_high": 0.7873,
               "edge": 0.0666,
@@ -4930,12 +4930,12 @@
               "fdr_significant": false
             },
             "26": {
-              "median": -0.000771,
+              "median": -0.000772,
               "p25": -0.017158,
               "p75": 0.024205,
               "hit_rate": 0.4894,
               "n": 47,
-              "ci_median_low": -0.007199,
+              "ci_median_low": -0.0072,
               "ci_median_high": 0.030311,
               "ci_hit_rate_low": 0.4074,
               "ci_hit_rate_high": 0.7879,
@@ -4964,9 +4964,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 28,
+      "vintage_count": 29,
       "unique_signal_dates": 3,
-      "duplicate_vintages": 25,
+      "duplicate_vintages": 26,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-07-24"
     },

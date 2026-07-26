@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-26T01:46:11.997582",
+  "computed_at": "2026-07-26T12:57:25.048739",
   "as_of": "2026-07-24",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1800,7 +1800,7 @@
         },
         {
           "date": "2025-08-08",
-          "value": 83.8047
+          "value": 83.8046
         },
         {
           "date": "2025-08-15",
@@ -1840,7 +1840,7 @@
         },
         {
           "date": "2025-10-17",
-          "value": 88.1973
+          "value": 88.1974
         },
         {
           "date": "2025-10-24",
@@ -1884,7 +1884,7 @@
         },
         {
           "date": "2026-01-02",
-          "value": 85.1002
+          "value": 85.1003
         },
         {
           "date": "2026-01-09",
@@ -1904,7 +1904,7 @@
         },
         {
           "date": "2026-02-06",
-          "value": 85.9264
+          "value": 85.9263
         },
         {
           "date": "2026-02-13",
@@ -1924,7 +1924,7 @@
         },
         {
           "date": "2026-03-13",
-          "value": 85.2273
+          "value": 85.2272
         },
         {
           "date": "2026-03-20",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-07-26T01:46:27.532697Z",
+    "computed_at": "2026-07-26T12:57:43.031063Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -2733,7 +2733,7 @@
         "return_126d": 0.21825,
         "excess_21d": -0.03791,
         "excess_63d": 0.082543,
-        "excess_126d": 0.138765,
+        "excess_126d": 0.138764,
         "relative_strength": 0.110654,
         "acceleration": -0.065425,
         "absolute_trend": 0.923835,
@@ -3092,7 +3092,7 @@
         "excess_126d": -0.057661,
         "relative_strength": -0.038616,
         "acceleration": -0.005838,
-        "absolute_trend": 0.185663,
+        "absolute_trend": 0.185664,
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
@@ -3143,7 +3143,7 @@
         "excess_126d": -0.050216,
         "relative_strength": -0.05822,
         "acceleration": 0.004356,
-        "absolute_trend": 0.213543,
+        "absolute_trend": 0.213544,
         "above_200d": true,
         "phase": "improving",
         "fund_flow": {

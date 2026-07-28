@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-28T01:27:52.472760",
+  "computed_at": "2026-07-28T13:29:24.217659",
   "date_range": {
     "start": "2024-04-19",
     "end": "2026-07-24"
@@ -4603,7 +4603,7 @@
           "n": 105
         },
         "26": {
-          "median": -0.007249,
+          "median": -0.00725,
           "hit_rate": 0.4565,
           "n": 92
         }
@@ -4706,11 +4706,11 @@
             "26": {
               "median": 0.004893,
               "p25": -0.022238,
-              "p75": 0.04829,
+              "p75": 0.048289,
               "hit_rate": 0.5517,
               "n": 58,
               "ci_median_low": -0.028238,
-              "ci_median_high": 0.04678,
+              "ci_median_high": 0.046779,
               "ci_hit_rate_low": 0.3611,
               "ci_hit_rate_high": 0.7667,
               "edge": 0.0952,
@@ -4724,12 +4724,12 @@
           },
           "loose": {
             "4": {
-              "median": -0.001807,
+              "median": -0.001806,
               "p25": -0.029704,
               "p75": 0.023729,
               "hit_rate": 0.46,
               "n": 50,
-              "ci_median_low": -0.012683,
+              "ci_median_low": -0.012682,
               "ci_median_high": 0.01387,
               "ci_hit_rate_low": 0.3023,
               "ci_hit_rate_high": 0.6591,
@@ -4858,7 +4858,7 @@
             "13": {
               "median": -0.003554,
               "p25": -0.019808,
-              "p75": 0.014106,
+              "p75": 0.014107,
               "hit_rate": 0.4286,
               "n": 21,
               "ci_median_low": null,
@@ -4931,11 +4931,11 @@
             },
             "26": {
               "median": -0.000772,
-              "p25": -0.017449,
-              "p75": 0.024205,
+              "p25": -0.017448,
+              "p75": 0.024204,
               "hit_rate": 0.4894,
               "n": 47,
-              "ci_median_low": -0.007199,
+              "ci_median_low": -0.0072,
               "ci_median_high": 0.030311,
               "ci_hit_rate_low": 0.4074,
               "ci_hit_rate_high": 0.7879,
@@ -4964,9 +4964,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 32,
+      "vintage_count": 33,
       "unique_signal_dates": 3,
-      "duplicate_vintages": 29,
+      "duplicate_vintages": 30,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-07-24"
     },

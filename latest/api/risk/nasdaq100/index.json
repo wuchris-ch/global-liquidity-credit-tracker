@@ -3,20 +3,20 @@
   "name": "Nasdaq 100",
   "category": "Large Cap Equities",
   "current_sharpe": 0.51,
-  "annualized_return": 16.65,
+  "annualized_return": 16.62,
   "annualized_volatility": 26.14,
   "max_drawdown": -82.9,
   "sharpe_by_regime": {
     "tight": null,
-    "neutral": 0.65,
+    "neutral": 0.61,
     "loose": 1.44
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 17.43,
+    "neutral": 16.57,
     "loose": 31.72
   },
-  "correlation_with_glci": 0.403,
+  "correlation_with_glci": 0.402,
   "rolling_sharpe": [
     {
       "date": "1986-12-31",
@@ -39893,6 +39893,10 @@
     {
       "date": "2026-07-27",
       "value": 0.887
+    },
+    {
+      "date": "2026-07-28",
+      "value": 0.822
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-02T01:46:16.981965",
+  "computed_at": "2026-08-02T12:57:18.651987",
   "as_of": "2026-07-31",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1792,7 +1792,7 @@
       "spark": [
         {
           "date": "2025-08-08",
-          "value": 83.8046
+          "value": 83.8047
         },
         {
           "date": "2025-08-15",
@@ -1828,11 +1828,11 @@
         },
         {
           "date": "2025-10-10",
-          "value": 87.6364
+          "value": 87.6365
         },
         {
           "date": "2025-10-17",
-          "value": 88.1974
+          "value": 88.1973
         },
         {
           "date": "2025-10-24",
@@ -1896,7 +1896,7 @@
         },
         {
           "date": "2026-02-06",
-          "value": 85.9263
+          "value": 85.9264
         },
         {
           "date": "2026-02-13",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-08-02T01:46:35.344707Z",
+    "computed_at": "2026-08-02T12:57:36.490712Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -2942,7 +2942,7 @@
         "excess_126d": -0.01517,
         "relative_strength": 0.027694,
         "acceleration": -0.00653,
-        "absolute_trend": 0.492918,
+        "absolute_trend": 0.492917,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2993,7 +2993,7 @@
         "excess_126d": 0.007311,
         "relative_strength": -0.000919,
         "acceleration": -0.018036,
-        "absolute_trend": 0.627941,
+        "absolute_trend": 0.62794,
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
@@ -3146,7 +3146,7 @@
         "excess_126d": -0.042276,
         "relative_strength": -0.06602,
         "acceleration": 0.018794,
-        "absolute_trend": 0.313996,
+        "absolute_trend": 0.313997,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {

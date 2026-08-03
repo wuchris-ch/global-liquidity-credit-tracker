@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-03T01:49:10.123051",
+  "computed_at": "2026-08-03T14:14:58.730431",
   "current_regime": "neutral",
   "assets": [
     {
@@ -9090,7 +9090,7 @@
         "neutral": 17.94,
         "loose": 31.72
       },
-      "correlation_with_glci": 0.4,
+      "correlation_with_glci": 0.401,
       "rolling_sharpe": [
         {
           "date": "1986-12-31",
@@ -49568,7 +49568,7 @@
         },
         {
           "date": "2018-02-27",
-          "value": 1.832
+          "value": 1.831
         },
         {
           "date": "2018-02-28",
@@ -52100,7 +52100,7 @@
         },
         {
           "date": "2020-09-01",
-          "value": 1.312
+          "value": 1.313
         },
         {
           "date": "2020-09-02",
@@ -59522,7 +59522,7 @@
         },
         {
           "date": "2019-01-18",
-          "value": -0.281
+          "value": -0.28
         },
         {
           "date": "2019-01-22",
@@ -60162,7 +60162,7 @@
         },
         {
           "date": "2019-09-09",
-          "value": -0.546
+          "value": -0.545
         },
         {
           "date": "2019-09-10",
@@ -62722,7 +62722,7 @@
         },
         {
           "date": "2022-03-23",
-          "value": -0.031
+          "value": -0.03
         },
         {
           "date": "2022-03-24",
@@ -65326,7 +65326,7 @@
         },
         {
           "date": "2024-10-24",
-          "value": 1.226
+          "value": 1.225
         },
         {
           "date": "2024-10-25",
@@ -66298,7 +66298,7 @@
         },
         {
           "date": "2025-10-15",
-          "value": 0.505
+          "value": 0.504
         },
         {
           "date": "2025-10-16",
@@ -76166,7 +76166,7 @@
         "neutral": 66.98,
         "loose": 18.31
       },
-      "correlation_with_glci": 0.2,
+      "correlation_with_glci": 0.199,
       "rolling_sharpe": [
         {
           "date": "2017-08-07",
@@ -85220,7 +85220,7 @@
         "neutral": -20.14,
         "loose": 46.52
       },
-      "correlation_with_glci": 0.135,
+      "correlation_with_glci": 0.134,
       "rolling_sharpe": [
         {
           "date": "2016-01-04",
@@ -114146,18 +114146,18 @@
       "id": "zcash_price",
       "name": "Zcash",
       "category": "Crypto",
-      "current_sharpe": 0.59,
-      "annualized_return": 69.16,
+      "current_sharpe": 0.6,
+      "annualized_return": 69.82,
       "annualized_volatility": 112.61,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 2.16,
+        "neutral": 2.19,
         "loose": 0.92
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 288.97,
+        "neutral": 293.04,
         "loose": 115.59
       },
       "correlation_with_glci": 0.033,
@@ -125453,6 +125453,10 @@
         {
           "date": "2026-08-01",
           "value": 2.326
+        },
+        {
+          "date": "2026-08-02",
+          "value": 2.372
         }
       ]
     },
@@ -125474,7 +125478,7 @@
         "neutral": 12.63,
         "loose": -4.89
       },
-      "correlation_with_glci": -0.123,
+      "correlation_with_glci": -0.124,
       "rolling_sharpe": [
         {
           "date": "2017-08-07",
@@ -127722,7 +127726,7 @@
         },
         {
           "date": "2019-10-29",
-          "value": 1.679
+          "value": 1.678
         },
         {
           "date": "2019-10-30",
@@ -127806,7 +127810,7 @@
         },
         {
           "date": "2019-11-27",
-          "value": 1.82
+          "value": 1.819
         },
         {
           "date": "2019-11-29",
@@ -128702,7 +128706,7 @@
         },
         {
           "date": "2020-10-19",
-          "value": 0.809
+          "value": 0.81
         },
         {
           "date": "2020-10-20",
@@ -132266,7 +132270,7 @@
         },
         {
           "date": "2024-05-06",
-          "value": -0.946
+          "value": -0.947
         },
         {
           "date": "2024-05-07",
@@ -134572,7 +134576,7 @@
       ],
       [
         null,
-        2.16,
+        2.19,
         0.92
       ],
       [
@@ -134624,7 +134628,7 @@
       ],
       [
         null,
-        288.97,
+        293.04,
         115.59
       ],
       [

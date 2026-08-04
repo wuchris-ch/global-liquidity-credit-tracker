@@ -3,17 +3,17 @@
   "name": "Long Bonds (TLT)",
   "category": "Fixed Income",
   "current_sharpe": -0.25,
-  "annualized_return": -1.32,
+  "annualized_return": -1.28,
   "annualized_volatility": 14.84,
   "max_drawdown": -48.35,
   "sharpe_by_regime": {
     "tight": null,
-    "neutral": 0.67,
+    "neutral": 0.7,
     "loose": -0.82
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 12.53,
+    "neutral": 12.86,
     "loose": -4.89
   },
   "correlation_with_glci": -0.124,
@@ -2260,7 +2260,7 @@
     },
     {
       "date": "2019-10-29",
-      "value": 1.678
+      "value": 1.679
     },
     {
       "date": "2019-10-30",
@@ -2344,7 +2344,7 @@
     },
     {
       "date": "2019-11-27",
-      "value": 1.819
+      "value": 1.82
     },
     {
       "date": "2019-11-29",
@@ -3240,7 +3240,7 @@
     },
     {
       "date": "2020-10-19",
-      "value": 0.809
+      "value": 0.81
     },
     {
       "date": "2020-10-20",
@@ -5116,7 +5116,7 @@
     },
     {
       "date": "2022-08-30",
-      "value": -1.415
+      "value": -1.414
     },
     {
       "date": "2022-08-31",
@@ -6804,7 +6804,7 @@
     },
     {
       "date": "2024-05-06",
-      "value": -0.946
+      "value": -0.947
     },
     {
       "date": "2024-05-07",
@@ -9048,7 +9048,7 @@
     },
     {
       "date": "2026-08-03",
-      "value": -0.488
+      "value": -0.445
     }
   ]
 }

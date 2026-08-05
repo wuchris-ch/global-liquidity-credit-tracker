@@ -16,7 +16,7 @@
     "neutral": -12.72,
     "loose": 46.52
   },
-  "correlation_with_glci": 0.134,
+  "correlation_with_glci": 0.133,
   "rolling_sharpe": [
     {
       "date": "2016-01-04",

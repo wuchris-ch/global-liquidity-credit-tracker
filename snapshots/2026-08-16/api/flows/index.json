@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-16T00:39:08.605233",
+  "computed_at": "2026-08-16T12:18:27.042155",
   "as_of": "2026-08-14",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1820,7 +1820,7 @@
         },
         {
           "date": "2025-10-10",
-          "value": 87.2848
+          "value": 87.2849
         },
         {
           "date": "2025-10-17",
@@ -1828,7 +1828,7 @@
         },
         {
           "date": "2025-10-24",
-          "value": 88.1036
+          "value": 88.1035
         },
         {
           "date": "2025-10-31",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-08-16T00:39:25.356143Z",
+    "computed_at": "2026-08-16T12:18:44.892823Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -2903,7 +2903,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 66.5,
+        "price_score": 63.0,
         "rank": 4,
         "ticker": "XLV",
         "options_activity": {
@@ -2954,7 +2954,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 63.5,
+        "price_score": 60.0,
         "rank": 5,
         "ticker": "XLI",
         "options_activity": {
@@ -2982,15 +2982,15 @@
         "id": "real_estate",
         "name": "Real Estate",
         "price_as_of": "2026-08-14",
-        "return_21d": -0.004188,
-        "return_63d": 0.039227,
-        "return_126d": 0.069896,
-        "excess_21d": -0.037746,
-        "excess_63d": -0.000306,
-        "excess_126d": -0.066036,
-        "relative_strength": -0.033171,
-        "acceleration": -0.037644,
-        "absolute_trend": 0.608955,
+        "return_21d": 0.015808,
+        "return_63d": 0.032418,
+        "return_126d": 0.07153,
+        "excess_21d": -0.01775,
+        "excess_63d": -0.007115,
+        "excess_126d": -0.064402,
+        "relative_strength": -0.035759,
+        "acceleration": -0.015378,
+        "absolute_trend": 0.627066,
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
@@ -3005,7 +3005,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 50.0,
+        "price_score": 57.0,
         "rank": 6,
         "ticker": "XLRE",
         "options_activity": {
@@ -3033,15 +3033,15 @@
         "id": "materials",
         "name": "Materials",
         "price_as_of": "2026-08-14",
-        "return_21d": 0.036833,
-        "return_63d": 0.011375,
-        "return_126d": 0.001152,
-        "excess_21d": 0.003275,
-        "excess_63d": -0.028159,
-        "excess_126d": -0.13478,
-        "relative_strength": -0.081469,
-        "acceleration": 0.012661,
-        "absolute_trend": 0.008197,
+        "return_21d": 0.031908,
+        "return_63d": 0.02043,
+        "return_126d": 0.002665,
+        "excess_21d": -0.00165,
+        "excess_63d": -0.019104,
+        "excess_126d": -0.133267,
+        "relative_strength": -0.076185,
+        "acceleration": 0.004718,
+        "absolute_trend": 0.018549,
         "above_200d": true,
         "phase": "improving",
         "fund_flow": {
@@ -3084,15 +3084,15 @@
         "id": "consumer_discretionary",
         "name": "Consumer Discretionary",
         "price_as_of": "2026-08-14",
-        "return_21d": 0.01965,
-        "return_63d": 0.00123,
-        "return_126d": 0.002898,
-        "excess_21d": -0.013908,
-        "excess_63d": -0.038304,
-        "excess_126d": -0.133034,
-        "relative_strength": -0.085669,
-        "acceleration": -0.00114,
-        "absolute_trend": 0.017216,
+        "return_21d": 0.007302,
+        "return_63d": -0.001978,
+        "return_126d": 0.021665,
+        "excess_21d": -0.026255,
+        "excess_63d": -0.041511,
+        "excess_126d": -0.114267,
+        "relative_strength": -0.077889,
+        "acceleration": -0.012418,
+        "absolute_trend": 0.138401,
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
@@ -3158,7 +3158,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 13.0,
+        "price_score": 16.5,
         "rank": 9,
         "ticker": "XLP",
         "options_activity": {
@@ -3209,7 +3209,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 10.0,
+        "price_score": 13.5,
         "rank": 10,
         "ticker": "XLU",
         "options_activity": {
@@ -3237,15 +3237,15 @@
         "id": "communication_services",
         "name": "Communication Services",
         "price_as_of": "2026-08-14",
-        "return_21d": 0.00266,
-        "return_63d": -0.03357,
-        "return_126d": -0.009067,
-        "excess_21d": -0.030898,
-        "excess_63d": -0.073104,
-        "excess_126d": -0.144999,
-        "relative_strength": -0.109052,
-        "acceleration": -0.00653,
-        "absolute_trend": -0.066272,
+        "return_21d": -0.0038,
+        "return_63d": -0.030577,
+        "return_126d": -0.02722,
+        "excess_21d": -0.037358,
+        "excess_63d": -0.070111,
+        "excess_126d": -0.163152,
+        "relative_strength": -0.116631,
+        "acceleration": -0.013987,
+        "absolute_trend": -0.197846,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
@@ -3260,7 +3260,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 7.0,
+        "price_score": 0.0,
         "rank": 11,
         "ticker": "XLC",
         "options_activity": {

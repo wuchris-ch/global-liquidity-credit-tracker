@@ -3,17 +3,17 @@
   "name": "Silver",
   "category": "Commodities",
   "current_sharpe": 0.46,
-  "annualized_return": 17.37,
+  "annualized_return": 17.19,
   "annualized_volatility": 32.28,
   "max_drawdown": -52.28,
   "sharpe_by_regime": {
     "tight": null,
-    "neutral": 1.71,
+    "neutral": 1.67,
     "loose": 0.35
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 67.99,
+    "neutral": 66.76,
     "loose": 24.05
   },
   "correlation_with_glci": 0.209,
@@ -9045,10 +9045,6 @@
     {
       "date": "2026-08-14",
       "value": 1.098
-    },
-    {
-      "date": "2026-08-17",
-      "value": 1.152
     }
   ]
 }

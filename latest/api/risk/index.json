@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-20T00:38:17.429252",
+  "computed_at": "2026-08-20T12:26:21.714432",
   "current_regime": "neutral",
   "assets": [
     {
@@ -9069,17 +9069,17 @@
       "name": "Nasdaq 100",
       "category": "Large Cap Equities",
       "current_sharpe": 0.52,
-      "annualized_return": 16.75,
+      "annualized_return": 16.74,
       "annualized_volatility": 26.14,
       "max_drawdown": -82.9,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 0.29,
+        "neutral": 0.28,
         "loose": 1.95
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 10.24,
+        "neutral": 10.04,
         "loose": 41.26
       },
       "correlation_with_glci": 0.392,
@@ -49023,6 +49023,10 @@
         {
           "date": "2026-08-18",
           "value": 1.017
+        },
+        {
+          "date": "2026-08-19",
+          "value": 1.005
         }
       ]
     },
@@ -49248,7 +49252,7 @@
         },
         {
           "date": "2017-11-01",
-          "value": 2.516
+          "value": 2.515
         },
         {
           "date": "2017-11-02",
@@ -52096,7 +52100,7 @@
         },
         {
           "date": "2020-09-01",
-          "value": 1.312
+          "value": 1.313
         },
         {
           "date": "2020-09-02",
@@ -53700,7 +53704,7 @@
         },
         {
           "date": "2022-04-05",
-          "value": 0.234
+          "value": 0.233
         },
         {
           "date": "2022-04-06",
@@ -55908,7 +55912,7 @@
         },
         {
           "date": "2024-06-17",
-          "value": 2.05
+          "value": 2.049
         },
         {
           "date": "2024-06-18",
@@ -59526,7 +59530,7 @@
         },
         {
           "date": "2019-01-18",
-          "value": -0.281
+          "value": -0.28
         },
         {
           "date": "2019-01-22",
@@ -62726,7 +62730,7 @@
         },
         {
           "date": "2022-03-23",
-          "value": -0.031
+          "value": -0.03
         },
         {
           "date": "2022-03-24",
@@ -62986,7 +62990,7 @@
         },
         {
           "date": "2022-06-27",
-          "value": -0.955
+          "value": -0.954
         },
         {
           "date": "2022-06-28",
@@ -63938,7 +63942,7 @@
         },
         {
           "date": "2023-06-07",
-          "value": 0.029
+          "value": 0.028
         },
         {
           "date": "2023-06-08",
@@ -65330,7 +65334,7 @@
         },
         {
           "date": "2024-10-24",
-          "value": 1.226
+          "value": 1.225
         },
         {
           "date": "2024-10-25",
@@ -114354,18 +114358,18 @@
       "id": "zcash_price",
       "name": "Zcash",
       "category": "Crypto",
-      "current_sharpe": 0.6,
-      "annualized_return": 69.98,
-      "annualized_volatility": 112.37,
+      "current_sharpe": 0.61,
+      "annualized_return": 71.2,
+      "annualized_volatility": 112.42,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 2.28,
+        "neutral": 2.34,
         "loose": 0.78
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 301.67,
+        "neutral": 309.45,
         "loose": 99.58
       },
       "correlation_with_glci": 0.025,
@@ -125729,6 +125733,10 @@
         {
           "date": "2026-08-18",
           "value": 2.401
+        },
+        {
+          "date": "2026-08-19",
+          "value": 2.478
         }
       ]
     },
@@ -129954,7 +129962,7 @@
         },
         {
           "date": "2021-10-22",
-          "value": -0.477
+          "value": -0.476
         },
         {
           "date": "2021-10-25",
@@ -134821,7 +134829,7 @@
       ],
       [
         null,
-        0.29,
+        0.28,
         1.95
       ],
       [
@@ -134856,7 +134864,7 @@
       ],
       [
         null,
-        2.28,
+        2.34,
         0.78
       ],
       [
@@ -134873,7 +134881,7 @@
       ],
       [
         null,
-        10.24,
+        10.04,
         41.26
       ],
       [
@@ -134908,7 +134916,7 @@
       ],
       [
         null,
-        301.67,
+        309.45,
         99.58
       ],
       [

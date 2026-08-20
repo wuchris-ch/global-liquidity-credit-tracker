@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-20T00:37:02.135858",
+  "computed_at": "2026-08-20T12:25:54.446012",
   "date_range": {
     "start": "2024-05-17",
     "end": "2026-08-14"
@@ -2403,7 +2403,7 @@
           "n": 113
         },
         "13": {
-          "median": 0.062233,
+          "median": 0.062232,
           "hit_rate": 0.7885,
           "n": 104
         },
@@ -2566,7 +2566,7 @@
             },
             "26": {
               "median": -0.022326,
-              "p25": -0.09567,
+              "p25": -0.095671,
               "p75": 0.119343,
               "hit_rate": 0.3824,
               "n": 34,
@@ -4732,7 +4732,7 @@
             },
             "13": {
               "median": -0.00685,
-              "p25": -0.040622,
+              "p25": -0.040621,
               "p75": 0.013003,
               "hit_rate": 0.381,
               "n": 42,
@@ -4754,7 +4754,7 @@
               "p75": -0.004262,
               "hit_rate": 0.2353,
               "n": 34,
-              "ci_median_low": -0.042215,
+              "ci_median_low": -0.042214,
               "ci_median_high": 0.023092,
               "ci_hit_rate_low": 0.0565,
               "ci_hit_rate_high": 0.6831,
@@ -4953,9 +4953,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 72,
+      "vintage_count": 73,
       "unique_signal_dates": 6,
-      "duplicate_vintages": 66,
+      "duplicate_vintages": 67,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-08-14"
     },

@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-23T00:39:43.903902",
+  "computed_at": "2026-08-23T12:18:56.886742",
   "as_of": "2026-08-21",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1816,7 +1816,7 @@
         },
         {
           "date": "2025-10-10",
-          "value": 87.2848
+          "value": 87.2849
         },
         {
           "date": "2025-10-17",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-08-23T00:39:59.266079Z",
+    "computed_at": "2026-08-23T12:19:14.138139Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",

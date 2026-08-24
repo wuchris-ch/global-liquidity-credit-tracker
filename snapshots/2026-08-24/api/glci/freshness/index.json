@@ -121,8 +121,8 @@
   {
     "series_id": "sofr",
     "pillar": "stress",
-    "last_date": "2026-08-20",
-    "days_old": 4,
+    "last_date": "2026-08-21",
+    "days_old": 3,
     "is_stale": false
   },
   {

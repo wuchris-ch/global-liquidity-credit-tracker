@@ -16,8 +16,8 @@
   {
     "series_id": "fed_reverse_repo",
     "pillar": "liquidity",
-    "last_date": "2026-08-28",
-    "days_old": 3,
+    "last_date": "2026-08-31",
+    "days_old": 0,
     "is_stale": false
   },
   {
@@ -107,22 +107,22 @@
   {
     "series_id": "ice_bofa_us_high_yield_spread",
     "pillar": "stress",
-    "last_date": "2026-08-27",
-    "days_old": 4,
+    "last_date": "2026-08-28",
+    "days_old": 3,
     "is_stale": false
   },
   {
     "series_id": "ice_bofa_us_ig_spread",
     "pillar": "stress",
-    "last_date": "2026-08-27",
-    "days_old": 4,
+    "last_date": "2026-08-28",
+    "days_old": 3,
     "is_stale": false
   },
   {
     "series_id": "sofr",
     "pillar": "stress",
-    "last_date": "2026-08-27",
-    "days_old": 4,
+    "last_date": "2026-08-28",
+    "days_old": 3,
     "is_stale": false
   },
   {

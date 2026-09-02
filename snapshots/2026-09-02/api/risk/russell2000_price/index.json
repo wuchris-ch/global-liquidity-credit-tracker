@@ -4,7 +4,7 @@
   "category": "Small Cap Equities",
   "current_sharpe": 0.43,
   "annualized_return": 12.43,
-  "annualized_volatility": 23.05,
+  "annualized_volatility": 23.04,
   "max_drawdown": -41.13,
   "sharpe_by_regime": {
     "tight": null,
@@ -16,7 +16,7 @@
     "neutral": -3.07,
     "loose": 54.52
   },
-  "correlation_with_glci": 0.323,
+  "correlation_with_glci": 0.321,
   "rolling_sharpe": [
     {
       "date": "2017-09-06",
@@ -1396,7 +1396,7 @@
     },
     {
       "date": "2019-01-18",
-      "value": -0.281
+      "value": -0.28
     },
     {
       "date": "2019-01-22",
@@ -4596,7 +4596,7 @@
     },
     {
       "date": "2022-03-23",
-      "value": -0.03
+      "value": -0.031
     },
     {
       "date": "2022-03-24",
@@ -4856,7 +4856,7 @@
     },
     {
       "date": "2022-06-27",
-      "value": -0.954
+      "value": -0.955
     },
     {
       "date": "2022-06-28",
@@ -5808,7 +5808,7 @@
     },
     {
       "date": "2023-06-07",
-      "value": 0.028
+      "value": 0.029
     },
     {
       "date": "2023-06-08",
@@ -8172,7 +8172,7 @@
     },
     {
       "date": "2025-10-15",
-      "value": 0.504
+      "value": 0.505
     },
     {
       "date": "2025-10-16",
@@ -9043,12 +9043,16 @@
       "value": 1.266
     },
     {
+      "date": "2026-08-28",
+      "value": 1.152
+    },
+    {
       "date": "2026-08-31",
-      "value": 1.117
+      "value": 1.113
     },
     {
       "date": "2026-09-01",
-      "value": 1.047
+      "value": 1.073
     }
   ]
 }

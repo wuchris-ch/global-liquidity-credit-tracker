@@ -107,22 +107,22 @@
   {
     "series_id": "ice_bofa_us_high_yield_spread",
     "pillar": "stress",
-    "last_date": "2026-08-31",
-    "days_old": 2,
+    "last_date": "2026-09-01",
+    "days_old": 1,
     "is_stale": false
   },
   {
     "series_id": "ice_bofa_us_ig_spread",
     "pillar": "stress",
-    "last_date": "2026-08-31",
-    "days_old": 2,
+    "last_date": "2026-09-01",
+    "days_old": 1,
     "is_stale": false
   },
   {
     "series_id": "sofr",
     "pillar": "stress",
-    "last_date": "2026-08-31",
-    "days_old": 2,
+    "last_date": "2026-09-01",
+    "days_old": 1,
     "is_stale": false
   },
   {

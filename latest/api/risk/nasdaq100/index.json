@@ -13,7 +13,7 @@
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 13.46,
+    "neutral": 13.59,
     "loose": 35.73
   },
   "correlation_with_glci": 0.381,
@@ -39997,6 +39997,10 @@
     {
       "date": "2026-09-01",
       "value": 1.01
+    },
+    {
+      "date": "2026-09-02",
+      "value": 1.063
     }
   ]
 }

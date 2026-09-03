@@ -4,7 +4,7 @@
   "category": "Fixed Income",
   "current_sharpe": -0.26,
   "annualized_return": -1.39,
-  "annualized_volatility": 14.84,
+  "annualized_volatility": 14.83,
   "max_drawdown": -48.35,
   "sharpe_by_regime": {
     "tight": null,
@@ -13,7 +13,7 @@
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 9.7,
+    "neutral": 9.66,
     "loose": -3.34
   },
   "correlation_with_glci": -0.141,
@@ -208,7 +208,7 @@
     },
     {
       "date": "2017-11-10",
-      "value": 0.334
+      "value": 0.335
     },
     {
       "date": "2017-11-13",
@@ -1028,7 +1028,7 @@
     },
     {
       "date": "2018-09-06",
-      "value": -0.526
+      "value": -0.525
     },
     {
       "date": "2018-09-07",
@@ -3104,7 +3104,7 @@
     },
     {
       "date": "2020-09-29",
-      "value": 0.808
+      "value": 0.809
     },
     {
       "date": "2020-09-30",
@@ -5036,7 +5036,7 @@
     },
     {
       "date": "2022-08-30",
-      "value": -1.415
+      "value": -1.414
     },
     {
       "date": "2022-08-31",
@@ -7712,7 +7712,7 @@
     },
     {
       "date": "2025-05-01",
-      "value": 0.025
+      "value": 0.024
     },
     {
       "date": "2025-05-02",
@@ -9043,16 +9043,20 @@
       "value": -0.333
     },
     {
+      "date": "2026-08-28",
+      "value": -0.352
+    },
+    {
       "date": "2026-08-31",
-      "value": -0.397
+      "value": -0.468
     },
     {
       "date": "2026-09-01",
-      "value": -0.51
+      "value": -0.437
     },
     {
       "date": "2026-09-02",
-      "value": -0.426
+      "value": -0.348
     }
   ]
 }

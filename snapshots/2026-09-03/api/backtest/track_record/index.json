@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-03T01:58:10.511273",
+  "computed_at": "2026-09-03T15:27:22.597161",
   "date_range": {
     "start": "2024-05-31",
     "end": "2026-08-28"
@@ -2034,7 +2034,7 @@
       "category": "AI Trade",
       "base_rates": {
         "4": {
-          "median": 0.026494,
+          "median": 0.024488,
           "hit_rate": 0.6372,
           "n": 113
         },
@@ -2109,7 +2109,7 @@
           },
           "neutral": {
             "4": {
-              "median": 0.046823,
+              "median": 0.042894,
               "p25": -0.021955,
               "p75": 0.102539,
               "hit_rate": 0.6721,
@@ -2335,7 +2335,7 @@
           },
           "loose": {
             "4": {
-              "median": 0.026494,
+              "median": 0.023273,
               "p25": -0.029585,
               "p75": 0.07516,
               "hit_rate": 0.6735,
@@ -2371,7 +2371,7 @@
               "fdr_significant": false
             },
             "26": {
-              "median": 0.380653,
+              "median": 0.375277,
               "p25": 0.301964,
               "p75": 0.445502,
               "hit_rate": 1.0,
@@ -2398,7 +2398,7 @@
       "category": "Small Cap Equities",
       "base_rates": {
         "4": {
-          "median": 0.019896,
+          "median": 0.018818,
           "hit_rate": 0.6903,
           "n": 113
         },
@@ -2735,7 +2735,7 @@
               "fdr_significant": false
             },
             "26": {
-              "median": 0.13943,
+              "median": 0.138559,
               "p25": 0.101849,
               "p75": 0.179539,
               "hit_rate": 0.913,
@@ -4657,7 +4657,7 @@
           },
           "neutral": {
             "4": {
-              "median": 0.004071,
+              "median": 0.004072,
               "p25": -0.014474,
               "p75": 0.018406,
               "hit_rate": 0.5902,
@@ -4675,8 +4675,8 @@
               "fdr_significant": false
             },
             "13": {
-              "median": 0.001822,
-              "p25": -0.021845,
+              "median": 0.001821,
+              "p25": -0.021846,
               "p75": 0.031985,
               "hit_rate": 0.5263,
               "n": 57,
@@ -4953,9 +4953,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 94,
+      "vintage_count": 95,
       "unique_signal_dates": 8,
-      "duplicate_vintages": 86,
+      "duplicate_vintages": 87,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-08-28"
     },

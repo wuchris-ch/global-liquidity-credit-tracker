@@ -3,7 +3,7 @@
   "name": "Semiconductors (SMH)",
   "category": "AI Trade",
   "current_sharpe": 0.96,
-  "annualized_return": 34.7,
+  "annualized_return": 34.69,
   "annualized_volatility": 33.48,
   "max_drawdown": -45.3,
   "sharpe_by_regime": {
@@ -13,10 +13,10 @@
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 24.26,
+    "neutral": 24.2,
     "loose": 72.95
   },
-  "correlation_with_glci": 0.41,
+  "correlation_with_glci": 0.409,
   "rolling_sharpe": [
     {
       "date": "2017-09-06",
@@ -3028,7 +3028,7 @@
     },
     {
       "date": "2020-09-01",
-      "value": 1.313
+      "value": 1.312
     },
     {
       "date": "2020-09-02",
@@ -9043,16 +9043,20 @@
       "value": 1.789
     },
     {
+      "date": "2026-08-28",
+      "value": 1.685
+    },
+    {
       "date": "2026-08-31",
-      "value": 1.703
+      "value": 1.691
     },
     {
       "date": "2026-09-01",
-      "value": 1.638
+      "value": 1.714
     },
     {
       "date": "2026-09-02",
-      "value": 1.741
+      "value": 1.774
     }
   ]
 }

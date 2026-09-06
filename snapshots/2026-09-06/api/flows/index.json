@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-06T01:48:13.983600",
+  "computed_at": "2026-09-06T14:35:16.069072",
   "as_of": "2026-09-04",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1348,7 +1348,7 @@
       "spark": [
         {
           "date": "2025-09-12",
-          "value": 235.89
+          "value": 235.8899
         },
         {
           "date": "2025-09-19",
@@ -1808,7 +1808,7 @@
         },
         {
           "date": "2025-10-10",
-          "value": 86.9516
+          "value": 86.9517
         },
         {
           "date": "2025-10-17",
@@ -1816,7 +1816,7 @@
         },
         {
           "date": "2025-10-24",
-          "value": 87.7673
+          "value": 87.7672
         },
         {
           "date": "2025-10-31",
@@ -1828,7 +1828,7 @@
         },
         {
           "date": "2025-11-14",
-          "value": 85.5806
+          "value": 85.5805
         },
         {
           "date": "2025-11-21",
@@ -1840,7 +1840,7 @@
         },
         {
           "date": "2025-12-05",
-          "value": 85.2096
+          "value": 85.2097
         },
         {
           "date": "2025-12-12",
@@ -1904,7 +1904,7 @@
         },
         {
           "date": "2026-03-27",
-          "value": 83.6818
+          "value": 83.6819
         },
         {
           "date": "2026-04-03",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-09-06T01:48:31.409194Z",
+    "computed_at": "2026-09-06T14:35:32.592434Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -2788,7 +2788,7 @@
         "excess_126d": 0.006317,
         "relative_strength": 0.034554,
         "acceleration": -0.018045,
-        "absolute_trend": 1.631255,
+        "absolute_trend": 1.631254,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2839,7 +2839,7 @@
         "excess_126d": -0.003074,
         "relative_strength": 0.031659,
         "acceleration": 0.072373,
-        "absolute_trend": 0.876569,
+        "absolute_trend": 0.87657,
         "above_200d": true,
         "phase": "leading",
         "fund_flow": {

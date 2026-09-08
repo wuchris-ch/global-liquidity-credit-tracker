@@ -4,23 +4,23 @@
   "point_in_time": false,
   "frequency": "W-FRI",
   "snapshots": {
-    "count": 102,
+    "count": 103,
     "unique_signal_dates": 9,
-    "duplicate_vintages": 93,
+    "duplicate_vintages": 94,
     "first_signal_date": "2026-07-10",
     "latest_signal_date": "2026-09-04",
     "first_computed_at": "2026-07-11T04:12:17.432117Z",
-    "last_computed_at": "2026-09-08T01:56:17.329262Z",
+    "last_computed_at": "2026-09-08T15:36:48.263169Z",
     "latest_signal_revision": {
-      "vintage_count": 6,
+      "vintage_count": 7,
       "first_glci": 108.17683369929921,
-      "latest_glci": 108.17683369929921,
-      "glci_change": 0,
-      "glci_min": 108.17683369929921,
+      "latest_glci": 108.13267236569513,
+      "glci_change": -0.044161333604080255,
+      "glci_min": 108.13267236569513,
       "glci_max": 108.17683369929921,
       "first_zscore": 0.5463350319963339,
-      "latest_zscore": 0.5463350319963339,
-      "zscore_change": 0,
+      "latest_zscore": 0.5411502127933784,
+      "zscore_change": -0.0051848192029555484,
       "first_regime": "neutral",
       "latest_regime": "neutral",
       "regime_changed": false
@@ -59,9 +59,9 @@
       "series_loading_shares": {
         "boj_total_assets": 0.18371950776513313,
         "ecb_total_assets": 0.25667725110500655,
-        "fed_reserve_balances": 0.0892198314484766,
-        "fed_total_assets": 0.24376788697584773,
-        "us_m2": 0.22661552270553595
+        "fed_reserve_balances": 0.08921983144847662,
+        "fed_total_assets": 0.24376788697584775,
+        "us_m2": 0.22661552270553598
       },
       "data_quality": {
         "total_series": 7,
@@ -104,12 +104,12 @@
       "max_series_loading_share": 0.19477342987516774,
       "series_loading_shares": {
         "bis_credit_eu": 0.09827769382808546,
-        "bis_credit_jp": 0.04690050538195396,
+        "bis_credit_jp": 0.04690050538195395,
         "bis_credit_us": 0.19431279233392695,
         "us_bank_credit_total": 0.18622532548359813,
         "us_bank_loans_leases": 0.19477342987516774,
         "us_commercial_paper": 0.1208779413292894,
-        "us_consumer_credit": 0.15863231176797832
+        "us_consumer_credit": 0.1586323117679783
       },
       "data_quality": {
         "total_series": 8,
@@ -144,17 +144,17 @@
     },
     "stress": {
       "method": "pca_shrunk",
-      "explained_variance": 0.5338440762259593,
+      "explained_variance": 0.5338865119134982,
       "n_variables": 4,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 13,
       "constraint_exclusion_share": 0.3333333333333333,
-      "max_series_loading_share": 0.2658608396894594,
+      "max_series_loading_share": 0.26584500455238674,
       "series_loading_shares": {
-        "ice_bofa_us_high_yield_spread": 0.2658608396894594,
-        "ice_bofa_us_ig_spread": 0.26213526761813705,
-        "nfci": 0.2358595228271998,
-        "vix": 0.23614436986520376
+        "ice_bofa_us_high_yield_spread": 0.26584500455238674,
+        "ice_bofa_us_ig_spread": 0.2621453357933107,
+        "nfci": 0.23583884309887349,
+        "vix": 0.2361708165554292
       },
       "data_quality": {
         "total_series": 6,

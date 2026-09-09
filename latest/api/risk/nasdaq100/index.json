@@ -8,12 +8,12 @@
   "max_drawdown": -82.9,
   "sharpe_by_regime": {
     "tight": null,
-    "neutral": 0.48,
+    "neutral": 0.47,
     "loose": 1.63
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 13.93,
+    "neutral": 13.78,
     "loose": 35.73
   },
   "correlation_with_glci": 0.379,
@@ -40009,6 +40009,10 @@
     {
       "date": "2026-09-04",
       "value": 1.046
+    },
+    {
+      "date": "2026-09-08",
+      "value": 1.035
     }
   ]
 }

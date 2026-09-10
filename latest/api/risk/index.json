@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-10T01:59:01.441533",
+  "computed_at": "2026-09-10T15:26:57.522230",
   "current_regime": "neutral",
   "assets": [
     {
@@ -9069,17 +9069,17 @@
       "name": "Nasdaq 100",
       "category": "Large Cap Equities",
       "current_sharpe": 0.52,
-      "annualized_return": 16.73,
+      "annualized_return": 16.72,
       "annualized_volatility": 26.12,
       "max_drawdown": -82.9,
       "sharpe_by_regime": {
         "tight": null,
-        "neutral": 0.47,
+        "neutral": 0.46,
         "loose": 1.63
       },
       "return_by_regime": {
         "tight": null,
-        "neutral": 13.78,
+        "neutral": 13.49,
         "loose": 35.73
       },
       "correlation_with_glci": 0.379,
@@ -49079,6 +49079,10 @@
         {
           "date": "2026-09-08",
           "value": 1.035
+        },
+        {
+          "date": "2026-09-09",
+          "value": 0.996
         }
       ]
     },
@@ -49564,7 +49568,7 @@
         },
         {
           "date": "2018-02-27",
-          "value": 1.831
+          "value": 1.832
         },
         {
           "date": "2018-02-28",
@@ -53700,7 +53704,7 @@
         },
         {
           "date": "2022-04-05",
-          "value": 0.234
+          "value": 0.233
         },
         {
           "date": "2022-04-06",
@@ -55908,7 +55912,7 @@
         },
         {
           "date": "2024-06-17",
-          "value": 2.049
+          "value": 2.05
         },
         {
           "date": "2024-06-18",
@@ -59846,7 +59850,7 @@
         },
         {
           "date": "2019-05-15",
-          "value": -0.155
+          "value": -0.156
         },
         {
           "date": "2019-05-16",
@@ -62726,7 +62730,7 @@
         },
         {
           "date": "2022-03-23",
-          "value": -0.03
+          "value": -0.031
         },
         {
           "date": "2022-03-24",
@@ -62986,7 +62990,7 @@
         },
         {
           "date": "2022-06-27",
-          "value": -0.955
+          "value": -0.954
         },
         {
           "date": "2022-06-28",
@@ -63938,7 +63942,7 @@
         },
         {
           "date": "2023-06-07",
-          "value": 0.029
+          "value": 0.028
         },
         {
           "date": "2023-06-08",
@@ -65330,7 +65334,7 @@
         },
         {
           "date": "2024-10-24",
-          "value": 1.225
+          "value": 1.226
         },
         {
           "date": "2024-10-25",
@@ -76286,7 +76290,7 @@
         "neutral": 65.92,
         "loose": 16.51
       },
-      "correlation_with_glci": 0.203,
+      "correlation_with_glci": 0.202,
       "rolling_sharpe": [
         {
           "date": "2017-09-12",
@@ -85348,7 +85352,7 @@
         "neutral": -5.33,
         "loose": 44.21
       },
-      "correlation_with_glci": 0.132,
+      "correlation_with_glci": 0.133,
       "rolling_sharpe": [
         {
           "date": "2016-01-04",
@@ -114578,18 +114582,18 @@
       "id": "zcash_price",
       "name": "Zcash",
       "category": "Crypto",
-      "current_sharpe": 0.68,
-      "annualized_return": 80.04,
+      "current_sharpe": 0.69,
+      "annualized_return": 80.66,
       "annualized_volatility": 113.01,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": 4.59,
-        "neutral": 2.48,
+        "neutral": 2.51,
         "loose": 0.76
       },
       "return_by_regime": {
         "tight": 701.85,
-        "neutral": 337.23,
+        "neutral": 341.11,
         "loose": 96.6
       },
       "correlation_with_glci": 0.015,
@@ -126037,6 +126041,10 @@
         {
           "date": "2026-09-08",
           "value": 2.674
+        },
+        {
+          "date": "2026-09-09",
+          "value": 2.739
         }
       ]
     },
@@ -126234,7 +126242,7 @@
         },
         {
           "date": "2017-11-10",
-          "value": 0.335
+          "value": 0.334
         },
         {
           "date": "2017-11-13",
@@ -127054,7 +127062,7 @@
         },
         {
           "date": "2018-09-06",
-          "value": -0.526
+          "value": -0.525
         },
         {
           "date": "2018-09-07",
@@ -128290,7 +128298,7 @@
         },
         {
           "date": "2019-11-27",
-          "value": 1.82
+          "value": 1.819
         },
         {
           "date": "2019-11-29",
@@ -129130,7 +129138,7 @@
         },
         {
           "date": "2020-09-29",
-          "value": 0.808
+          "value": 0.809
         },
         {
           "date": "2020-09-30",
@@ -132750,7 +132758,7 @@
         },
         {
           "date": "2024-05-06",
-          "value": -0.946
+          "value": -0.947
         },
         {
           "date": "2024-05-07",
@@ -135129,7 +135137,7 @@
       ],
       [
         null,
-        0.47,
+        0.46,
         1.63
       ],
       [
@@ -135164,7 +135172,7 @@
       ],
       [
         4.59,
-        2.48,
+        2.51,
         0.76
       ],
       [
@@ -135181,7 +135189,7 @@
       ],
       [
         null,
-        13.78,
+        13.49,
         35.73
       ],
       [
@@ -135216,7 +135224,7 @@
       ],
       [
         701.85,
-        337.23,
+        341.11,
         96.6
       ],
       [

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { researchEnabled } from "@/lib/research-availability";
 
 const SECTIONS = [
   { href: "/", label: "Today" },
@@ -11,6 +12,7 @@ const SECTIONS = [
   { href: "/playbook", label: "Playbook" },
   { href: "/plumbing", label: "Plumbing" },
   { href: "/explorer", label: "Explorer" },
+  ...(researchEnabled ? [{ href: "/research", label: "Research" }] : []),
 ];
 
 function isActive(pathname: string, href: string) {

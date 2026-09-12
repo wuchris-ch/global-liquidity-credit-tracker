@@ -1,0 +1,14 @@
+{
+  "retrieved_at": "2026-09-11T22:45:40.931978+00:00",
+  "url": "https://wuchris-ch.github.io/global-liquidity-credit-tracker/latest/api/glci/latest/index.json",
+  "status": 200,
+  "body_sha256": "5bf7b99ee5cb90496ffebababe0cc573ca04cc5c9d08381f7b6e983af4589a10",
+  "response": {
+    "date": "2026-09-04",
+    "value": 108.63969003825642,
+    "zscore": 0.6050960010018676,
+    "regime": 0,
+    "regime_label": "neutral",
+    "momentum": -1.9208278489931558
+  }
+}

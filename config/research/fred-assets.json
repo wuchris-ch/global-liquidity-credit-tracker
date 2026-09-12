@@ -1,0 +1,1 @@
+{"series":{"id":"fred:WALCL","name":"Federal Reserve total assets","source":"fred","source_id":"WALCL","country":"USA","unit":"millions USD","frequency":"weekly","redistribution":"unreviewed","source_url":"https://fred.stlouisfed.org/series/WALCL"},"scope":{"start":"2020-01-01","end":"2026-09-11","information_date":"2026-09-11","mode":"source_vintage"}}

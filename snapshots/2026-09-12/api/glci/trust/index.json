@@ -4,23 +4,23 @@
   "point_in_time": false,
   "frequency": "W-FRI",
   "snapshots": {
-    "count": 110,
+    "count": 111,
     "unique_signal_dates": 10,
-    "duplicate_vintages": 100,
+    "duplicate_vintages": 101,
     "first_signal_date": "2026-07-10",
     "latest_signal_date": "2026-09-11",
     "first_computed_at": "2026-07-11T04:12:17.432117Z",
-    "last_computed_at": "2026-09-12T02:02:16.962639Z",
+    "last_computed_at": "2026-09-12T05:20:38.803886Z",
     "latest_signal_revision": {
-      "vintage_count": 2,
+      "vintage_count": 3,
       "first_glci": 110.7245710336764,
       "latest_glci": 110.7245710336764,
       "glci_change": 0,
       "glci_min": 110.7245710336764,
       "glci_max": 110.7245710336764,
       "first_zscore": 0.8430204584915226,
-      "latest_zscore": 0.8430204584915227,
-      "zscore_change": 1.1102230246251565e-16,
+      "latest_zscore": 0.8430204584915226,
+      "zscore_change": 0,
       "first_regime": "neutral",
       "latest_regime": "neutral",
       "regime_changed": false
@@ -59,9 +59,9 @@
       "series_loading_shares": {
         "boj_total_assets": 0.1838735354876284,
         "ecb_total_assets": 0.2566955951137956,
-        "fed_reserve_balances": 0.08926141179772269,
-        "fed_total_assets": 0.24368087370096891,
-        "us_m2": 0.2264885838998845
+        "fed_reserve_balances": 0.0892614117977227,
+        "fed_total_assets": 0.24368087370096894,
+        "us_m2": 0.22648858389988444
       },
       "data_quality": {
         "total_series": 7,
@@ -103,13 +103,13 @@
       "constraint_exclusion_share": 0.125,
       "max_series_loading_share": 0.19478428075410287,
       "series_loading_shares": {
-        "bis_credit_eu": 0.09823344186069313,
-        "bis_credit_jp": 0.047000116161649785,
-        "bis_credit_us": 0.19430161295562712,
-        "us_bank_credit_total": 0.18622616536461414,
+        "bis_credit_eu": 0.09823344186069316,
+        "bis_credit_jp": 0.04700011616164979,
+        "bis_credit_us": 0.19430161295562717,
+        "us_bank_credit_total": 0.18622616536461425,
         "us_bank_loans_leases": 0.19478428075410287,
-        "us_commercial_paper": 0.12086791912639763,
-        "us_consumer_credit": 0.15858646377691535
+        "us_commercial_paper": 0.12086791912639766,
+        "us_consumer_credit": 0.1585864637769154
       },
       "data_quality": {
         "total_series": 8,
@@ -152,9 +152,9 @@
       "max_series_loading_share": 0.26655238130393805,
       "series_loading_shares": {
         "ice_bofa_us_high_yield_spread": 0.26655238130393805,
-        "ice_bofa_us_ig_spread": 0.26159984584851065,
-        "nfci": 0.23548100051851878,
-        "vix": 0.23636677232903258
+        "ice_bofa_us_ig_spread": 0.2615998458485106,
+        "nfci": 0.23548100051851875,
+        "vix": 0.23636677232903255
       },
       "data_quality": {
         "total_series": 6,

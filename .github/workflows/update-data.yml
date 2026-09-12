@@ -98,6 +98,22 @@ jobs:
         run: |
           python scripts/export_to_json.py --output data/export/latest --snapshot --require-production
 
+      - name: Reconcile releases and publish verified research
+        run: |
+          set -euo pipefail
+          RESTORE_ARGS=()
+          mkdir -p /tmp/research-prior
+          if git cat-file -e origin/gh-pages:state/release-lab/backup.json 2>/dev/null; then
+            git archive origin/gh-pages state/release-lab state/release-lab.required latest/research | tar -x -C /tmp/research-prior
+            RESTORE_ARGS=(--restore /tmp/research-prior/state/release-lab --prior-public /tmp/research-prior/latest/research)
+          elif git cat-file -e origin/gh-pages:state/release-lab.required 2>/dev/null || \
+               git cat-file -e origin/gh-pages:latest/research/index.json 2>/dev/null; then
+            echo "ERROR: Published research history is missing. Refusing to reset it."
+            exit 1
+          fi
+          python scripts/publish_release_lab.py "${RESTORE_ARGS[@]}" --backup data/public-release-backup
+          python scripts/replay_release_lab.py data/export/latest/research/index.json data/export/latest/research/study.json
+
       - name: Smoke-check artifacts before publishing
         run: python scripts/smoke.py
 
@@ -114,6 +130,8 @@ jobs:
           fi
           cp data/curated/indices/glci_vintages.parquet /tmp/state/
           touch /tmp/state/glci_vintages.required
+          cp -R data/public-release-backup /tmp/state/release-lab
+          cp data/public-release-backup.required /tmp/state/release-lab.required
           cp vercel.json /tmp/export/
 
       - name: Publish to gh-pages
@@ -150,6 +168,8 @@ jobs:
           mkdir -p state
           cp /tmp/state/glci_vintages.parquet state/
           cp /tmp/state/glci_vintages.required state/
+          cp -R /tmp/state/release-lab state/release-lab
+          cp /tmp/state/release-lab.required state/
           
           # Restore vercel.json to disable Vercel builds for this branch
           cp /tmp/export/vercel.json .

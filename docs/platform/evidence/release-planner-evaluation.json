@@ -1,0 +1,184 @@
+{
+  "evaluation": "public-planner-evaluation/1",
+  "prompts": 36,
+  "factual_cases_passed": 14,
+  "exact_input_citations_verified": 54,
+  "unsupported_prompts_refused": 22,
+  "deterministic_mode": true,
+  "network_requests": 0,
+  "scope": "Finite comparison grammar over the two captured collections",
+  "demonstration": [
+    {
+      "question": "Compare payrolls for 2024-07 first to latest above 100",
+      "recipe": {
+        "schema_version": "research-comparison/1",
+        "title": "Nonfarm payrolls: 2024-07",
+        "bundle_id": "055128562c6747336e453695ed07f4868c3dfc98d7d7f1c5e64c021582501bd0",
+        "series_id": "PAYEMS",
+        "before_snapshot": "90ea11baa35a5ca9942a892747674a54eb628fb3eda053c8ae1755ec1bf14ad3",
+        "after_snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+        "observation_start": "2024-07-01",
+        "observation_end": "2024-07-01",
+        "operation": "difference",
+        "threshold": 100,
+        "comparison": "strictly_above"
+      },
+      "result": {
+        "recipe": {
+          "schema_version": "research-comparison/1",
+          "title": "Nonfarm payrolls: 2024-07",
+          "bundle_id": "055128562c6747336e453695ed07f4868c3dfc98d7d7f1c5e64c021582501bd0",
+          "series_id": "PAYEMS",
+          "before_snapshot": "90ea11baa35a5ca9942a892747674a54eb628fb3eda053c8ae1755ec1bf14ad3",
+          "after_snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+          "observation_start": "2024-07-01",
+          "observation_end": "2024-07-01",
+          "operation": "difference",
+          "threshold": 100,
+          "comparison": "strictly_above"
+        },
+        "rows": [
+          {
+            "period": "2024-07-01",
+            "initial": 114,
+            "revised": 53,
+            "revision": -61,
+            "current_contribution": -975,
+            "previous_contribution": 914,
+            "switched": true,
+            "reason": null,
+            "citations": [
+              {
+                "snapshot": "90ea11baa35a5ca9942a892747674a54eb628fb3eda053c8ae1755ec1bf14ad3",
+                "information_date": "2024-08-02",
+                "observation_date": "2024-07-01",
+                "value": "158723",
+                "capture": "4e793c2c8beec3abadbc3e7dbd8fbdbace353966c790a875557551ad97d3224d"
+              },
+              {
+                "snapshot": "90ea11baa35a5ca9942a892747674a54eb628fb3eda053c8ae1755ec1bf14ad3",
+                "information_date": "2024-08-02",
+                "observation_date": "2024-06-01",
+                "value": "158609",
+                "capture": "4e793c2c8beec3abadbc3e7dbd8fbdbace353966c790a875557551ad97d3224d"
+              },
+              {
+                "snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+                "information_date": "2026-09-11",
+                "observation_date": "2024-07-01",
+                "value": "157748",
+                "capture": "1ff0b748d750a33d2926e242851e98f702d1bd305cc57f1eac276209ed43f8d2"
+              },
+              {
+                "snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+                "information_date": "2026-09-11",
+                "observation_date": "2024-06-01",
+                "value": "157695",
+                "capture": "1ff0b748d750a33d2926e242851e98f702d1bd305cc57f1eac276209ed43f8d2"
+              }
+            ]
+          }
+        ],
+        "before_date": "2024-08-02",
+        "after_date": "2026-09-11",
+        "unit": "thousand jobs",
+        "threshold_rule": "strictly above the reference",
+        "date_precision": "day",
+        "attribution_method": "Exact additive change in the current level and preceding level.",
+        "steps": [
+          "Resolve two immutable source snapshots",
+          "Match exact calendar periods and units",
+          "Calculate each measure within its own vintage",
+          "Attribute the revision and compare the reference",
+          "Attach each raw input's capture hash and information date"
+        ]
+      }
+    },
+    {
+      "question": "SHOW JOBS IN 2023-06 INITIAL TO REVISED AT 209.",
+      "recipe": {
+        "schema_version": "research-comparison/1",
+        "title": "Nonfarm payrolls: 2023-06",
+        "bundle_id": "055128562c6747336e453695ed07f4868c3dfc98d7d7f1c5e64c021582501bd0",
+        "series_id": "PAYEMS",
+        "before_snapshot": "1d969703b17f0fcdc5a85c11945839ca86ebf12734bafc7f7ec5f161f5e786a1",
+        "after_snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+        "observation_start": "2023-06-01",
+        "observation_end": "2023-06-01",
+        "operation": "difference",
+        "threshold": 209,
+        "comparison": "strictly_above"
+      },
+      "result": {
+        "recipe": {
+          "schema_version": "research-comparison/1",
+          "title": "Nonfarm payrolls: 2023-06",
+          "bundle_id": "055128562c6747336e453695ed07f4868c3dfc98d7d7f1c5e64c021582501bd0",
+          "series_id": "PAYEMS",
+          "before_snapshot": "1d969703b17f0fcdc5a85c11945839ca86ebf12734bafc7f7ec5f161f5e786a1",
+          "after_snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+          "observation_start": "2023-06-01",
+          "observation_end": "2023-06-01",
+          "operation": "difference",
+          "threshold": 209,
+          "comparison": "strictly_above"
+        },
+        "rows": [
+          {
+            "period": "2023-06-01",
+            "initial": 209,
+            "revised": 225,
+            "revision": 16,
+            "current_contribution": -324,
+            "previous_contribution": 340,
+            "switched": true,
+            "reason": null,
+            "citations": [
+              {
+                "snapshot": "1d969703b17f0fcdc5a85c11945839ca86ebf12734bafc7f7ec5f161f5e786a1",
+                "information_date": "2023-07-07",
+                "observation_date": "2023-06-01",
+                "value": "156204",
+                "capture": "a81f3b088051715c68de2aa2d68efabd07502fb512710e46715fa3ebf38b2dce"
+              },
+              {
+                "snapshot": "1d969703b17f0fcdc5a85c11945839ca86ebf12734bafc7f7ec5f161f5e786a1",
+                "information_date": "2023-07-07",
+                "observation_date": "2023-05-01",
+                "value": "155995",
+                "capture": "a81f3b088051715c68de2aa2d68efabd07502fb512710e46715fa3ebf38b2dce"
+              },
+              {
+                "snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+                "information_date": "2026-09-11",
+                "observation_date": "2023-06-01",
+                "value": "155880",
+                "capture": "1ff0b748d750a33d2926e242851e98f702d1bd305cc57f1eac276209ed43f8d2"
+              },
+              {
+                "snapshot": "ffcd0127c512af03d63445b47fae8a9cb9e6b2fb0df792e0b8447fd3a6d1a55a",
+                "information_date": "2026-09-11",
+                "observation_date": "2023-05-01",
+                "value": "155655",
+                "capture": "1ff0b748d750a33d2926e242851e98f702d1bd305cc57f1eac276209ed43f8d2"
+              }
+            ]
+          }
+        ],
+        "before_date": "2023-07-07",
+        "after_date": "2026-09-11",
+        "unit": "thousand jobs",
+        "threshold_rule": "strictly above the reference",
+        "date_precision": "day",
+        "attribution_method": "Exact additive change in the current level and preceding level.",
+        "steps": [
+          "Resolve two immutable source snapshots",
+          "Match exact calendar periods and units",
+          "Calculate each measure within its own vintage",
+          "Attribute the revision and compare the reference",
+          "Attach each raw input's capture hash and information date"
+        ]
+      }
+    }
+  ]
+}

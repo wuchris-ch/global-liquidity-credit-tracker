@@ -105,6 +105,10 @@ class ResearchStore:
             "endDate",
             "source",
             "footnote",
+            "release_id",
+            "include_release_dates_with_no_data",
+            "sort_order",
+            "output_type",
         }
         safe = {k: v for k, v in params.items() if k in allowed}
         clean_url = urlunsplit(

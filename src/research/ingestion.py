@@ -93,7 +93,12 @@ class Transport:
 
 
 def fred_snapshot(
-    store: ResearchStore, workspace: str, series: Series, scope: Scope, transport=None
+    store: ResearchStore,
+    workspace: str,
+    series: Series,
+    scope: Scope,
+    transport=None,
+    validator=None,
 ):
     if scope.mode != "source_vintage":
         raise ValueError("FRED historical queries require source_vintage mode")
@@ -150,6 +155,8 @@ def fred_snapshot(
             raise ValueError("Incomplete FRED pagination")
     if len(rows) != total:
         raise ValueError("FRED observation count mismatch")
+    if validator is not None:
+        validator(rows, captures)
     return store.ingest(workspace, series, scope, rows, captures)
 
 

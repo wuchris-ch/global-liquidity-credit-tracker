@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-12T05:21:39.315012",
+  "computed_at": "2026-09-12T14:37:14.989962",
   "current_regime": "neutral",
   "assets": [
     {
@@ -49260,7 +49260,7 @@
         },
         {
           "date": "2017-11-01",
-          "value": 2.516
+          "value": 2.515
         },
         {
           "date": "2017-11-02",
@@ -53712,7 +53712,7 @@
         },
         {
           "date": "2022-04-05",
-          "value": 0.233
+          "value": 0.234
         },
         {
           "date": "2022-04-06",
@@ -59538,7 +59538,7 @@
         },
         {
           "date": "2019-01-18",
-          "value": -0.28
+          "value": -0.281
         },
         {
           "date": "2019-01-22",
@@ -62738,7 +62738,7 @@
         },
         {
           "date": "2022-03-23",
-          "value": -0.03
+          "value": -0.031
         },
         {
           "date": "2022-03-24",
@@ -114615,20 +114615,20 @@
       "name": "Zcash",
       "category": "Crypto",
       "current_sharpe": 0.68,
-      "annualized_return": 79.13,
-      "annualized_volatility": 113.09,
+      "annualized_return": 80.0,
+      "annualized_volatility": 113.1,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": 4.59,
-        "neutral": 2.42,
+        "neutral": 2.46,
         "loose": 0.76
       },
       "return_by_regime": {
         "tight": 701.85,
-        "neutral": 329.47,
+        "neutral": 335.17,
         "loose": 96.6
       },
-      "correlation_with_glci": 0.015,
+      "correlation_with_glci": 0.017,
       "rolling_sharpe": [
         {
           "date": "2018-11-09",
@@ -126081,6 +126081,10 @@
         {
           "date": "2026-09-10",
           "value": 2.651
+        },
+        {
+          "date": "2026-09-11",
+          "value": 2.697
         }
       ]
     },
@@ -127090,7 +127094,7 @@
         },
         {
           "date": "2018-09-06",
-          "value": -0.526
+          "value": -0.525
         },
         {
           "date": "2018-09-07",
@@ -128242,7 +128246,7 @@
         },
         {
           "date": "2019-10-29",
-          "value": 1.679
+          "value": 1.678
         },
         {
           "date": "2019-10-30",
@@ -135208,7 +135212,7 @@
       ],
       [
         4.59,
-        2.42,
+        2.46,
         0.76
       ],
       [
@@ -135260,7 +135264,7 @@
       ],
       [
         701.85,
-        329.47,
+        335.17,
         96.6
       ],
       [

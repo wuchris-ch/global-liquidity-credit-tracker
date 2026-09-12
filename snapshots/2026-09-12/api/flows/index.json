@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-12T05:21:16.496983",
+  "computed_at": "2026-09-12T14:36:50.409607",
   "as_of": "2026-09-11",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -898,14 +898,10 @@
       "series_id": "zcash_price",
       "name": "Zcash",
       "group": "Crypto",
-      "last_date": "2026-09-04",
-      "flow_z": 0.29,
+      "last_date": "2026-09-11",
+      "flow_z": 0.36,
       "glci_corr_52w": -0.04,
       "spark": [
-        {
-          "date": "2025-09-12",
-          "value": 49.7093
-        },
         {
           "date": "2025-09-19",
           "value": 48.9369
@@ -1109,11 +1105,15 @@
         {
           "date": "2026-09-04",
           "value": 1024.2167
+        },
+        {
+          "date": "2026-09-11",
+          "value": 1163.3274
         }
       ],
-      "ret_4w": 1.0025,
-      "ret_13w": 1.6309,
-      "ret_26w": 3.8753
+      "ret_4w": 1.3603,
+      "ret_13w": 1.8283,
+      "ret_26w": 4.5932
     },
     {
       "id": "sp500",
@@ -1804,7 +1804,7 @@
         },
         {
           "date": "2025-10-10",
-          "value": 86.9516
+          "value": 86.9517
         },
         {
           "date": "2025-10-17",
@@ -1812,7 +1812,7 @@
         },
         {
           "date": "2025-10-24",
-          "value": 87.7672
+          "value": 87.7673
         },
         {
           "date": "2025-10-31",
@@ -1824,7 +1824,7 @@
         },
         {
           "date": "2025-11-14",
-          "value": 85.5806
+          "value": 85.5805
         },
         {
           "date": "2025-11-21",
@@ -1836,7 +1836,7 @@
         },
         {
           "date": "2025-12-05",
-          "value": 85.2097
+          "value": 85.2096
         },
         {
           "date": "2025-12-12",
@@ -1964,7 +1964,7 @@
         },
         {
           "date": "2026-07-17",
-          "value": 83.8596
+          "value": 83.8595
         },
         {
           "date": "2026-07-24",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-09-12T05:21:34.615621Z",
+    "computed_at": "2026-09-12T14:37:07.952418Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",

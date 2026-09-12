@@ -43,8 +43,10 @@ export default function RootLayout({
             <footer className="border-t border-border">
               <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
                 <p className="font-mono text-xs text-muted-foreground">
-                  Sources: FRED, BIS, World Bank, NY Fed, Yahoo Finance. The update job runs every
-                  12 hours; check each data-through date before using a signal. Not investment advice.
+                  Sources: FRED, BIS, World Bank, NY Fed, Yahoo Finance.
+                  Dashboard updates run every 12 hours; research collections
+                  show their capture dates. Check each data-through date. Not
+                  investment advice.
                 </p>
               </div>
             </footer>

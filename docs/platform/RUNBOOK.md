@@ -107,7 +107,9 @@ The container recipe defaults to OIDC and a non-root user. Mount persistent obje
 
 No hosted service, OIDC tenant or paid resource has been provisioned. Local signed-token and PostgreSQL isolation tests do not establish production readiness. Keep the existing public static dashboard deployment separate until a deliberate release.
 
-The public frontend hides Research unless `NEXT_PUBLIC_RESEARCH_API_URL` is configured at build time. A direct visit to `/research` without that setting shows an unavailable message and makes no research API requests. Development mode enables the local workbench. Enable the hosted entry only after provisioning and verifying an authenticated research service, its allowed browser origin and persistent storage. The existing frontend and scheduled data publication can be released independently; this change requires no production database migration.
+The public frontend presents the Research Atlas at `/research` when no `NEXT_PUBLIC_RESEARCH_API_URL` is configured. Its three fixed historical studies use nine explicit FRED vintage captures, bundled public observations and browser calculations. It never contacts a private research API. `/research/atlas` exposes the same published collection in development. Development mode and an explicitly configured research API retain the private workbench at `/research`. Only configure a hosted private service after verifying authentication, the allowed browser origin and persistent storage. No production database migration is required.
+
+The atlas collector, `python -m scripts.publish_research_atlas`, requires `FRED_API_KEY` in its environment. It reads no private workspace data. Review new captures before committing: `frontend/src/lib/research-atlas.json` must match `frontend/public/research/evidence/atlas.json`, and all original response hashes must pass `npm run test:research`. Raw source responses, their retrieval times and allowlisted request parameters are published deliberately. Updating the collection is a separate reviewed action, not part of the scheduled dashboard feed.
 
 ## Verification commands
 

@@ -30,9 +30,9 @@ A synthetic workload of 100 series and 1,000,000 rows, spanning January 1990 thr
 
 The complete 21-input GLCI reconstruction and replay took 7.30 seconds for two runs. The dataset and result identities are recorded in [the verification receipt](evidence/implementation-verification.json). Source bytes, model artifacts, additional live checks and the local catalog remain under ignored `data/` directories. The receipt contains hashes and measurements rather than redistributing unreviewed provider data.
 
-The full offline suite has 236 passing tests: the existing 209 plus 27 research tests. Eight additional client checks verify safe network retries, idempotency and hosted availability. One existing test remains skipped because it requires a complete local production export. No production pipeline was run merely to satisfy that skip. The final test count is recorded in the verification receipt.
+The full offline suite has 238 passing tests: the existing 209, 27 research tests and two release regression cases. Eight additional client checks verify safe network retries, idempotency and hosted availability. One existing test remains skipped because it requires a complete local production export. No production pipeline was run merely to satisfy that skip. The final test count is recorded in the verification receipt.
 
-For release, Research is available in development and in deployments with an explicitly configured research API. Unconfigured public deployments hide its navigation entry and show an unavailable page without calling localhost. CI and scheduled data publication use the same pinned Python runtime and dependency lock.
+For release, Research is available in development and in deployments with an explicitly configured research API. Unconfigured public deployments hide its navigation entry and show an unavailable page without calling localhost. CI and scheduled data publication use the same pinned Python runtime and dependency lock. Release preflight reproduced the existing Friday OCC failure: the date-only cutoff requested an unfinished weekly report. Weekly selection now starts with a Friday strictly before the cutoff; Friday and Saturday boundaries are covered by regression tests, and the corrected Friday query succeeded against the live provider.
 
 ## Remaining validation gates
 

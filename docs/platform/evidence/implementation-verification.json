@@ -488,5 +488,21 @@
   "client_checks": {
     "passed": 8,
     "scope": "safe network retries, stable idempotency keys, non-retried unsafe mutations and deployment availability"
+  },
+  "release_preflight": {
+    "tests": {
+      "tests": "239",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "1",
+      "time": "6.338"
+    },
+    "passed": 238,
+    "occ": {
+      "cutoff": "2026-09-11",
+      "selected_week": "2026-09-04",
+      "live_result": "success"
+    },
+    "production_frontend_gate": "verified on local production build for /, /flows and /research"
   }
 }

@@ -197,7 +197,10 @@ class OCCOptionsClient:
         max_weeks_back: int = 4,
     ) -> date:
         """Find the latest Friday-labelled weekly report that OCC serves."""
-        cursor = as_of or date.today()
+        # A date-only cutoff cannot establish that Friday's session has closed
+        # or that OCC has published it. Start with a Friday strictly before it.
+        cutoff = as_of or date.today()
+        cursor = cutoff - timedelta(days=1)
         cursor -= timedelta(days=(cursor.weekday() - 4) % 7)
         for _ in range(max_weeks_back):
             report = self.get_report(reference_symbol, cursor, "W")

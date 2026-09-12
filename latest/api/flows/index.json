@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-12T00:14:19.452789",
+  "computed_at": "2026-09-12T02:02:47.066404",
   "as_of": "2026-09-11",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -10,14 +10,10 @@
       "series_id": "semis_price",
       "name": "Semiconductors (SMH)",
       "group": "AI trade",
-      "last_date": "2026-09-04",
-      "flow_z": -0.79,
+      "last_date": "2026-09-11",
+      "flow_z": -1.23,
       "glci_corr_52w": 0.32,
       "spark": [
-        {
-          "date": "2025-09-12",
-          "value": 303.376
-        },
         {
           "date": "2025-09-19",
           "value": 314.7307
@@ -221,11 +217,15 @@
         {
           "date": "2026-09-04",
           "value": 567.01
+        },
+        {
+          "date": "2026-09-11",
+          "value": 568.53
         }
       ],
-      "ret_4w": -0.0269,
-      "ret_13w": -0.0047,
-      "ret_26w": 0.4899
+      "ret_4w": -0.0328,
+      "ret_13w": -0.083,
+      "ret_26w": 0.4678
     },
     {
       "id": "megacap_tech",
@@ -1342,14 +1342,10 @@
       "series_id": "russell2000_price",
       "name": "Small caps (IWM)",
       "group": "Broad equities",
-      "last_date": "2026-09-04",
-      "flow_z": 0.09,
-      "glci_corr_52w": 0.36,
+      "last_date": "2026-09-11",
+      "flow_z": -0.65,
+      "glci_corr_52w": 0.34,
       "spark": [
-        {
-          "date": "2025-09-12",
-          "value": 235.89
-        },
         {
           "date": "2025-09-19",
           "value": 241.1644
@@ -1553,25 +1549,25 @@
         {
           "date": "2026-09-04",
           "value": 296.01
+        },
+        {
+          "date": "2026-09-11",
+          "value": 288.89
         }
       ],
-      "ret_4w": -0.0184,
-      "ret_13w": 0.0535,
-      "ret_26w": 0.1847
+      "ret_4w": -0.0531,
+      "ret_13w": -0.0115,
+      "ret_26w": 0.1764
     },
     {
       "id": "gold",
       "series_id": "gold_price",
       "name": "Gold (GLD)",
       "group": "Hedges",
-      "last_date": "2026-09-04",
-      "flow_z": -0.47,
-      "glci_corr_52w": 0.14,
+      "last_date": "2026-09-11",
+      "flow_z": -0.42,
+      "glci_corr_52w": 0.13,
       "spark": [
-        {
-          "date": "2025-09-12",
-          "value": 335.42
-        },
         {
           "date": "2025-09-19",
           "value": 339.18
@@ -1775,25 +1771,25 @@
         {
           "date": "2026-09-04",
           "value": 406.77
+        },
+        {
+          "date": "2026-09-11",
+          "value": 398.77
         }
       ],
-      "ret_4w": 0.0208,
-      "ret_13w": 0.0266,
-      "ret_26w": -0.1409
+      "ret_4w": -0.0068,
+      "ret_13w": 0.0316,
+      "ret_26w": -0.1347
     },
     {
       "id": "long_bonds",
       "series_id": "long_bond_price",
       "name": "Long Treasuries (TLT)",
       "group": "Duration",
-      "last_date": "2026-09-04",
-      "flow_z": -0.37,
-      "glci_corr_52w": 0.09,
+      "last_date": "2026-09-11",
+      "flow_z": -0.8,
+      "glci_corr_52w": 0.08,
       "spark": [
-        {
-          "date": "2025-09-12",
-          "value": 86.0094
-        },
         {
           "date": "2025-09-19",
           "value": 85.1201
@@ -1808,7 +1804,7 @@
         },
         {
           "date": "2025-10-10",
-          "value": 86.9516
+          "value": 86.9517
         },
         {
           "date": "2025-10-17",
@@ -1816,7 +1812,7 @@
         },
         {
           "date": "2025-10-24",
-          "value": 87.7673
+          "value": 87.7672
         },
         {
           "date": "2025-10-31",
@@ -1836,11 +1832,11 @@
         },
         {
           "date": "2025-11-28",
-          "value": 86.871
+          "value": 86.8709
         },
         {
           "date": "2025-12-05",
-          "value": 85.2097
+          "value": 85.2096
         },
         {
           "date": "2025-12-12",
@@ -1856,7 +1852,7 @@
         },
         {
           "date": "2026-01-02",
-          "value": 84.4352
+          "value": 84.4353
         },
         {
           "date": "2026-01-09",
@@ -1904,7 +1900,7 @@
         },
         {
           "date": "2026-03-27",
-          "value": 83.6818
+          "value": 83.6819
         },
         {
           "date": "2026-04-03",
@@ -1997,11 +1993,15 @@
         {
           "date": "2026-09-04",
           "value": 82.21
+        },
+        {
+          "date": "2026-09-11",
+          "value": 80.87
         }
       ],
-      "ret_4w": -0.0028,
-      "ret_13w": -0.0223,
-      "ret_26w": -0.0489
+      "ret_4w": -0.0105,
+      "ret_13w": -0.0462,
+      "ret_26w": -0.0437
     }
   ],
   "pair": {
@@ -2009,643 +2009,643 @@
     "name": "Bitcoin priced in semiconductors",
     "numerator": "bitcoin_price",
     "denominator": "semis_price",
-    "spread_13w": 0.2206,
+    "spread_13w": 0.2989,
     "ratio": [
       {
-        "date": "2023-09-15",
+        "date": "2023-09-22",
         "value": 100.0
       },
       {
-        "date": "2023-09-22",
-        "value": 103.27
-      },
-      {
         "date": "2023-09-29",
-        "value": 102.33
+        "value": 99.09
       },
       {
         "date": "2023-10-06",
-        "value": 103.9
+        "value": 100.61
       },
       {
         "date": "2023-10-13",
-        "value": 99.83
+        "value": 96.67
       },
       {
         "date": "2023-10-20",
-        "value": 115.22
+        "value": 111.57
       },
       {
         "date": "2023-10-27",
-        "value": 135.19
+        "value": 130.91
       },
       {
         "date": "2023-11-03",
-        "value": 128.13
+        "value": 124.07
       },
       {
         "date": "2023-11-10",
-        "value": 130.81
+        "value": 126.67
       },
       {
         "date": "2023-11-17",
-        "value": 124.25
+        "value": 120.32
       },
       {
         "date": "2023-11-24",
-        "value": 128.69
+        "value": 124.61
       },
       {
         "date": "2023-12-01",
-        "value": 132.51
+        "value": 128.31
       },
       {
         "date": "2023-12-08",
-        "value": 150.11
+        "value": 145.35
       },
       {
         "date": "2023-12-15",
-        "value": 132.87
+        "value": 128.66
       },
       {
         "date": "2023-12-22",
-        "value": 139.25
+        "value": 134.84
       },
       {
         "date": "2023-12-29",
-        "value": 131.84
+        "value": 127.67
       },
       {
         "date": "2024-01-05",
-        "value": 145.81
+        "value": 141.19
       },
       {
         "date": "2024-01-12",
-        "value": 135.65
+        "value": 131.36
       },
       {
         "date": "2024-01-19",
-        "value": 121.93
+        "value": 118.07
       },
       {
         "date": "2024-01-26",
-        "value": 121.69
+        "value": 117.83
       },
       {
         "date": "2024-02-02",
-        "value": 123.81
+        "value": 119.89
       },
       {
         "date": "2024-02-09",
-        "value": 126.81
+        "value": 122.79
       },
       {
         "date": "2024-02-16",
-        "value": 141.79
+        "value": 137.3
       },
       {
         "date": "2024-02-23",
-        "value": 133.36
+        "value": 129.14
       },
       {
         "date": "2024-03-01",
-        "value": 155.28
+        "value": 150.36
       },
       {
         "date": "2024-03-08",
-        "value": 166.45
+        "value": 161.18
       },
       {
         "date": "2024-03-15",
-        "value": 174.88
+        "value": 169.34
       },
       {
         "date": "2024-03-22",
-        "value": 153.43
+        "value": 148.57
       },
       {
         "date": "2024-03-29",
-        "value": 170.4
+        "value": 165.0
       },
       {
         "date": "2024-04-05",
-        "value": 167.14
+        "value": 161.84
       },
       {
         "date": "2024-04-12",
-        "value": 166.7
+        "value": 161.42
       },
       {
         "date": "2024-04-19",
-        "value": 175.67
+        "value": 170.1
       },
       {
         "date": "2024-04-26",
-        "value": 160.57
+        "value": 155.48
       },
       {
         "date": "2024-05-03",
-        "value": 158.26
+        "value": 153.24
       },
       {
         "date": "2024-05-10",
-        "value": 149.27
+        "value": 144.54
       },
       {
         "date": "2024-05-17",
-        "value": 159.38
+        "value": 154.33
       },
       {
         "date": "2024-05-24",
-        "value": 153.89
-      },
-      {
-        "date": "2024-05-31",
-        "value": 153.89
-      },
-      {
-        "date": "2024-06-07",
-        "value": 150.59
-      },
-      {
-        "date": "2024-06-14",
-        "value": 135.11
-      },
-      {
-        "date": "2024-06-21",
-        "value": 132.73
-      },
-      {
-        "date": "2024-06-28",
-        "value": 126.85
-      },
-      {
-        "date": "2024-07-05",
-        "value": 115.09
-      },
-      {
-        "date": "2024-07-12",
-        "value": 115.67
-      },
-      {
-        "date": "2024-07-19",
-        "value": 147.51
-      },
-      {
-        "date": "2024-07-26",
-        "value": 154.96
-      },
-      {
-        "date": "2024-08-02",
-        "value": 154.26
-      },
-      {
-        "date": "2024-08-09",
-        "value": 148.28
-      },
-      {
-        "date": "2024-08-16",
-        "value": 130.83
-      },
-      {
-        "date": "2024-08-23",
-        "value": 141.54
-      },
-      {
-        "date": "2024-08-30",
-        "value": 133.11
-      },
-      {
-        "date": "2024-09-06",
-        "value": 137.51
-      },
-      {
-        "date": "2024-09-13",
-        "value": 138.87
-      },
-      {
-        "date": "2024-09-20",
-        "value": 146.01
-      },
-      {
-        "date": "2024-09-27",
-        "value": 145.73
-      },
-      {
-        "date": "2024-10-04",
-        "value": 137.26
-      },
-      {
-        "date": "2024-10-11",
-        "value": 134.95
-      },
-      {
-        "date": "2024-10-18",
         "value": 149.01
       },
       {
+        "date": "2024-05-31",
+        "value": 149.01
+      },
+      {
+        "date": "2024-06-07",
+        "value": 145.82
+      },
+      {
+        "date": "2024-06-14",
+        "value": 130.83
+      },
+      {
+        "date": "2024-06-21",
+        "value": 128.53
+      },
+      {
+        "date": "2024-06-28",
+        "value": 122.83
+      },
+      {
+        "date": "2024-07-05",
+        "value": 111.44
+      },
+      {
+        "date": "2024-07-12",
+        "value": 112.01
+      },
+      {
+        "date": "2024-07-19",
+        "value": 142.84
+      },
+      {
+        "date": "2024-07-26",
+        "value": 150.05
+      },
+      {
+        "date": "2024-08-02",
+        "value": 149.38
+      },
+      {
+        "date": "2024-08-09",
+        "value": 143.58
+      },
+      {
+        "date": "2024-08-16",
+        "value": 126.69
+      },
+      {
+        "date": "2024-08-23",
+        "value": 137.05
+      },
+      {
+        "date": "2024-08-30",
+        "value": 128.89
+      },
+      {
+        "date": "2024-09-06",
+        "value": 133.15
+      },
+      {
+        "date": "2024-09-13",
+        "value": 134.47
+      },
+      {
+        "date": "2024-09-20",
+        "value": 141.38
+      },
+      {
+        "date": "2024-09-27",
+        "value": 141.12
+      },
+      {
+        "date": "2024-10-04",
+        "value": 132.91
+      },
+      {
+        "date": "2024-10-11",
+        "value": 130.67
+      },
+      {
+        "date": "2024-10-18",
+        "value": 144.29
+      },
+      {
         "date": "2024-10-25",
-        "value": 145.23
+        "value": 140.62
       },
       {
         "date": "2024-11-01",
-        "value": 155.35
+        "value": 150.43
       },
       {
         "date": "2024-11-08",
-        "value": 162.16
+        "value": 157.03
       },
       {
         "date": "2024-11-15",
-        "value": 207.07
+        "value": 200.51
       },
       {
         "date": "2024-11-22",
-        "value": 219.12
+        "value": 212.18
       },
       {
         "date": "2024-11-29",
-        "value": 218.4
+        "value": 211.49
       },
       {
         "date": "2024-12-06",
-        "value": 220.35
+        "value": 213.37
       },
       {
         "date": "2024-12-13",
-        "value": 222.8
+        "value": 215.75
       },
       {
         "date": "2024-12-20",
-        "value": 219.61
+        "value": 212.65
       },
       {
         "date": "2024-12-27",
-        "value": 209.02
+        "value": 202.4
       },
       {
         "date": "2025-01-03",
-        "value": 212.8
+        "value": 206.06
       },
       {
         "date": "2025-01-10",
-        "value": 208.8
+        "value": 202.19
       },
       {
         "date": "2025-01-17",
-        "value": 220.71
+        "value": 213.72
       },
       {
         "date": "2025-01-24",
-        "value": 218.57
+        "value": 211.64
       },
       {
         "date": "2025-01-31",
-        "value": 225.43
+        "value": 218.29
       },
       {
         "date": "2025-02-07",
-        "value": 214.92
+        "value": 208.11
       },
       {
         "date": "2025-02-14",
-        "value": 210.89
+        "value": 204.21
       },
       {
         "date": "2025-02-21",
-        "value": 210.86
+        "value": 204.18
       },
       {
         "date": "2025-02-28",
-        "value": 201.69
+        "value": 195.3
       },
       {
         "date": "2025-03-07",
-        "value": 209.03
+        "value": 202.41
       },
       {
         "date": "2025-03-14",
-        "value": 203.19
+        "value": 196.76
       },
       {
         "date": "2025-03-21",
-        "value": 203.61
+        "value": 197.16
       },
       {
         "date": "2025-03-28",
-        "value": 212.52
+        "value": 205.79
       },
       {
         "date": "2025-04-04",
-        "value": 252.06
+        "value": 244.07
       },
       {
         "date": "2025-04-11",
-        "value": 231.18
+        "value": 223.86
       },
       {
         "date": "2025-04-18",
-        "value": 241.17
+        "value": 233.53
       },
       {
         "date": "2025-04-25",
-        "value": 243.75
+        "value": 236.03
       },
       {
         "date": "2025-05-02",
-        "value": 238.87
+        "value": 231.3
       },
       {
         "date": "2025-05-09",
-        "value": 256.08
+        "value": 247.97
       },
       {
         "date": "2025-05-16",
-        "value": 228.48
+        "value": 221.25
       },
       {
         "date": "2025-05-23",
-        "value": 247.77
+        "value": 239.93
       },
       {
         "date": "2025-05-30",
-        "value": 238.22
+        "value": 230.68
       },
       {
         "date": "2025-06-06",
-        "value": 228.09
+        "value": 220.86
       },
       {
         "date": "2025-06-13",
-        "value": 223.98
+        "value": 216.89
       },
       {
         "date": "2025-06-20",
-        "value": 214.23
+        "value": 207.44
       },
       {
         "date": "2025-06-27",
-        "value": 210.44
+        "value": 203.77
       },
       {
         "date": "2025-07-04",
-        "value": 208.3
+        "value": 201.7
       },
       {
         "date": "2025-07-11",
-        "value": 223.01
+        "value": 215.95
       },
       {
         "date": "2025-07-18",
-        "value": 221.68
+        "value": 214.66
       },
       {
         "date": "2025-07-25",
-        "value": 223.96
+        "value": 216.86
       },
       {
         "date": "2025-08-01",
-        "value": 216.32
+        "value": 209.47
       },
       {
         "date": "2025-08-08",
-        "value": 216.6
+        "value": 209.74
       },
       {
         "date": "2025-08-15",
-        "value": 216.83
+        "value": 209.96
       },
       {
         "date": "2025-08-22",
-        "value": 214.46
+        "value": 207.67
       },
       {
         "date": "2025-08-29",
-        "value": 204.61
+        "value": 198.13
       },
       {
         "date": "2025-09-05",
-        "value": 205.1
+        "value": 198.6
       },
       {
         "date": "2025-09-12",
-        "value": 207.98
+        "value": 201.39
       },
       {
         "date": "2025-09-19",
-        "value": 200.11
+        "value": 193.77
       },
       {
         "date": "2025-09-26",
-        "value": 186.01
+        "value": 180.12
       },
       {
         "date": "2025-10-03",
-        "value": 198.51
+        "value": 192.22
       },
       {
         "date": "2025-10-10",
-        "value": 185.82
+        "value": 179.94
       },
       {
         "date": "2025-10-17",
-        "value": 170.67
+        "value": 165.27
       },
       {
         "date": "2025-10-24",
-        "value": 173.56
+        "value": 168.07
       },
       {
         "date": "2025-10-31",
-        "value": 165.46
+        "value": 160.22
       },
       {
         "date": "2025-11-07",
-        "value": 161.3
+        "value": 156.19
       },
       {
         "date": "2025-11-14",
-        "value": 150.03
+        "value": 145.27
       },
       {
         "date": "2025-11-21",
-        "value": 141.96
+        "value": 137.46
       },
       {
         "date": "2025-11-28",
-        "value": 140.86
+        "value": 136.4
       },
       {
         "date": "2025-12-05",
-        "value": 133.81
+        "value": 129.57
       },
       {
         "date": "2025-12-12",
-        "value": 139.25
+        "value": 134.84
       },
       {
         "date": "2025-12-19",
-        "value": 134.85
+        "value": 130.58
       },
       {
         "date": "2025-12-26",
-        "value": 129.8
+        "value": 125.69
       },
       {
         "date": "2026-01-02",
-        "value": 131.34
+        "value": 127.18
       },
       {
         "date": "2026-01-09",
-        "value": 126.48
+        "value": 122.47
       },
       {
         "date": "2026-01-16",
-        "value": 129.73
+        "value": 125.62
       },
       {
         "date": "2026-01-23",
-        "value": 121.53
+        "value": 117.68
       },
       {
         "date": "2026-01-30",
-        "value": 113.26
+        "value": 109.67
       },
       {
         "date": "2026-02-06",
-        "value": 94.74
+        "value": 91.74
       },
       {
         "date": "2026-02-13",
-        "value": 92.04
+        "value": 89.12
       },
       {
         "date": "2026-02-20",
-        "value": 88.99
+        "value": 86.18
       },
       {
         "date": "2026-02-27",
-        "value": 88.3
+        "value": 85.5
       },
       {
         "date": "2026-03-06",
-        "value": 97.72
+        "value": 94.62
       },
       {
         "date": "2026-03-13",
-        "value": 99.51
+        "value": 96.36
       },
       {
         "date": "2026-03-20",
-        "value": 99.78
+        "value": 96.62
       },
       {
         "date": "2026-03-27",
-        "value": 96.52
+        "value": 93.46
       },
       {
         "date": "2026-04-03",
-        "value": 92.8
+        "value": 89.86
       },
       {
         "date": "2026-04-10",
-        "value": 90.8
+        "value": 87.92
       },
       {
         "date": "2026-04-17",
-        "value": 88.78
+        "value": 85.97
       },
       {
         "date": "2026-04-24",
-        "value": 83.25
+        "value": 80.61
       },
       {
         "date": "2026-05-01",
-        "value": 83.55
+        "value": 80.9
       },
       {
         "date": "2026-05-08",
-        "value": 76.97
+        "value": 74.54
       },
       {
         "date": "2026-05-15",
-        "value": 77.29
+        "value": 74.84
       },
       {
         "date": "2026-05-22",
-        "value": 71.26
+        "value": 69.0
       },
       {
         "date": "2026-05-29",
-        "value": 67.13
+        "value": 65.0
       },
       {
         "date": "2026-06-05",
-        "value": 58.52
+        "value": 56.66
       },
       {
         "date": "2026-06-12",
-        "value": 55.78
+        "value": 54.01
       },
       {
         "date": "2026-06-19",
-        "value": 52.38
+        "value": 50.72
       },
       {
         "date": "2026-06-26",
-        "value": 53.37
+        "value": 51.68
       },
       {
         "date": "2026-07-03",
-        "value": 57.45
+        "value": 55.63
       },
       {
         "date": "2026-07-10",
-        "value": 57.04
+        "value": 55.23
       },
       {
         "date": "2026-07-17",
-        "value": 62.47
+        "value": 60.49
       },
       {
         "date": "2026-07-24",
-        "value": 62.15
+        "value": 60.19
       },
       {
         "date": "2026-07-31",
-        "value": 63.3
+        "value": 61.3
       },
       {
         "date": "2026-08-07",
-        "value": 60.58
+        "value": 58.66
       },
       {
         "date": "2026-08-14",
-        "value": 58.28
+        "value": 56.44
       },
       {
         "date": "2026-08-21",
-        "value": 75.85
+        "value": 73.45
       },
       {
         "date": "2026-08-28",
-        "value": 76.57
+        "value": 74.14
       },
       {
         "date": "2026-09-04",
-        "value": 76.44
+        "value": 74.02
+      },
+      {
+        "date": "2026-09-11",
+        "value": 71.61
       }
     ]
   },
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-09-12T00:14:37.169043Z",
+    "computed_at": "2026-09-12T02:03:03.195441Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
     "benchmark": "SPY",
-    "price_as_of": "2026-09-10",
+    "price_as_of": "2026-09-11",
     "fund_flow_as_of": "2026-09-10",
     "options_as_of": "2026-09-04",
     "price_basis": "yahoo_adjusted_close",
@@ -2704,14 +2704,14 @@
         "energy"
       ],
       "laggards": [
-        "consumer_staples",
         "communication_services",
+        "consumer_staples",
         "utilities"
       ],
       "improving": [
         "communication_services",
-        "real_estate",
-        "consumer_staples"
+        "consumer_staples",
+        "real_estate"
       ],
       "strongest_inflows": [
         "communication_services",
@@ -2728,16 +2728,16 @@
       {
         "id": "technology",
         "name": "Technology",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.004686,
-        "return_63d": 0.048679,
-        "return_126d": 0.27927,
-        "excess_21d": 0.011972,
-        "excess_63d": 0.002411,
-        "excess_126d": 0.160191,
-        "relative_strength": 0.081301,
-        "acceleration": 0.011169,
-        "absolute_trend": 1.266178,
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.006321,
+        "return_63d": 0.025244,
+        "return_126d": 0.311026,
+        "excess_21d": 0.004351,
+        "excess_63d": -0.012658,
+        "excess_126d": 0.168158,
+        "relative_strength": 0.07775,
+        "acceleration": 0.00857,
+        "absolute_trend": 1.44491,
         "above_200d": true,
         "phase": "leading",
         "fund_flow": {
@@ -2779,16 +2779,16 @@
       {
         "id": "financials",
         "name": "Financials",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.016221,
-        "return_63d": 0.088608,
-        "return_126d": 0.144595,
-        "excess_21d": 0.000438,
-        "excess_63d": 0.04234,
-        "excess_126d": 0.025517,
-        "relative_strength": 0.033929,
-        "acceleration": -0.013676,
-        "absolute_trend": 1.573408,
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.011635,
+        "return_63d": 0.087828,
+        "return_126d": 0.167707,
+        "excess_21d": -0.000963,
+        "excess_63d": 0.049927,
+        "excess_126d": 0.024839,
+        "relative_strength": 0.037383,
+        "acceleration": -0.017605,
+        "absolute_trend": 1.826835,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2830,16 +2830,16 @@
       {
         "id": "energy",
         "name": "Energy",
-        "price_as_of": "2026-09-10",
-        "return_21d": 0.063584,
-        "return_63d": 0.115752,
-        "return_126d": 0.144308,
-        "excess_21d": 0.080243,
-        "excess_63d": 0.069484,
-        "excess_126d": 0.02523,
-        "relative_strength": 0.047357,
-        "acceleration": 0.057081,
-        "absolute_trend": 0.931882,
+        "price_as_of": "2026-09-11",
+        "return_21d": 0.065173,
+        "return_63d": 0.13857,
+        "return_126d": 0.138278,
+        "excess_21d": 0.075845,
+        "excess_63d": 0.100669,
+        "excess_126d": -0.004589,
+        "relative_strength": 0.04804,
+        "acceleration": 0.042289,
+        "absolute_trend": 0.911097,
         "above_200d": true,
         "phase": "leading",
         "fund_flow": {
@@ -2881,18 +2881,18 @@
       {
         "id": "health_care",
         "name": "Health Care",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.014086,
-        "return_63d": 0.084881,
-        "return_126d": 0.088983,
-        "excess_21d": 0.002572,
-        "excess_63d": 0.038613,
-        "excess_126d": -0.030095,
-        "relative_strength": 0.004259,
-        "acceleration": -0.010299,
-        "absolute_trend": 0.654897,
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.018455,
+        "return_63d": 0.074989,
+        "return_126d": 0.104927,
+        "excess_21d": -0.007783,
+        "excess_63d": 0.037087,
+        "excess_126d": -0.037941,
+        "relative_strength": -0.000427,
+        "acceleration": -0.020145,
+        "absolute_trend": 0.773808,
         "above_200d": true,
-        "phase": "weakening",
+        "phase": "lagging",
         "fund_flow": {
           "as_of": "2026-09-10",
           "aum_usd": 42988498032.06,
@@ -2930,35 +2930,35 @@
         "flow_confirmation": "supports"
       },
       {
-        "id": "materials",
-        "name": "Materials",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.047701,
-        "return_63d": 0.02685,
-        "return_126d": 0.02646,
-        "excess_21d": -0.031043,
-        "excess_63d": -0.019418,
-        "excess_126d": -0.092618,
-        "relative_strength": -0.056018,
-        "acceleration": -0.02457,
-        "absolute_trend": 0.200076,
+        "id": "industrials",
+        "name": "Industrials",
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.075458,
+        "return_63d": -0.013542,
+        "return_126d": 0.047508,
+        "excess_21d": -0.064786,
+        "excess_63d": -0.051444,
+        "excess_126d": -0.09536,
+        "relative_strength": -0.073402,
+        "acceleration": -0.047638,
+        "absolute_trend": 0.407856,
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
           "as_of": "2026-09-10",
-          "aum_usd": 8395078898.44,
-          "flow_1d_usd": 43143452.55,
-          "flow_5d_usd": 46758987.95,
-          "flow_20d_usd": -47992070.2,
-          "flow_5d_pct_aum": 0.005368,
-          "flow_20d_pct_aum": -0.005488,
-          "flow_20d_z": -0.745,
+          "aum_usd": 30908026285.06,
+          "flow_1d_usd": -85274812.5,
+          "flow_5d_usd": -347735849.3,
+          "flow_20d_usd": -1246604771.8,
+          "flow_5d_pct_aum": -0.010986,
+          "flow_20d_pct_aum": -0.035639,
+          "flow_20d_z": -2.187,
           "history_observations": 252,
-          "split_adjustments": 1
+          "split_adjustments": 0
         },
         "price_score": 56.5,
         "rank": 5,
-        "ticker": "XLB",
+        "ticker": "XLI",
         "options_activity": {
           "evidence_level": "cleared_activity",
           "direction": null,
@@ -2968,29 +2968,31 @@
           "week_start": "2026-08-31",
           "week_end": "2026-09-04",
           "sessions": 5,
-          "call_volume": 15626,
-          "put_volume": 7394,
-          "total_volume": 23020,
-          "put_call_ratio": 0.4732,
-          "prior_month_daily_average": 20711.81,
-          "activity_ratio": 0.222,
-          "excluded_adjusted_roots": []
+          "call_volume": 50121,
+          "put_volume": 187377,
+          "total_volume": 237498,
+          "put_call_ratio": 3.7385,
+          "prior_month_daily_average": 28779.62,
+          "activity_ratio": 1.65,
+          "excluded_adjusted_roots": [
+            "2XLI"
+          ]
         },
         "flow_confirmation": "supports"
       },
       {
         "id": "real_estate",
         "name": "Real Estate",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.023644,
-        "return_63d": -0.035353,
-        "return_126d": 0.030402,
-        "excess_21d": -0.006986,
-        "excess_63d": -0.081621,
-        "excess_126d": -0.088677,
-        "relative_strength": -0.085149,
-        "acceleration": 0.020221,
-        "absolute_trend": 0.293866,
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.024344,
+        "return_63d": -0.025238,
+        "return_126d": 0.045346,
+        "excess_21d": -0.013673,
+        "excess_63d": -0.06314,
+        "excess_126d": -0.097521,
+        "relative_strength": -0.080331,
+        "acceleration": 0.007374,
+        "absolute_trend": 0.435011,
         "above_200d": true,
         "phase": "improving",
         "fund_flow": {
@@ -3030,35 +3032,35 @@
         "flow_confirmation": "diverges"
       },
       {
-        "id": "industrials",
-        "name": "Industrials",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.085104,
-        "return_63d": 0.007689,
-        "return_126d": 0.011498,
-        "excess_21d": -0.068446,
-        "excess_63d": -0.038578,
-        "excess_126d": -0.10758,
-        "relative_strength": -0.073079,
-        "acceleration": -0.055586,
-        "absolute_trend": 0.09264,
-        "above_200d": false,
+        "id": "materials",
+        "name": "Materials",
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.031491,
+        "return_63d": -0.001553,
+        "return_126d": 0.033412,
+        "excess_21d": -0.020819,
+        "excess_63d": -0.039455,
+        "excess_126d": -0.109456,
+        "relative_strength": -0.074455,
+        "acceleration": -0.007668,
+        "absolute_trend": 0.268868,
+        "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
           "as_of": "2026-09-10",
-          "aum_usd": 30908026285.06,
-          "flow_1d_usd": -85274812.5,
-          "flow_5d_usd": -347735849.3,
-          "flow_20d_usd": -1246604771.8,
-          "flow_5d_pct_aum": -0.010986,
-          "flow_20d_pct_aum": -0.035639,
-          "flow_20d_z": -2.187,
+          "aum_usd": 8395078898.44,
+          "flow_1d_usd": 43143452.55,
+          "flow_5d_usd": 46758987.95,
+          "flow_20d_usd": -47992070.2,
+          "flow_5d_pct_aum": 0.005368,
+          "flow_20d_pct_aum": -0.005488,
+          "flow_20d_z": -0.745,
           "history_observations": 252,
-          "split_adjustments": 0
+          "split_adjustments": 1
         },
         "price_score": 46.5,
         "rank": 7,
-        "ticker": "XLI",
+        "ticker": "XLB",
         "options_activity": {
           "evidence_level": "cleared_activity",
           "direction": null,
@@ -3068,31 +3070,29 @@
           "week_start": "2026-08-31",
           "week_end": "2026-09-04",
           "sessions": 5,
-          "call_volume": 50121,
-          "put_volume": 187377,
-          "total_volume": 237498,
-          "put_call_ratio": 3.7385,
-          "prior_month_daily_average": 28779.62,
-          "activity_ratio": 1.65,
-          "excluded_adjusted_roots": [
-            "2XLI"
-          ]
+          "call_volume": 15626,
+          "put_volume": 7394,
+          "total_volume": 23020,
+          "put_call_ratio": 0.4732,
+          "prior_month_daily_average": 20711.81,
+          "activity_ratio": 0.222,
+          "excluded_adjusted_roots": []
         },
         "flow_confirmation": "supports"
       },
       {
         "id": "consumer_discretionary",
         "name": "Consumer Discretionary",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.062997,
-        "return_63d": -0.011582,
-        "return_126d": -0.015287,
-        "excess_21d": -0.046338,
-        "excess_63d": -0.05785,
-        "excess_126d": -0.134365,
-        "relative_strength": -0.096107,
-        "acceleration": -0.027055,
-        "absolute_trend": -0.101357,
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.042718,
+        "return_63d": -0.027149,
+        "return_126d": 0.016827,
+        "excess_21d": -0.032046,
+        "excess_63d": -0.06505,
+        "excess_126d": -0.12604,
+        "relative_strength": -0.095545,
+        "acceleration": -0.010363,
+        "absolute_trend": 0.114305,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
@@ -3107,7 +3107,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 26.5,
+        "price_score": 30.0,
         "rank": 8,
         "ticker": "XLY",
         "options_activity": {
@@ -3132,69 +3132,18 @@
         "flow_confirmation": "supports"
       },
       {
-        "id": "consumer_staples",
-        "name": "Consumer Staples",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.019073,
-        "return_63d": -0.02156,
-        "return_126d": -0.005364,
-        "excess_21d": -0.002415,
-        "excess_63d": -0.067828,
-        "excess_126d": -0.124442,
-        "relative_strength": -0.096135,
-        "acceleration": 0.020194,
-        "absolute_trend": -0.045407,
-        "above_200d": true,
-        "phase": "improving",
-        "fund_flow": {
-          "as_of": "2026-09-10",
-          "aum_usd": 14308918830.47,
-          "flow_1d_usd": -124662558.0,
-          "flow_5d_usd": 147935107.5,
-          "flow_20d_usd": -702941909.35,
-          "flow_5d_pct_aum": 0.010154,
-          "flow_20d_pct_aum": -0.045839,
-          "flow_20d_z": -1.293,
-          "history_observations": 252,
-          "split_adjustments": 0
-        },
-        "price_score": 23.5,
-        "rank": 9,
-        "ticker": "XLP",
-        "options_activity": {
-          "evidence_level": "cleared_activity",
-          "direction": null,
-          "trade_side": "unavailable",
-          "open_close": "unavailable",
-          "as_of": "2026-09-04",
-          "week_start": "2026-08-31",
-          "week_end": "2026-09-04",
-          "sessions": 5,
-          "call_volume": 40962,
-          "put_volume": 61932,
-          "total_volume": 102894,
-          "put_call_ratio": 1.5119,
-          "prior_month_daily_average": 29179.86,
-          "activity_ratio": 0.705,
-          "excluded_adjusted_roots": [
-            "2XLP"
-          ]
-        },
-        "flow_confirmation": "diverges"
-      },
-      {
         "id": "communication_services",
         "name": "Communication Services",
-        "price_as_of": "2026-09-10",
-        "return_21d": 0.002065,
-        "return_63d": 0.007002,
-        "return_126d": -0.042365,
-        "excess_21d": 0.018723,
-        "excess_63d": -0.039265,
-        "excess_126d": -0.161443,
-        "relative_strength": -0.100354,
-        "acceleration": 0.031812,
-        "absolute_trend": -0.301329,
+        "price_as_of": "2026-09-11",
+        "return_21d": 0.02091,
+        "return_63d": 0.00687,
+        "return_126d": -0.017651,
+        "excess_21d": 0.031582,
+        "excess_63d": -0.031032,
+        "excess_126d": -0.160519,
+        "relative_strength": -0.095775,
+        "acceleration": 0.041925,
+        "absolute_trend": -0.125564,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {
@@ -3209,8 +3158,8 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 10.0,
-        "rank": 10,
+        "price_score": 16.5,
+        "rank": 9,
         "ticker": "XLC",
         "options_activity": {
           "evidence_level": "cleared_activity",
@@ -3234,18 +3183,69 @@
         "flow_confirmation": "supports"
       },
       {
+        "id": "consumer_staples",
+        "name": "Consumer Staples",
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.020184,
+        "return_63d": -0.0155,
+        "return_126d": 0.002147,
+        "excess_21d": -0.009512,
+        "excess_63d": -0.053401,
+        "excess_126d": -0.14072,
+        "relative_strength": -0.097061,
+        "acceleration": 0.008289,
+        "absolute_trend": 0.018166,
+        "above_200d": true,
+        "phase": "improving",
+        "fund_flow": {
+          "as_of": "2026-09-10",
+          "aum_usd": 14308918830.47,
+          "flow_1d_usd": -124662558.0,
+          "flow_5d_usd": 147935107.5,
+          "flow_20d_usd": -702941909.35,
+          "flow_5d_pct_aum": 0.010154,
+          "flow_20d_pct_aum": -0.045839,
+          "flow_20d_z": -1.293,
+          "history_observations": 252,
+          "split_adjustments": 0
+        },
+        "price_score": 13.5,
+        "rank": 10,
+        "ticker": "XLP",
+        "options_activity": {
+          "evidence_level": "cleared_activity",
+          "direction": null,
+          "trade_side": "unavailable",
+          "open_close": "unavailable",
+          "as_of": "2026-09-04",
+          "week_start": "2026-08-31",
+          "week_end": "2026-09-04",
+          "sessions": 5,
+          "call_volume": 40962,
+          "put_volume": 61932,
+          "total_volume": 102894,
+          "put_call_ratio": 1.5119,
+          "prior_month_daily_average": 29179.86,
+          "activity_ratio": 0.705,
+          "excluded_adjusted_roots": [
+            "2XLP"
+          ]
+        },
+        "flow_confirmation": "diverges"
+      },
+      {
         "id": "utilities",
         "name": "Utilities",
-        "price_as_of": "2026-09-10",
-        "return_21d": -0.02577,
-        "return_63d": -0.02785,
-        "return_126d": -0.069023,
-        "excess_21d": -0.009112,
-        "excess_63d": -0.074117,
-        "excess_126d": -0.188102,
-        "relative_strength": -0.131109,
-        "acceleration": 0.015594,
-        "absolute_trend": -0.675535,
+        "price_as_of": "2026-09-11",
+        "return_21d": -0.033634,
+        "return_63d": -0.032048,
+        "return_126d": -0.079208,
+        "excess_21d": -0.022962,
+        "excess_63d": -0.069949,
+        "excess_126d": -0.222075,
+        "relative_strength": -0.146012,
+        "acceleration": 0.000354,
+        "absolute_trend": -0.774901,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {

@@ -2,21 +2,21 @@
   "id": "gold_price",
   "name": "Gold",
   "category": "Commodities",
-  "current_sharpe": 0.63,
-  "annualized_return": 12.84,
+  "current_sharpe": 0.64,
+  "annualized_return": 12.89,
   "annualized_volatility": 16.36,
   "max_drawdown": -26.4,
   "sharpe_by_regime": {
     "tight": null,
-    "neutral": 1.35,
+    "neutral": 1.37,
     "loose": 0.52
   },
   "return_by_regime": {
     "tight": null,
-    "neutral": 33.63,
+    "neutral": 34.02,
     "loose": 17.15
   },
-  "correlation_with_glci": 0.085,
+  "correlation_with_glci": 0.086,
   "rolling_sharpe": [
     {
       "date": "2017-09-14",
@@ -9053,6 +9053,10 @@
     {
       "date": "2026-09-10",
       "value": 0.602
+    },
+    {
+      "date": "2026-09-11",
+      "value": 0.611
     }
   ]
 }

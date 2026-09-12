@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "test:research": "node scripts/test-research-client.mjs && node scripts/test-public-research.mjs"
+    "test:research": "node scripts/test-research-client.mjs && node scripts/test-public-research.mjs && node scripts/test-release-lab.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

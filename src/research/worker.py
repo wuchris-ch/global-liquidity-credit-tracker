@@ -23,7 +23,14 @@ def tick(store, workspace="personal"):
 
     token = lease.set(job)
     try:
-        if job["job_kind"] == "analysis":
+        if job["job_kind"] == "release_ingest":
+            from .release_lab import capture_release
+            from .release_sources import WORKSPACE
+
+            if workspace != WORKSPACE:
+                raise ValueError("Release jobs require the dedicated public workspace")
+            result = {"snapshot": capture_release(store, **job["payload"])}
+        elif job["job_kind"] == "analysis":
             result = {
                 "run_id": Research(store).execute(workspace, job["payload"])["id"]
             }

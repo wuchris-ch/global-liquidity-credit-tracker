@@ -1,0 +1,57 @@
+{
+  "verified_at": "2026-09-12T05:17:27.847513+00:00",
+  "python": {
+    "passed": 261,
+    "skipped": 1,
+    "skip_reason": "Existing complete production export fixture is not present in the offline suite"
+  },
+  "browser": {
+    "route": "/research/lab",
+    "tested_widths_px": [
+      1272,
+      390
+    ],
+    "chart_marks": 48,
+    "mobile_views": [
+      "revision study",
+      "release monitor",
+      "research notebook",
+      "methods and evidence"
+    ],
+    "source_hashes_verified": 51,
+    "actual_browser_manifest_independent_replay": "passed",
+    "save_share_reload_import": "passed",
+    "csv_export_rows_verified": 24
+  },
+  "source_collection": {
+    "series": [
+      "PAYEMS",
+      "INDPRO",
+      "A191RL1Q225SBEA"
+    ],
+    "release_snapshots": 9,
+    "study_snapshots": 25,
+    "study_source_responses": 51,
+    "study_periods": 24,
+    "independent_BLS_first_estimates_matched": 24
+  },
+  "recovery": {
+    "real_source_collection": "passed",
+    "backup_restore_republication": "passed",
+    "backup_files_verified": 150,
+    "recorded_failure_cases": [
+      "metadata drift",
+      "missing and duplicate periods",
+      "wrong vintage",
+      "pagination count and offset",
+      "same-vintage conflict",
+      "source outage",
+      "concurrent duplicate ingestion",
+      "incomplete study publication hold"
+    ]
+  },
+  "publication_ids": {
+    "study": "055128562c6747336e453695ed07f4868c3dfc98d7d7f1c5e64c021582501bd0",
+    "feed": "dc944fe125b6e040961907ea25124073a615fe92fc656d3b9c8bf6c04a6800a7"
+  }
+}

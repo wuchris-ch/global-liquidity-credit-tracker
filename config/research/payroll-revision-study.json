@@ -1,0 +1,19 @@
+{
+  "id": "payroll-revisions-2023-2024-v1",
+  "title": "Two years of payrolls, through the revision cycle",
+  "series_id": "PAYEMS",
+  "observation_start": "2023-01-01",
+  "observation_end": "2024-12-01",
+  "comparison_information_date": "2026-09-11",
+  "initial_vintage_rule": "FRED output_type=4 initial-release realtime_start, cross-checked against the full snapshot on that date",
+  "operation": "difference",
+  "unit": "thousand jobs",
+  "thresholds": [0, 100, 200],
+  "threshold_rule": "strictly greater than the reference",
+  "outcomes": ["mean_revision", "median_revision", "mean_absolute_revision", "largest_absolute_revision", "above_reference_switches", "upward_revisions", "downward_revisions", "unchanged"],
+  "uncertainty": {"method": "circular moving-block bootstrap percentile interval", "block_months": [3, 6], "replicates": 5000, "seed": 20260911, "confidence": 0.95},
+  "missing_history": "retain an explicit excluded row and reason; never substitute current observations",
+  "population": "Every calendar month in 2023 and 2024, in chronological order; no selection by revision size",
+  "interpretation": "Descriptive revision study. Latest means the fixed comparison information date. Monthly differences use two levels from the same vintage. Reference classifications are illustrative economic thresholds, not investment signals. Revisions include later benchmark and seasonal-factor updates; they are not pure measurement errors.",
+  "plan_stage": "Exploratory historical study with a specification fixed before outcome calculation"
+}

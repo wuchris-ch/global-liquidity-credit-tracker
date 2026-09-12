@@ -1,0 +1,86 @@
+{
+  "schema_version": "research-replay/1",
+  "recipe": {
+    "schema_version": "research-comparison/1",
+    "title": "Industrial production: release comparison",
+    "bundle_id": "dc944fe125b6e040961907ea25124073a615fe92fc656d3b9c8bf6c04a6800a7",
+    "series_id": "INDPRO",
+    "before_snapshot": "ef225e0f84b8c8b65b1575b49363886e1b4c058d7c8842fd84b94aef49e892bd",
+    "after_snapshot": "59a75a0cf2cfed2204874b6444c0b8756dfc71aa583507eb38b7a62fa8a4839c",
+    "observation_start": "2026-06-01",
+    "observation_end": "2026-06-01",
+    "operation": "pct_change",
+    "threshold": 0.07693012858192724,
+    "comparison": "strictly_above"
+  },
+  "result": {
+    "recipe": {
+      "schema_version": "research-comparison/1",
+      "title": "Industrial production: release comparison",
+      "bundle_id": "dc944fe125b6e040961907ea25124073a615fe92fc656d3b9c8bf6c04a6800a7",
+      "series_id": "INDPRO",
+      "before_snapshot": "ef225e0f84b8c8b65b1575b49363886e1b4c058d7c8842fd84b94aef49e892bd",
+      "after_snapshot": "59a75a0cf2cfed2204874b6444c0b8756dfc71aa583507eb38b7a62fa8a4839c",
+      "observation_start": "2026-06-01",
+      "observation_end": "2026-06-01",
+      "operation": "pct_change",
+      "threshold": 0.07693012858192724,
+      "comparison": "strictly_above"
+    },
+    "rows": [
+      {
+        "period": "2026-06-01",
+        "initial": 0.07693013,
+        "revised": 0.27012025,
+        "revision": 0.19319012,
+        "current_contribution": 0.14365792,
+        "previous_contribution": 0.0495322,
+        "switched": true,
+        "reason": null,
+        "citations": [
+          {
+            "snapshot": "ef225e0f84b8c8b65b1575b49363886e1b4c058d7c8842fd84b94aef49e892bd",
+            "information_date": "2026-07-17",
+            "observation_date": "2026-06-01",
+            "value": "102.6395",
+            "capture": "c59ab261ebca63bcc0121b24604fc50bd9e0106e57bc62e464924786e32cc5ea"
+          },
+          {
+            "snapshot": "ef225e0f84b8c8b65b1575b49363886e1b4c058d7c8842fd84b94aef49e892bd",
+            "information_date": "2026-07-17",
+            "observation_date": "2026-05-01",
+            "value": "102.5606",
+            "capture": "c59ab261ebca63bcc0121b24604fc50bd9e0106e57bc62e464924786e32cc5ea"
+          },
+          {
+            "snapshot": "59a75a0cf2cfed2204874b6444c0b8756dfc71aa583507eb38b7a62fa8a4839c",
+            "information_date": "2026-08-18",
+            "observation_date": "2026-06-01",
+            "value": "102.7868",
+            "capture": "ea5dc7a172e1a877c7d1384feec64454934755125579f261c3a43f3f4bb43f19"
+          },
+          {
+            "snapshot": "59a75a0cf2cfed2204874b6444c0b8756dfc71aa583507eb38b7a62fa8a4839c",
+            "information_date": "2026-08-18",
+            "observation_date": "2026-05-01",
+            "value": "102.5099",
+            "capture": "ea5dc7a172e1a877c7d1384feec64454934755125579f261c3a43f3f4bb43f19"
+          }
+        ]
+      }
+    ],
+    "before_date": "2026-07-17",
+    "after_date": "2026-08-18",
+    "unit": "%",
+    "threshold_rule": "strictly above the reference",
+    "date_precision": "day",
+    "attribution_method": "Symmetric average of both input-update orders (Shapley decomposition).",
+    "steps": [
+      "Resolve two immutable source snapshots",
+      "Match exact calendar periods and units",
+      "Calculate each measure within its own vintage",
+      "Attribute the revision and compare the reference",
+      "Attach each raw input's capture hash and information date"
+    ]
+  }
+}

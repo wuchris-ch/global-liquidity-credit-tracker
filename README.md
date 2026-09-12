@@ -7,11 +7,11 @@ Track global liquidity and credit metrics from central banks, BIS, World Bank, a
 
 **Docs:** [Methodology & formulas](docs/METHODOLOGY.md) · [Market flows and sector rotation](docs/MARKET_FLOWS.md) · [Data sources](docs/SOURCES.md) · [Operations runbook](docs/OPERATIONS.md) · [Sample output](docs/SAMPLE_OUTPUT.md) · [Claim → evidence map](docs/PROOF.md)
 
-## Live Demo
+## Live application
 
 **[global-liquidity-credit-tracker.vercel.app](https://global-liquidity-credit-tracker.vercel.app)**
 
-The frontend is organized as a daily research note in six sections:
+The frontend combines a daily research note with an economic release laboratory:
 
 - [Today](https://global-liquidity-credit-tracker.vercel.app/), the 30-second brief: regime verdict, what changed, what it has meant, plumbing vitals
 - [Index](https://global-liquidity-credit-tracker.vercel.app/glci), the GLCI deep dive: pillar decomposition, regime history, methodology
@@ -19,8 +19,19 @@ The frontend is organized as a daily research note in six sections:
 - [Playbook](https://global-liquidity-credit-tracker.vercel.app/playbook), forward returns using the production rolling regime classifier, explicit timing, and confidence intervals
 - [Plumbing](https://global-liquidity-credit-tracker.vercel.app/plumbing), net liquidity vs S&P 500, TGA/RRP components, credit spreads, central banks
 - [Explorer](https://global-liquidity-credit-tracker.vercel.app/explorer), chart any series against any other, with preset overlays
+- [Research](https://global-liquidity-credit-tracker.vercel.app/research/lab), follow releases, study revisions, save typed comparisons and independently replay their source evidence
 
 (Old routes `/risk`, `/track-record`, `/liquidity`, `/spreads` redirect to the merged pages.)
+
+## Release laboratory
+
+The [laboratory](https://global-liquidity-credit-tracker.vercel.app/research/lab) follows payrolls, industrial production and real GDP growth from provider calendars into immutable source captures. Its release inbox distinguishes scheduled dates, archived revisions, pending captures and verification holds. The scheduled publisher retains complete snapshots and reconciles missed runs.
+
+The main study compares every monthly payroll estimate in 2023 and 2024 with its revised value at a fixed September 11, 2026 information date. Explore reference levels, see how revisions to both input months change reported growth, inspect all 24 observations, and examine uncertainty using consecutive-month resampling. The [Research Atlas](https://global-liquidity-credit-tracker.vercel.app/research/atlas) adds three focused release histories.
+
+A public notebook turns a supported research prompt into an inspectable typed recipe. Saved and shared recipes pin their publication, series, observation range, information dates and reference level. Each result includes exact source-input citations and a downloadable replay manifest. A standalone Python verifier checks the raw response hashes and recomputes the result offline.
+
+The laboratory runs on the existing Vercel and GitHub Pages deployment. Public calculations run in the browser, and saved recipes use browser storage. [Methods, architecture and operations](docs/platform/RELEASE_LAB.md) describe the source contracts, recovery procedure and measured workload.
 
 ## Architecture
 

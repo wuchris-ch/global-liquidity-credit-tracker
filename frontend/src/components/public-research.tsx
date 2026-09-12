@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
   ArrowDownToLine,
   ArrowRight,
@@ -335,6 +336,24 @@ export function PublicResearch() {
           </div>
         </div>
       </header>
+
+      <Link
+        href="/research/lab"
+        className="mt-6 flex flex-col justify-between gap-4 rounded-lg border border-foreground/25 bg-card px-5 py-4 sm:flex-row sm:items-center"
+      >
+        <div>
+          <p className={label}>Release laboratory</p>
+          <p className="mt-2 font-serif text-xl">
+            Two years of payroll revisions. A new way to explore the evidence.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Follow releases, build a saved comparison, and replay every result.
+          </p>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-2 text-xs font-medium">
+          Open the laboratory <ArrowRight size={14} />
+        </span>
+      </Link>
 
       <section
         aria-label="Choose a research study"

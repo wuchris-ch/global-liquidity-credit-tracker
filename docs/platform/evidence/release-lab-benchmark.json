@@ -1,0 +1,41 @@
+{
+  "measured_at": "2026-09-12T05:15:46.941430+00:00",
+  "environment": {
+    "python": "3.11.14",
+    "os": "Darwin",
+    "os_release": "25.5.0",
+    "architecture": "arm64",
+    "logical_cpus": 10
+  },
+  "workload": {
+    "workers": 4,
+    "jobs": 24,
+    "source_snapshots": 13,
+    "observations_per_run": 2,
+    "input_series": "PAYEMS",
+    "study_periods": "2023-01 through 2023-12",
+    "network_requests": 0,
+    "path": "leased claim, pinned DuckDB query, Decimal calculation, immutable result and fenced commit",
+    "setup_excluded": true,
+    "queue_wait_included_in_per_job": false
+  },
+  "elapsed_seconds": 1.746283708984265,
+  "jobs_per_second": 13.743471279337378,
+  "job_latency_seconds": {
+    "p50": 0.288255895517068,
+    "p95": 0.3152710830036085,
+    "maximum": 0.31763591698836535
+  },
+  "cpu_seconds": 2.3399199999999998,
+  "process_peak_rss_bytes": 169050112,
+  "verified_results": 24,
+  "failed_jobs": 0,
+  "publication": "055128562c6747336e453695ed07f4868c3dfc98d7d7f1c5e64c021582501bd0",
+  "code": {
+    "src/research/worker.py": "8167379ed5ddb2d9cf0e97a202aa7b3e928601f98181b425bb4d619f7b83a832",
+    "src/research/storage.py": "18593d1800005804abf8966e1d08ab6e2e2322794f78aea9a97247ba9d8887b7",
+    "src/research/calculations.py": "f020a33f69d0f9f15df16ed00dad6b7d6feac93a6709e5fbf0e76e063cfaccc7",
+    "scripts/benchmark_release_lab.py": "068018525cc5672f9bf7acedc3c44153eb96dfa94dbce5902c348fed341a0991"
+  },
+  "lock_sha256": "9f6339df7c8931d4f5b6e624c35e19d9a27401d3fa1ed82ebef2c17d2264ff18"
+}

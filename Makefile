@@ -23,3 +23,25 @@ dev:            ## Run the local FastAPI backend
 
 frontend-build: ## Build the Next.js frontend
 	cd frontend && npm run build
+
+.PHONY: research-setup research-demo research-api research-types research-test research-benchmark
+research-setup:
+	uv sync --locked --extra dev
+	cd frontend && npm ci
+
+research-demo:
+	uv run macro-research demo
+
+research-api:
+	uv run macro-research serve
+
+research-types:
+	uv run python -m scripts.research_openapi
+	uv run python -m scripts.research_types
+
+research-test:
+	uv run pytest tests/research
+	uv run macro-research evaluate
+
+research-benchmark:
+	uv run python -m scripts.research_benchmark

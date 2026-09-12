@@ -1,0 +1,418 @@
+[
+  {
+    "name": "bis-current",
+    "url": "https://stats.bis.org/api/v1/data/WS_TC/Q.US.P.A.M.XDC.A",
+    "params": {
+      "startPeriod": "2024-Q1",
+      "endPeriod": "2024-Q1"
+    },
+    "status": 200,
+    "retrieved_at": "2026-09-11T22:46:47.707371+00:00",
+    "response": {
+      "meta": {
+        "id": "IDREFf1c4863d-1c42-4038-b830-aad6f83d84f4",
+        "prepared": "2026-09-11T22:46:47",
+        "test": false,
+        "datasetId": "b7d6b785-801a-46a0-8dee-344bb99e2c4a",
+        "sender": {
+          "id": "UNKNOWN"
+        },
+        "receiver": {
+          "id": "guest"
+        },
+        "links": [
+          {
+            "rel": "self",
+            "href": "/data/WS_TC/Q.US.P.A.M.XDC.A?endPeriod=2024-Q1&startPeriod=2024-Q1",
+            "uri": "https://raw.githubusercontent.com/sdmx-twg/sdmx-json/develop/structure-message/tools/schemas/1.0/sdmx-json-structure-schema.json"
+          }
+        ]
+      },
+      "data": {
+        "dataSets": [
+          {
+            "links": [
+              {
+                "rel": "dataflow",
+                "urn": "urn:sdmx:org.sdmx.infomodel.datastructure.Dataflow=BIS:WS_TC(2.0)"
+              }
+            ],
+            "reportingBegin": "2024-01-01T00:00:00",
+            "reportingEnd": "2024-01-01T23:59:59",
+            "action": "Information",
+            "series": {
+              "0:0:0:0:0:0:0": {
+                "attributes": [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                "observations": {
+                  "0": [
+                    "41167.637",
+                    0,
+                    null,
+                    0
+                  ]
+                }
+              }
+            },
+            "attributes": [
+              0
+            ]
+          }
+        ],
+        "structure": {
+          "links": [
+            {
+              "rel": "dataflow",
+              "urn": "urn:sdmx:org.sdmx.infomodel.datastructure.Dataflow=BIS:WS_TC(2.0)"
+            },
+            {
+              "rel": "datastructure",
+              "urn": "urn:sdmx:org.sdmx.infomodel.datastructure.DataStructure=BIS:BIS_TOTAL_CREDIT(2.0)"
+            }
+          ],
+          "name": "Total credit",
+          "names": {
+            "en": "Total credit"
+          },
+          "dimensions": {
+            "dataset": [],
+            "series": [
+              {
+                "id": "FREQ",
+                "name": "Frequency",
+                "keyPosition": 0,
+                "role": null,
+                "values": [
+                  {
+                    "id": "Q",
+                    "name": "Quarterly"
+                  }
+                ]
+              },
+              {
+                "id": "BORROWERS_CTY",
+                "name": "Borrowers' country",
+                "keyPosition": 1,
+                "role": null,
+                "values": [
+                  {
+                    "id": "US",
+                    "name": "United States"
+                  }
+                ]
+              },
+              {
+                "id": "TC_BORROWERS",
+                "name": "Borrowing sector",
+                "keyPosition": 2,
+                "role": null,
+                "values": [
+                  {
+                    "id": "P",
+                    "name": "Private non-financial sector"
+                  }
+                ]
+              },
+              {
+                "id": "TC_LENDERS",
+                "name": "Lending sector",
+                "keyPosition": 3,
+                "role": null,
+                "values": [
+                  {
+                    "id": "A",
+                    "name": "All sectors"
+                  }
+                ]
+              },
+              {
+                "id": "VALUATION",
+                "name": "Valuation method",
+                "keyPosition": 4,
+                "role": null,
+                "values": [
+                  {
+                    "id": "M",
+                    "name": "Market value"
+                  }
+                ]
+              },
+              {
+                "id": "UNIT_TYPE",
+                "name": "Unit type",
+                "keyPosition": 5,
+                "role": null,
+                "values": [
+                  {
+                    "id": "XDC",
+                    "name": "Domestic currency (incl. conv. to current ccy made using a fix parity)"
+                  }
+                ]
+              },
+              {
+                "id": "TC_ADJUST",
+                "name": "Adjustment",
+                "keyPosition": 6,
+                "role": null,
+                "values": [
+                  {
+                    "id": "A",
+                    "name": "Adjusted for breaks"
+                  }
+                ]
+              }
+            ],
+            "observation": [
+              {
+                "id": "TIME_PERIOD",
+                "name": "Time period or range",
+                "keyPosition": 7,
+                "role": "time",
+                "values": [
+                  {
+                    "start": "2024-01-01T00:00:00",
+                    "end": "2024-03-31T23:59:59",
+                    "id": "2024-Q1",
+                    "name": "2024-Q1"
+                  }
+                ]
+              }
+            ]
+          },
+          "attributes": {
+            "dataset": [
+              {
+                "id": "COLLECTION",
+                "name": "Collection Indicator",
+                "relationship": {
+                  "none": {}
+                },
+                "role": null,
+                "values": [
+                  {
+                    "id": "E",
+                    "name": "End of period"
+                  }
+                ]
+              }
+            ],
+            "series": [
+              {
+                "id": "UNIT_MULT",
+                "name": "Unit Multiplier",
+                "relationship": {
+                  "dimensions": [
+                    "FREQ",
+                    "BORROWERS_CTY",
+                    "TC_BORROWERS",
+                    "TC_LENDERS",
+                    "VALUATION",
+                    "UNIT_TYPE",
+                    "TC_ADJUST"
+                  ]
+                },
+                "role": null,
+                "values": [
+                  {
+                    "id": "9",
+                    "name": "Billions"
+                  }
+                ]
+              },
+              {
+                "id": "UNIT_MEASURE",
+                "name": "Unit of measure",
+                "relationship": {
+                  "dimensions": [
+                    "FREQ",
+                    "BORROWERS_CTY",
+                    "TC_BORROWERS",
+                    "TC_LENDERS",
+                    "VALUATION",
+                    "UNIT_TYPE",
+                    "TC_ADJUST"
+                  ]
+                },
+                "role": null,
+                "values": [
+                  {
+                    "id": "USD",
+                    "name": "US dollar"
+                  }
+                ]
+              },
+              {
+                "id": "TITLE_TS",
+                "name": "Title (tseries level)",
+                "relationship": {
+                  "dimensions": [
+                    "FREQ",
+                    "BORROWERS_CTY",
+                    "TC_BORROWERS",
+                    "TC_LENDERS",
+                    "VALUATION",
+                    "UNIT_TYPE",
+                    "TC_ADJUST"
+                  ]
+                },
+                "role": null,
+                "values": [
+                  {
+                    "id": "United States - Credit to Private non-financial sector from All sectors at Market value - domestic currency - Adjusted for breaks",
+                    "name": "United States - Credit to Private non-financial sector from All sectors at Market value - domestic currency - Adjusted for breaks"
+                  }
+                ]
+              },
+              {
+                "id": "DECIMALS",
+                "name": "Decimals",
+                "relationship": {},
+                "role": null,
+                "values": [
+                  {
+                    "id": "3",
+                    "name": "Three"
+                  }
+                ]
+              }
+            ],
+            "observation": [
+              {
+                "id": "OBS_STATUS",
+                "name": "Observation Status",
+                "relationship": {
+                  "primaryMeasure": "OBS_VALUE"
+                },
+                "role": null,
+                "values": [
+                  {
+                    "id": "A",
+                    "name": "Normal value"
+                  }
+                ]
+              },
+              {
+                "id": "OBS_PRE_BREAK",
+                "name": "Pre-Break Observation",
+                "relationship": {
+                  "primaryMeasure": "OBS_VALUE"
+                },
+                "role": null,
+                "values": []
+              },
+              {
+                "id": "OBS_CONF",
+                "name": "Observation confidentiality",
+                "relationship": {
+                  "primaryMeasure": "OBS_VALUE"
+                },
+                "role": null,
+                "values": [
+                  {
+                    "id": "F",
+                    "name": "Free"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "worldbank-pages",
+    "url": "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD",
+    "params": {
+      "format": "json",
+      "per_page": 1,
+      "date": "2024"
+    },
+    "status": 200,
+    "retrieved_at": "2026-09-11T22:46:48.402536+00:00",
+    "response": [
+      {
+        "page": 1,
+        "pages": 265,
+        "per_page": 1,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      },
+      [
+        {
+          "indicator": {
+            "id": "NY.GDP.MKTP.CD",
+            "value": "GDP (current US$)"
+          },
+          "country": {
+            "id": "ZH",
+            "value": "Africa Eastern and Southern"
+          },
+          "countryiso3code": "AFE",
+          "date": "2024",
+          "value": 1252564134751.16,
+          "unit": "",
+          "obs_status": "",
+          "decimal": 0
+        }
+      ]
+    ]
+  },
+  {
+    "name": "worldbank-archive",
+    "url": "https://api.worldbank.org/v2/sources/57",
+    "params": {
+      "format": "json"
+    },
+    "status": 200,
+    "retrieved_at": "2026-09-11T22:46:48.537968+00:00",
+    "response": [
+      {
+        "page": "1",
+        "pages": "1",
+        "per_page": "50",
+        "total": "1"
+      },
+      [
+        {
+          "id": "57",
+          "lastupdated": "2025-10-29",
+          "name": "WDI Database Archives",
+          "code": "WDA",
+          "description": "",
+          "url": "",
+          "dataavailability": "Y",
+          "metadataavailability": "Y",
+          "concepts": "4"
+        }
+      ]
+    ]
+  },
+  {
+    "name": "nyfed-sofr",
+    "url": "https://markets.newyorkfed.org/api/rates/secured/sofr/last/1.json",
+    "params": {},
+    "status": 200,
+    "retrieved_at": "2026-09-11T22:46:50.395135+00:00",
+    "response": {
+      "refRates": [
+        {
+          "effectiveDate": "2026-09-10",
+          "type": "SOFR",
+          "percentRate": 3.62,
+          "percentPercentile1": 3.58,
+          "percentPercentile25": 3.6,
+          "percentPercentile75": 3.67,
+          "percentPercentile99": 3.7,
+          "volumeInBillions": 2921,
+          "revisionIndicator": ""
+        }
+      ]
+    }
+  }
+]

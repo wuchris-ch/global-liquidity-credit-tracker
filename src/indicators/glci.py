@@ -213,8 +213,12 @@ class GLCIComputer:
     def __init__(
         self,
         fetcher: DataFetcher | None = None,
-        storage: DataStorage | None = None
+        storage: DataStorage | None = None,
+        artifact_sink=None,
+        training_cutoff=None,
     ) -> None:
+        self.training_cutoff = training_cutoff
+        self.artifact_sink = artifact_sink
         self.fetcher = fetcher or DataFetcher()
         self.storage = storage or DataStorage()
         self.feature_builder = FeatureMatrixBuilder(self.fetcher)
@@ -448,6 +452,10 @@ class GLCIComputer:
                 }
             }
         
+        regime_available = pd.notna(glci_df['regime'].iloc[-1])
+        if not regime_available and self.training_cutoff is None:
+            raise ValueError('GLCI has insufficient common history for a current regime')
+
         metadata = {
             "computed_at": datetime.utcnow().isoformat(),
             "start_date": str(glci_df["date"].min()),
@@ -469,9 +477,9 @@ class GLCIComputer:
             "pillar_stats": pillar_stats,
             "current_regime": {
                 "value": float(glci_df["value"].iloc[-1]),
-                "zscore": float(glci_df["zscore"].iloc[-1]),
-                "regime": int(glci_df["regime"].iloc[-1]),
-                "regime_label": regimes_df["regime_label"].iloc[-1],
+                "zscore": float(glci_df["zscore"].iloc[-1]) if regime_available else None,
+                "regime": int(glci_df["regime"].iloc[-1]) if regime_available else None,
+                "regime_label": regimes_df["regime_label"].iloc[-1] if regime_available else "unavailable",
                 "momentum": float(glci_df["momentum"].iloc[-1]) if pd.notna(glci_df["momentum"].iloc[-1]) else 0
             }
         }
@@ -530,6 +538,9 @@ class GLCIComputer:
         X = X.select_dtypes(include=[np.number])
         X.index = pd.DatetimeIndex(feature_matrix["date"])
         
+        if self.training_cutoff is not None:
+            X = X.loc[X.index <= pd.Timestamp(self.training_cutoff)].copy()
+
         # Component orientation is already applied to each transformed feature,
         # so all inputs should now have positive expected loadings.
         sign_constraints = {col: 1 for col in X.columns}
@@ -573,6 +584,8 @@ class GLCIComputer:
                     print(f"  ✗ Loading sign audit failed: {sign_error}")
                 raise
         
+        if self.artifact_sink is not None:
+            self.artifact_sink(pillar_name, model, X)
         factor_result = model.get_result()
         sign_violations = find_sign_violations(
             factor_result.loadings,

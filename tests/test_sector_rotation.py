@@ -170,6 +170,20 @@ OCC_REPORT = """quantity,underlying,symbol,actype,porc,exchange,actdate
 
 
 class TestOCCOptionsClient:
+    @pytest.mark.parametrize(
+        ("as_of", "expected"),
+        [(date(2026, 9, 11), date(2026, 9, 4)),
+         (date(2026, 9, 12), date(2026, 9, 11))],
+    )
+    def test_weekly_report_must_precede_date_only_cutoff(self, as_of, expected):
+        report = OCC_REPORT.replace("XLK", "SPY").replace(
+            "07/10/2026", expected.strftime("%m/%d/%Y")
+        )
+        session = StubSession(StubResponse(text=report))
+        client = OCCOptionsClient(session=session)
+        assert client.latest_completed_week(as_of=as_of) == expected
+        assert session.calls[0][1]["params"]["reportDate"] == expected.strftime("%Y%m%d")
+
     def test_trailing_comma_parsing_and_standard_root_aggregation(self):
         response = StubResponse(text=OCC_REPORT)
         session = StubSession(response)

@@ -2,6 +2,7 @@
 import pandas as pd
 import requests
 from pathlib import Path
+from datetime import date
 from .base import BaseClient
 
 
@@ -66,22 +67,32 @@ class WorldBankClient(BaseClient):
             "per_page": 1000,
         }
         
-        if start_date:
-            params["date"] = f"{start_date[:4]}:{end_date[:4] if end_date else '2025'}"
+        if start_date or end_date:
+            params['date'] = f"{start_date[:4] if start_date else '1960'}:{end_date[:4] if end_date else date.today().year}"
         
         try:
-            response = self.session.get(url, params=params, timeout=30)
-            response.raise_for_status()
-            
-            data = response.json()
-            df = self._parse_response(data)
-            
-            # Add country column before standardizing
-            if "country" not in df.columns:
-                df["country"] = country
-            
-            return self._standardize_output(df, series_id)
-            
+            pages, page, total, updated = [], 1, None, None
+            while True:
+                response = self.session.get(url, params={**params, 'page':page}, timeout=30)
+                response.raise_for_status()
+                data = response.json()
+                if not isinstance(data,list) or len(data)!=2:
+                    raise ValueError('Invalid World Bank response')
+                meta, items = data
+                if total is None:
+                    total, updated = int(meta['total']), meta.get('lastupdated')
+                if int(meta['total'])!=total or meta.get('lastupdated')!=updated or int(meta['pages'])>1000:
+                    raise ValueError('Unstable or excessive World Bank pagination')
+                pages.extend(items or [])
+                if page>=int(meta['pages']): break
+                page+=1
+            if len(pages)!=total:
+                raise ValueError('Incomplete World Bank response')
+            df=self._parse_response([{},pages])
+            result=self._standardize_output(df,series_id)
+            result['country']=df['country'] if 'country' in df else country
+            return result
+
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Failed to fetch World Bank indicator {series_id}: {e}")
     

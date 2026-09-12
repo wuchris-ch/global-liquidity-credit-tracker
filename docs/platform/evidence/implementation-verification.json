@@ -1,0 +1,508 @@
+{
+  "checked_at": "2026-09-11T23:55:55.757899+00:00",
+  "benchmark": {
+    "cache": "mixed OS cache; no claim of controlled cold-cache measurements",
+    "concurrency": 1,
+    "environment": {
+      "calculator": "8ec4989a6962ecde0d1a3ab53de8958acbfaa1e347b284a05369c02dfe614157",
+      "code": {
+        "config/series.yml": "7fffdf256d9d6117b1e4f776bf72be7f2e839c5072cb0a9a481b11de3aa7d761",
+        "src/__init__.py": "7351fb22067db1fe467c8ad9e5a4206dec8dee7fa2c229eda5ffd2d13eedd07d",
+        "src/api/__init__.py": "3f757f9dfe40f24bc82a962e15b3a2a5ad25268d9024f3d72e1452bdb1c477f3",
+        "src/api/server.py": "8e2963fbf4be1badf4f975537ba004cddecad9bb934f5ca856c175d844f6251e",
+        "src/config.py": "e5728aca94e865c19e53f15177deeaeb5ae71e9312618147b912c92820cf8829",
+        "src/data_quality.py": "c167d2197060dbb928456626854b16df6cf478924a52ee4be031750783dfcb00",
+        "src/data_sources/__init__.py": "92265b7214f1b709a956219a814af9e14a6a10d595013b5e6a9c3a3fce975f93",
+        "src/data_sources/base.py": "d1cb73cf31e9bf9bb174d6d7913bd1b58be68d8481abea9a0dc9fc9b3bcea18c",
+        "src/data_sources/bis.py": "8ff09937ee2b7761e6adcac17ef5faada38e4b3dcc59ab42844ebb58eff62472",
+        "src/data_sources/fred.py": "398d51454350e7cec77d78ec5abff4f0f02dca41c0396a71a4414d8ff8baef10",
+        "src/data_sources/http.py": "38bbad0609210ab977d522439e40c374529f46cb09372690f1f0da16aaf2e271",
+        "src/data_sources/nyfed.py": "a3280954e074f9a0c4952b42baee23402326725904ecd4f3d4b8d9178e582bd8",
+        "src/data_sources/occ.py": "5c9f9e9bff4659f6b6fbb6b035b351f14d4d236d102c6af0b6a6159b8d7c19e6",
+        "src/data_sources/state_street.py": "65899692897e04f0dc0be102f71b8b793f80667e0dcb33524ddb999293476f8b",
+        "src/data_sources/worldbank.py": "ffef538cd6fc0c65bbc3d257a8f7aecda42b0f1950f73d8ed0e807153b80e50a",
+        "src/data_sources/yfinance_client.py": "1f4b7cc7b240e02746f8b7e6caa28a3e11899355c688fb6ba2006cd6334c974b",
+        "src/etl/__init__.py": "3a0005f4985e0275a9e9ee6cea5c14ea7d76edf4f623a3470d1c5d9e14ebe3b7",
+        "src/etl/fetcher.py": "d484f91e5e987fda1f77102f89ad291fe79acd01b524da94cb65684f26d07401",
+        "src/etl/storage.py": "8d8545ca3b75d44800f48aeef3e801292ba42792596ecbaa920784cf5d77f101",
+        "src/indicators/__init__.py": "a52decf985d50f8b7bdb4c66ec45b62a09f3d71997de26553761e25a5d1a0e75",
+        "src/indicators/aggregator.py": "6d323ea4cd4a946af65cc4ca9b2f8c567e8c4f907d9b9fd2624d08585a31cc2e",
+        "src/indicators/backtest.py": "0ee7fef26c4cd51fced6abd8b4a70e2e4b34a499276eadec1df239221bd875d7",
+        "src/indicators/dynamic_factor.py": "4ced90e1119b45687f978a3d426de5e4ada0142414a76bb023db0e4ff4c419f6",
+        "src/indicators/factors.py": "ce3090ee7bb63959ef3767682dd43f3454bfadb062a70175149c6b1605646327",
+        "src/indicators/flows.py": "c87867090eec39a6fbd15fe57d8f79b3e970eda562ddf4693f1714844bc3a0f7",
+        "src/indicators/glci.py": "55a970c9787ee4cf9d2021becc4b352e585de07c1ee8f02344cf319db8393bfd",
+        "src/indicators/live_evaluation.py": "363a526d6841c00b169881801fd6b8b08ecb9a529727755399b4e5f821822c45",
+        "src/indicators/risk_metrics.py": "b9bb313ef93181fda9fc3efc23d0e500c458f8c43c14c55b9afb6ead6c4bf3b2",
+        "src/indicators/sector_rotation.py": "3d692067ec81f92b8164c0250358c16e3db614c29417025cc46e5c8e1307e451",
+        "src/indicators/transforms.py": "c772d985de692a9438ef525a71e8c0e0ebfa2dad53d71c8996856a406b5da255",
+        "src/research/__init__.py": "2f09c2c73da12a36e77be79750abd4d04eddb214edf5aae44e516ac2ff7a9f9f",
+        "src/research/api.py": "8a1e34afe590e9e7ea9bff21381d9b72f77070cbc1abe417bb8af641232fd090",
+        "src/research/assistant.py": "a5ebbb42df34d25a88ce229233130a95f16eaa1e3ba0c67685259ea90ad547c8",
+        "src/research/auth.py": "2fa57351a7c2408e1281567e65a86a28357f56bb670e10275a79e34431c5f096",
+        "src/research/calculations.py": "8ec4989a6962ecde0d1a3ab53de8958acbfaa1e347b284a05369c02dfe614157",
+        "src/research/cli.py": "164b93e231ce4e365c6ee2214aea5eb39db722077aa52bb258e786a881149399",
+        "src/research/contracts.py": "872110e4474805d49457c6ff9e0f6884962ee8e8af07baabdd938f7f459f413e",
+        "src/research/control.py": "354a7fc047f39491bfc7d36dd6d5b921bb42f53ce34eacc86457c1b9d1549811",
+        "src/research/evaluation.py": "09882afa13751d42ddc54c82586f6ad7204abddc577d95d86a55748b25e0f209",
+        "src/research/fencing.py": "f36bfb65d674a56b3ad4fa18f0469ab24141197c3c8c6b372cdfb35a0045a996",
+        "src/research/ingestion.py": "d30ab2325ff123118c4b46bc6dd5811cd66e474adecd88332e55ef5bce680682",
+        "src/research/models.py": "8ed78f3057e1ea472d4f0a6f700ae959a7f3931e3b0237103ed9347145625c7f",
+        "src/research/operations.py": "9ed05101af50a1b32c58c88d50222a066f99fcfc49e5cb356f76545b329a7f82",
+        "src/research/outcomes.py": "bdf2a50cda11420163a5ea1159212daed227a56c8dd07f889976f1fc3ef8b0c9",
+        "src/research/scheduler.py": "7de890af4f512af5c7f80217ce0e4b769e74791132dcc07c9ec6d6835f1affb2",
+        "src/research/service.py": "80aa6b25d8ae6eab8f7c7608491072220fdc7a1ed7e6a6e92020623dc7f9c40f",
+        "src/research/source_metadata.py": "229f4fe0df340a343de39fdb520511174a3597c42bf916b5d20c0c2faa503fe8",
+        "src/research/storage.py": "ff73be3d73ef0f0504d88ab145eba21d55bbe4ee55d30833ba8146cf6aa9105e",
+        "src/research/worker.py": "c1282e022ac0b76e1cbb5a451ea902e26eb0e644752eff74a85103adf8845177"
+      },
+      "lock": "9f6339df7c8931d4f5b6e624c35e19d9a27401d3fa1ed82ebef2c17d2264ff18",
+      "packages": [
+        [
+          "PyJWT",
+          "2.14.0"
+        ],
+        [
+          "PyYAML",
+          "6.0.3"
+        ],
+        [
+          "Pygments",
+          "2.21.0"
+        ],
+        [
+          "SQLAlchemy",
+          "2.0.52"
+        ],
+        [
+          "annotated-doc",
+          "0.0.5"
+        ],
+        [
+          "annotated-types",
+          "0.8.0"
+        ],
+        [
+          "anyio",
+          "4.15.1"
+        ],
+        [
+          "beautifulsoup4",
+          "4.15.0"
+        ],
+        [
+          "black",
+          "26.5.1"
+        ],
+        [
+          "certifi",
+          "2026.7.22"
+        ],
+        [
+          "cffi",
+          "2.1.1"
+        ],
+        [
+          "charset-normalizer",
+          "3.5.1"
+        ],
+        [
+          "click",
+          "8.5.0"
+        ],
+        [
+          "cloudpickle",
+          "3.1.2"
+        ],
+        [
+          "cryptography",
+          "50.0.1"
+        ],
+        [
+          "curl_cffi",
+          "0.16.3"
+        ],
+        [
+          "duckdb",
+          "1.5.5"
+        ],
+        [
+          "et_xmlfile",
+          "2.0.0"
+        ],
+        [
+          "fastapi",
+          "0.141.1"
+        ],
+        [
+          "formulaic",
+          "1.2.2"
+        ],
+        [
+          "fredapi",
+          "0.5.2"
+        ],
+        [
+          "global-liquidity-tracker",
+          "0.1.0"
+        ],
+        [
+          "global-liquidity-tracker",
+          "0.1.0"
+        ],
+        [
+          "h11",
+          "0.16.0"
+        ],
+        [
+          "httpcore",
+          "1.0.9"
+        ],
+        [
+          "httptools",
+          "0.8.0"
+        ],
+        [
+          "httpx",
+          "0.28.1"
+        ],
+        [
+          "idna",
+          "3.19"
+        ],
+        [
+          "iniconfig",
+          "2.3.0"
+        ],
+        [
+          "interface_meta",
+          "2.0.1"
+        ],
+        [
+          "joblib",
+          "1.6.0"
+        ],
+        [
+          "lxml",
+          "6.1.3"
+        ],
+        [
+          "multitasking",
+          "0.0.13"
+        ],
+        [
+          "mypy_extensions",
+          "1.1.0"
+        ],
+        [
+          "narwhals",
+          "2.26.0"
+        ],
+        [
+          "numpy",
+          "2.4.6"
+        ],
+        [
+          "openpyxl",
+          "3.1.5"
+        ],
+        [
+          "packaging",
+          "26.3"
+        ],
+        [
+          "pandaSDMX",
+          "1.9.0"
+        ],
+        [
+          "pandas",
+          "3.0.5"
+        ],
+        [
+          "pathspec",
+          "1.1.1"
+        ],
+        [
+          "patsy",
+          "1.0.3"
+        ],
+        [
+          "peewee",
+          "4.5.1"
+        ],
+        [
+          "platformdirs",
+          "4.11.8"
+        ],
+        [
+          "pluggy",
+          "1.6.0"
+        ],
+        [
+          "protobuf",
+          "7.36.1"
+        ],
+        [
+          "psycopg",
+          "3.3.5"
+        ],
+        [
+          "psycopg-binary",
+          "3.3.5"
+        ],
+        [
+          "pyarrow",
+          "25.0.1"
+        ],
+        [
+          "pycparser",
+          "3.0"
+        ],
+        [
+          "pydantic",
+          "2.13.5"
+        ],
+        [
+          "pydantic_core",
+          "2.46.5"
+        ],
+        [
+          "pytest",
+          "9.1.1"
+        ],
+        [
+          "python-dateutil",
+          "2.9.0.post0"
+        ],
+        [
+          "python-dotenv",
+          "1.2.3"
+        ],
+        [
+          "pytokens",
+          "0.4.1"
+        ],
+        [
+          "pytz",
+          "2026.3.post1"
+        ],
+        [
+          "requests",
+          "2.34.2"
+        ],
+        [
+          "ruff",
+          "0.16.7"
+        ],
+        [
+          "scikit-learn",
+          "1.9.1"
+        ],
+        [
+          "scipy",
+          "1.17.1"
+        ],
+        [
+          "six",
+          "1.17.0"
+        ],
+        [
+          "soupsieve",
+          "2.9.2"
+        ],
+        [
+          "starlette",
+          "1.6.0"
+        ],
+        [
+          "statsmodels",
+          "0.15.0"
+        ],
+        [
+          "threadpoolctl",
+          "3.6.0"
+        ],
+        [
+          "typing-inspection",
+          "0.4.4"
+        ],
+        [
+          "typing_extensions",
+          "4.16.0"
+        ],
+        [
+          "urllib3",
+          "2.7.0"
+        ],
+        [
+          "uvicorn",
+          "0.52.4"
+        ],
+        [
+          "uvloop",
+          "0.22.1"
+        ],
+        [
+          "watchfiles",
+          "1.2.0"
+        ],
+        [
+          "websockets",
+          "17.1"
+        ],
+        [
+          "wrapt",
+          "2.4.1"
+        ],
+        [
+          "yfinance",
+          "1.7.0"
+        ]
+      ],
+      "platform": "macOS-26.5-arm64-arm-64bit",
+      "python": "3.11.14 (main, Dec  5 2025, 21:28:33) [Clang 21.1.4 ]"
+    },
+    "ingestion_seconds": 6.925948457996128,
+    "logical_query_hash": "cdfb62877772e8f6c66bab13c08501e09aa5b9d7eef7fc0169cf5694356434ec",
+    "measured_at": "2026-09-11",
+    "peak_rss_bytes": 176766976,
+    "period": [
+      "1990-01-01",
+      "2017-05-18"
+    ],
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "query_count": 100,
+    "query_ms": {
+      "max": 25.862166978185996,
+      "p50": 8.044354006415233,
+      "p95": 9.443333983654156
+    },
+    "query_rows": 365,
+    "rows": 1000000,
+    "series": 100
+  },
+  "model": {
+    "cutoff": "2026-09-04",
+    "glci_hash": "3072eb82b2303c77abc41ed28d5f65d2871d75eff9546dd5fbc83300ba2dc677",
+    "inputs": 21,
+    "interpretation": "current-vintage reconstruction, not a historical platform prediction",
+    "model_run_id": "6f96bec7b7fd36b5a22f6a3de60e1908d0915596d41087769b682dfd8569b26f",
+    "observations": 136,
+    "pillar_artifacts": 3,
+    "regime_coverage": "available",
+    "seconds_two_runs": 7.304938458983088,
+    "status": "passed"
+  },
+  "sources": [
+    {
+      "series": "fred:WALCL",
+      "unit": "millions USD",
+      "mode": "source_vintage",
+      "rows": 3,
+      "logical_hash": "32f6157cd518e1189d66219c062dd4b1b3522720dbb88be9b88b40a3fee1d725"
+    },
+    {
+      "series": "fred:RRPONTSYD",
+      "unit": "billions USD",
+      "mode": "source_vintage",
+      "rows": 11,
+      "logical_hash": "3139b94dd028b6c40eabb19351c710590232090a29ba7d377bcc59e45e73c5c1"
+    },
+    {
+      "series": "nyfed:sofr",
+      "unit": "percent",
+      "mode": "forward_capture",
+      "rows": 11,
+      "logical_hash": "88bdedd5f961e5a7e859e162c3a8bf571702dec0a4e25f86c88129a8e9503680"
+    },
+    {
+      "series": "worldbank:NY.GDP.MKTP.CD",
+      "unit": "current USD",
+      "mode": "forward_capture",
+      "rows": 2,
+      "logical_hash": "a99f0534c3dcf7bfc071a0f9a3b22eedebdfc7cd2d8bcaa447d3a5de022439ad"
+    },
+    {
+      "series": "fred:WTREGEN",
+      "unit": "billions USD",
+      "mode": "source_vintage",
+      "rows": 3,
+      "logical_hash": "6e13a582cca9a526bb6a40b8f01892d4a5afeba86c766f16a707d95921545625"
+    },
+    {
+      "series": "bis:credit:USA",
+      "unit": "billions USD",
+      "mode": "forward_capture",
+      "rows": 2,
+      "logical_hash": "c799365468b9ec3dd99974f877b5e4669780c884524d84b74b4cf51bc21c8ead"
+    }
+  ],
+  "postgres": {
+    "status": "passed",
+    "concurrent_claim_winners": 1,
+    "isolated_workspaces": 2,
+    "cross_workspace_denial": true,
+    "postgres_to_sqlite_restore": true
+  },
+  "container": {
+    "build": "passed",
+    "offline_demo": "passed"
+  },
+  "browser": {
+    "desktop_revision": "1.6 to 1.3, difference -0.3",
+    "narrow_viewport_width": 390,
+    "annotation_saved": true,
+    "independent_user_trial": false,
+    "watchlist_saved": true
+  },
+  "assistant": {
+    "suite_hash": "aa06c44931636963f8b0d3e58d604f7a97cc7dfd2147e52ce905884bee1eb1f9",
+    "cases": 40,
+    "passed": 40,
+    "deterministic": true,
+    "external_model_calls": 0,
+    "model_cost_usd": 0,
+    "holdout": false,
+    "limits": "Implementation regression corpus, not an independent held-out model-quality evaluation. No retrieval recall claim."
+  },
+  "hardware": {
+    "processor": "Apple M1 Max",
+    "memory_bytes": 68719476736
+  },
+  "final_model_replay": {
+    "run_id": "79189868359b7202f983f09582f6021d8bf0d08ce372bec0ea29295e094ef781",
+    "logical_output_hash": "3072eb82b2303c77abc41ed28d5f65d2871d75eff9546dd5fbc83300ba2dc677",
+    "rows": 136,
+    "regime_coverage": "available",
+    "status": "passed"
+  },
+  "tests": {
+    "tests": "237",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "1",
+    "time": "8.431",
+    "passed": 236
+  },
+  "catalog_series": 22,
+  "client_checks": {
+    "passed": 8,
+    "scope": "safe network retries, stable idempotency keys, non-retried unsafe mutations and deployment availability"
+  },
+  "release_preflight": {
+    "tests": {
+      "tests": "239",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "1",
+      "time": "6.338"
+    },
+    "passed": 238,
+    "occ": {
+      "cutoff": "2026-09-11",
+      "selected_week": "2026-09-04",
+      "live_result": "success"
+    },
+    "production_frontend_gate": "verified on local production build for /, /flows and /research"
+  }
+}

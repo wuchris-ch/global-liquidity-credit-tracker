@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-13T01:55:53.611652",
+  "computed_at": "2026-09-13T15:16:53.715800",
   "as_of": "2026-09-11",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1804,7 +1804,7 @@
         },
         {
           "date": "2025-10-10",
-          "value": 86.9516
+          "value": 86.9517
         },
         {
           "date": "2025-10-17",
@@ -1812,7 +1812,7 @@
         },
         {
           "date": "2025-10-24",
-          "value": 87.7673
+          "value": 87.7672
         },
         {
           "date": "2025-10-31",
@@ -1964,7 +1964,7 @@
         },
         {
           "date": "2026-07-17",
-          "value": 83.8596
+          "value": 83.8595
         },
         {
           "date": "2026-07-24",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-09-13T01:56:11.145905Z",
+    "computed_at": "2026-09-13T15:17:10.805864Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -2788,7 +2788,7 @@
         "excess_126d": 0.024839,
         "relative_strength": 0.037383,
         "acceleration": -0.017605,
-        "absolute_trend": 1.826836,
+        "absolute_trend": 1.826835,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2935,13 +2935,13 @@
         "price_as_of": "2026-09-11",
         "return_21d": -0.075458,
         "return_63d": -0.013542,
-        "return_126d": 0.047507,
+        "return_126d": 0.047508,
         "excess_21d": -0.064786,
         "excess_63d": -0.051444,
         "excess_126d": -0.09536,
         "relative_strength": -0.073402,
         "acceleration": -0.047638,
-        "absolute_trend": 0.407855,
+        "absolute_trend": 0.407856,
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {

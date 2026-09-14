@@ -7,16 +7,16 @@
   "annualized_volatility": 92.84,
   "max_drawdown": -94.01,
   "sharpe_by_regime": {
-    "tight": -0.34,
-    "neutral": 0.21,
-    "loose": -0.25
+    "tight": 0.16,
+    "neutral": -0.37,
+    "loose": 0.4
   },
   "return_by_regime": {
-    "tight": -40.24,
-    "neutral": 18.15,
-    "loose": -11.01
+    "tight": 23.7,
+    "neutral": -21.01,
+    "loose": 29.02
   },
-  "correlation_with_glci": 0.093,
+  "correlation_with_glci": 0.103,
   "rolling_sharpe": [
     {
       "date": "2017-05-20",

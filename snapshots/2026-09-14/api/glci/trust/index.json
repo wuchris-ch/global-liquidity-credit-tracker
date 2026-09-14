@@ -4,26 +4,26 @@
   "point_in_time": false,
   "frequency": "W-FRI",
   "snapshots": {
-    "count": 115,
+    "count": 116,
     "unique_signal_dates": 10,
-    "duplicate_vintages": 105,
+    "duplicate_vintages": 106,
     "first_signal_date": "2026-07-10",
     "latest_signal_date": "2026-09-11",
     "first_computed_at": "2026-07-11T04:12:17.432117Z",
-    "last_computed_at": "2026-09-14T02:12:59.936152Z",
+    "last_computed_at": "2026-09-14T17:12:36.644341Z",
     "latest_signal_revision": {
-      "vintage_count": 7,
+      "vintage_count": 8,
       "first_glci": 110.7245710336764,
-      "latest_glci": 110.7245710336764,
-      "glci_change": 0,
+      "latest_glci": 113.1846683126213,
+      "glci_change": 2.4600972789449003,
       "glci_min": 110.7245710336764,
-      "glci_max": 110.7245710336764,
+      "glci_max": 113.1846683126213,
       "first_zscore": 0.8430204584915226,
-      "latest_zscore": 0.8430204584915227,
-      "zscore_change": 1.1102230246251565e-16,
+      "latest_zscore": 1.1200854250688672,
+      "zscore_change": 0.2770649665773446,
       "first_regime": "neutral",
-      "latest_regime": "neutral",
-      "regime_changed": false
+      "latest_regime": "loose",
+      "regime_changed": true
     }
   },
   "data_quality": {
@@ -96,20 +96,20 @@
     },
     "credit": {
       "method": "pca_shrunk",
-      "explained_variance": 0.3797472682556151,
+      "explained_variance": 0.3783417362514786,
       "n_variables": 14,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 21,
       "constraint_exclusion_share": 0.125,
-      "max_series_loading_share": 0.19478428075410287,
+      "max_series_loading_share": 0.195516948530196,
       "series_loading_shares": {
-        "bis_credit_eu": 0.09823344186069313,
-        "bis_credit_jp": 0.047000116161649785,
-        "bis_credit_us": 0.19430161295562712,
-        "us_bank_credit_total": 0.18622616536461414,
-        "us_bank_loans_leases": 0.19478428075410287,
-        "us_commercial_paper": 0.12086791912639763,
-        "us_consumer_credit": 0.15858646377691535
+        "bis_credit_eu": 0.09543735093341947,
+        "bis_credit_jp": 0.04723254085552857,
+        "bis_credit_us": 0.19530449416044676,
+        "us_bank_credit_total": 0.18682915354391916,
+        "us_bank_loans_leases": 0.195516948530196,
+        "us_commercial_paper": 0.1210608744105989,
+        "us_consumer_credit": 0.15861863756589115
       },
       "data_quality": {
         "total_series": 8,
@@ -144,17 +144,17 @@
     },
     "stress": {
       "method": "pca_shrunk",
-      "explained_variance": 0.5319340947352936,
+      "explained_variance": 0.5317044060957012,
       "n_variables": 4,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 13,
       "constraint_exclusion_share": 0.3333333333333333,
-      "max_series_loading_share": 0.26655238130393805,
+      "max_series_loading_share": 0.2665876691535897,
       "series_loading_shares": {
-        "ice_bofa_us_high_yield_spread": 0.26655238130393805,
-        "ice_bofa_us_ig_spread": 0.26159984584851065,
-        "nfci": 0.23548100051851878,
-        "vix": 0.23636677232903258
+        "ice_bofa_us_high_yield_spread": 0.2665876691535897,
+        "ice_bofa_us_ig_spread": 0.26135521497661507,
+        "nfci": 0.23574207956660914,
+        "vix": 0.23631503630318618
       },
       "data_quality": {
         "total_series": 6,

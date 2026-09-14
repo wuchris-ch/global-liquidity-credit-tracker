@@ -7,16 +7,16 @@
   "annualized_volatility": 33.47,
   "max_drawdown": -45.3,
   "sharpe_by_regime": {
-    "tight": null,
-    "neutral": 0.53,
-    "loose": 1.77
+    "tight": 1.16,
+    "neutral": 0.26,
+    "loose": 1.8
   },
   "return_by_regime": {
-    "tight": null,
-    "neutral": 23.25,
-    "loose": 72.95
+    "tight": 89.49,
+    "neutral": 13.86,
+    "loose": 73.09
   },
-  "correlation_with_glci": 0.405,
+  "correlation_with_glci": 0.403,
   "rolling_sharpe": [
     {
       "date": "2017-09-18",
@@ -2996,7 +2996,7 @@
     },
     {
       "date": "2020-09-01",
-      "value": 1.313
+      "value": 1.312
     },
     {
       "date": "2020-09-02",
@@ -4600,7 +4600,7 @@
     },
     {
       "date": "2022-04-05",
-      "value": 0.234
+      "value": 0.233
     },
     {
       "date": "2022-04-06",
@@ -6808,7 +6808,7 @@
     },
     {
       "date": "2024-06-17",
-      "value": 2.049
+      "value": 2.05
     },
     {
       "date": "2024-06-18",

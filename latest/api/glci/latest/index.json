@@ -1,8 +1,8 @@
 {
   "date": "2026-09-11",
-  "value": 110.7245710336764,
-  "zscore": 0.8430204584915227,
-  "regime": 0,
-  "regime_label": "neutral",
-  "momentum": 0.5556291774060185
+  "value": 113.1846683126213,
+  "zscore": 1.1200854250688672,
+  "regime": 1,
+  "regime_label": "loose",
+  "momentum": 0.558810364136491
 }

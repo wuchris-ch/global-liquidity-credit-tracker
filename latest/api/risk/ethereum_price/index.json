@@ -9,12 +9,12 @@
   "sharpe_by_regime": {
     "tight": 0.16,
     "neutral": -0.37,
-    "loose": 0.42
+    "loose": 0.58
   },
   "return_by_regime": {
     "tight": 23.7,
     "neutral": -21.01,
-    "loose": 30.4
+    "loose": 39.91
   },
   "correlation_with_glci": 0.103,
   "rolling_sharpe": [

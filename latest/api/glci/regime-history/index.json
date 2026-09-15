@@ -1,11 +1,6 @@
 {
   "periods": [
     {
-      "regime": "loose",
-      "start": "2024-06-07",
-      "end": "2024-06-14"
-    },
-    {
       "regime": "neutral",
       "start": "2024-06-14",
       "end": "2024-07-05"
@@ -138,7 +133,7 @@
   ],
   "counts": {
     "neutral": 59,
-    "loose": 55,
+    "loose": 54,
     "tight": 5
   },
   "current": "loose"

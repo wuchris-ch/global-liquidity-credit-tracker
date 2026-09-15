@@ -9,12 +9,12 @@
   "sharpe_by_regime": {
     "tight": 1.16,
     "neutral": 0.26,
-    "loose": 1.67
+    "loose": 1.54
   },
   "return_by_regime": {
     "tight": 89.49,
     "neutral": 13.86,
-    "loose": 68.22
+    "loose": 63.88
   },
   "correlation_with_glci": 0.403,
   "rolling_sharpe": [
@@ -2992,7 +2992,7 @@
     },
     {
       "date": "2020-09-01",
-      "value": 1.312
+      "value": 1.313
     },
     {
       "date": "2020-09-02",
@@ -6804,7 +6804,7 @@
     },
     {
       "date": "2024-06-17",
-      "value": 2.049
+      "value": 2.05
     },
     {
       "date": "2024-06-18",

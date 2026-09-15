@@ -9,14 +9,14 @@
   "sharpe_by_regime": {
     "tight": 0.48,
     "neutral": 0.08,
-    "loose": 2.03
+    "loose": 1.94
   },
   "return_by_regime": {
     "tight": 23.84,
     "neutral": 5.52,
-    "loose": 28.69
+    "loose": 27.77
   },
-  "correlation_with_glci": 0.403,
+  "correlation_with_glci": 0.404,
   "rolling_sharpe": [
     {
       "date": "2017-09-15",

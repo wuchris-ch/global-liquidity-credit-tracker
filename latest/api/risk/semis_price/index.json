@@ -4,7 +4,7 @@
   "category": "AI Trade",
   "current_sharpe": 0.96,
   "annualized_return": 34.55,
-  "annualized_volatility": 33.51,
+  "annualized_volatility": 33.5,
   "max_drawdown": -45.3,
   "sharpe_by_regime": {
     "tight": 1.16,
@@ -14,7 +14,7 @@
   "return_by_regime": {
     "tight": 89.49,
     "neutral": 13.86,
-    "loose": 63.88
+    "loose": 63.74
   },
   "correlation_with_glci": 0.403,
   "rolling_sharpe": [
@@ -460,7 +460,7 @@
     },
     {
       "date": "2018-02-27",
-      "value": 1.832
+      "value": 1.831
     },
     {
       "date": "2018-02-28",
@@ -9049,6 +9049,10 @@
     {
       "date": "2026-09-14",
       "value": 1.567
+    },
+    {
+      "date": "2026-09-15",
+      "value": 1.566
     }
   ]
 }

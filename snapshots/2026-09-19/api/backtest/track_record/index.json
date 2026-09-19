@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-19T02:08:06.933554",
+  "computed_at": "2026-09-19T15:01:00.865071",
   "date_range": {
     "start": "2024-06-14",
     "end": "2026-09-18"
@@ -1682,7 +1682,7 @@
       "category": "Large Cap Equities",
       "base_rates": {
         "4": {
-          "median": 0.011269,
+          "median": 0.012137,
           "hit_rate": 0.6491,
           "n": 114
         },
@@ -1813,7 +1813,7 @@
           },
           "loose": {
             "4": {
-              "median": 0.006383,
+              "median": 0.007122,
               "p25": -0.022555,
               "p75": 0.03136,
               "hit_rate": 0.566,
@@ -1983,7 +1983,7 @@
           },
           "loose": {
             "4": {
-              "median": 0.00738,
+              "median": 0.007602,
               "p25": -0.023004,
               "p75": 0.034138,
               "hit_rate": 0.58,
@@ -2420,7 +2420,7 @@
           "n": 105
         },
         "26": {
-          "median": 0.120295,
+          "median": 0.120294,
           "hit_rate": 0.7391,
           "n": 92
         }
@@ -2505,7 +2505,7 @@
             "13": {
               "median": 0.075305,
               "p25": 0.018904,
-              "p75": 0.125041,
+              "p75": 0.125042,
               "hit_rate": 0.8148,
               "n": 54,
               "ci_median_low": 0.031199,
@@ -2521,8 +2521,8 @@
               "fdr_significant": false
             },
             "26": {
-              "median": 0.139429,
-              "p25": 0.089134,
+              "median": 0.13943,
+              "p25": 0.089135,
               "p75": 0.191933,
               "hit_rate": 0.9423,
               "n": 52,
@@ -2560,7 +2560,7 @@
             },
             "13": {
               "median": 0.04291,
-              "p25": -0.015713,
+              "p25": -0.015712,
               "p75": 0.076678,
               "hit_rate": 0.6957,
               "n": 46,
@@ -2578,7 +2578,7 @@
             },
             "26": {
               "median": -0.018439,
-              "p25": -0.092274,
+              "p25": -0.092273,
               "p75": 0.124148,
               "hit_rate": 0.4,
               "n": 35,
@@ -2713,7 +2713,7 @@
             "4": {
               "median": 0.012179,
               "p25": -0.046945,
-              "p75": 0.037844,
+              "p75": 0.037845,
               "hit_rate": 0.6,
               "n": 50,
               "ci_median_low": -0.024362,
@@ -2735,7 +2735,7 @@
               "hit_rate": 0.8182,
               "n": 44,
               "ci_median_low": 0.008892,
-              "ci_median_high": 0.09792,
+              "ci_median_high": 0.097919,
               "ci_hit_rate_low": 0.5556,
               "ci_hit_rate_high": 1.0,
               "edge": -0.0448,
@@ -2747,7 +2747,7 @@
               "fdr_significant": false
             },
             "26": {
-              "median": 0.139429,
+              "median": 0.13943,
               "p25": 0.104416,
               "p75": 0.181351,
               "hit_rate": 0.9545,
@@ -4343,7 +4343,7 @@
             "26": {
               "median": 1.282168,
               "p25": 0.191317,
-              "p75": 4.967111,
+              "p75": 5.311486,
               "hit_rate": 0.8462,
               "n": 52,
               "ci_median_low": 0.251358,
@@ -4689,7 +4689,7 @@
             "13": {
               "median": 0.001009,
               "p25": -0.023665,
-              "p75": 0.030802,
+              "p75": 0.030801,
               "hit_rate": 0.5185,
               "n": 54,
               "ci_median_low": -0.018898,
@@ -4743,7 +4743,7 @@
               "fdr_significant": false
             },
             "13": {
-              "median": -0.017369,
+              "median": -0.01737,
               "p25": -0.043009,
               "p75": 0.006149,
               "hit_rate": 0.3261,
@@ -4844,7 +4844,7 @@
               "p75": 0.014656,
               "hit_rate": 0.4333,
               "n": 30,
-              "ci_median_low": -0.016412,
+              "ci_median_low": -0.016413,
               "ci_median_high": 0.009003,
               "ci_hit_rate_low": 0.2159,
               "ci_hit_rate_high": 0.6571,
@@ -4900,7 +4900,7 @@
               "p75": 0.01695,
               "hit_rate": 0.56,
               "n": 50,
-              "ci_median_low": -0.008051,
+              "ci_median_low": -0.008052,
               "ci_median_high": 0.01387,
               "ci_hit_rate_low": 0.3947,
               "ci_hit_rate_high": 0.7562,
@@ -4965,9 +4965,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 125,
+      "vintage_count": 126,
       "unique_signal_dates": 11,
-      "duplicate_vintages": 114,
+      "duplicate_vintages": 115,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-09-18"
     },
@@ -5112,12 +5112,12 @@
         "horizons": {
           "4": {
             "issued": 11,
-            "matured": 5,
-            "pending": 6,
+            "matured": 6,
+            "pending": 5,
             "unavailable": 0,
             "median": null,
             "hit_rate": null,
-            "next_maturity_date": "2026-09-18",
+            "next_maturity_date": "2026-09-25",
             "status": "collecting",
             "by_regime": {
               "tight": {
@@ -5132,12 +5132,12 @@
               },
               "neutral": {
                 "issued": 10,
-                "matured": 4,
-                "pending": 6,
+                "matured": 5,
+                "pending": 5,
                 "unavailable": 0,
                 "median": null,
                 "hit_rate": null,
-                "next_maturity_date": "2026-09-18",
+                "next_maturity_date": "2026-09-25",
                 "status": "collecting"
               },
               "loose": {
@@ -6043,12 +6043,12 @@
         "horizons": {
           "4": {
             "issued": 11,
-            "matured": 5,
-            "pending": 6,
+            "matured": 6,
+            "pending": 5,
             "unavailable": 0,
             "median": null,
             "hit_rate": null,
-            "next_maturity_date": "2026-09-18",
+            "next_maturity_date": "2026-09-25",
             "status": "collecting",
             "by_regime": {
               "tight": {
@@ -6063,12 +6063,12 @@
               },
               "neutral": {
                 "issued": 10,
-                "matured": 4,
-                "pending": 6,
+                "matured": 5,
+                "pending": 5,
                 "unavailable": 0,
                 "median": null,
                 "hit_rate": null,
-                "next_maturity_date": "2026-09-18",
+                "next_maturity_date": "2026-09-25",
                 "status": "collecting"
               },
               "loose": {

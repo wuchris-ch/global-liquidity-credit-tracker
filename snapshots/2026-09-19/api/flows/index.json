@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-19T02:08:09.110752",
+  "computed_at": "2026-09-19T15:01:02.542280",
   "as_of": "2026-09-18",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -232,14 +232,10 @@
       "series_id": "nasdaq100",
       "name": "Nasdaq 100",
       "group": "AI trade",
-      "last_date": "2026-09-11",
-      "flow_z": -0.8,
-      "glci_corr_52w": 0.26,
+      "last_date": "2026-09-18",
+      "flow_z": -0.99,
+      "glci_corr_52w": 0.28,
       "spark": [
-        {
-          "date": "2025-09-19",
-          "value": 24626.25
-        },
         {
           "date": "2025-09-26",
           "value": 24503.85
@@ -443,11 +439,15 @@
         {
           "date": "2026-09-11",
           "value": 29368.44
+        },
+        {
+          "date": "2026-09-18",
+          "value": 29644.17
         }
       ],
-      "ret_4w": -0.0226,
-      "ret_13w": -0.009,
-      "ret_26w": 0.2046
+      "ret_4w": 0.0114,
+      "ret_13w": -0.0251,
+      "ret_26w": 0.2404
     },
     {
       "id": "bitcoin",
@@ -898,14 +898,10 @@
       "series_id": "zcash_price",
       "name": "Zcash",
       "group": "Crypto",
-      "last_date": "2026-09-11",
-      "flow_z": 0.36,
-      "glci_corr_52w": -0.04,
+      "last_date": "2026-09-18",
+      "flow_z": 0.52,
+      "glci_corr_52w": -0.06,
       "spark": [
-        {
-          "date": "2025-09-19",
-          "value": 48.9369
-        },
         {
           "date": "2025-09-26",
           "value": 56.2691
@@ -1109,11 +1105,15 @@
         {
           "date": "2026-09-11",
           "value": 1163.3274
+        },
+        {
+          "date": "2026-09-18",
+          "value": 1557.7944
         }
       ],
-      "ret_4w": 1.3603,
-      "ret_13w": 1.8283,
-      "ret_26w": 4.5932
+      "ret_4w": 1.1259,
+      "ret_13w": 2.267,
+      "ret_26w": 5.6407
     },
     {
       "id": "sp500",
@@ -1356,11 +1356,11 @@
         },
         {
           "date": "2025-10-10",
-          "value": 235.3984
+          "value": 235.3983
         },
         {
           "date": "2025-10-17",
-          "value": 240.9619
+          "value": 240.9618
         },
         {
           "date": "2025-10-24",
@@ -1396,7 +1396,7 @@
         },
         {
           "date": "2025-12-19",
-          "value": 249.1002
+          "value": 249.1001
         },
         {
           "date": "2025-12-26",
@@ -1428,11 +1428,11 @@
         },
         {
           "date": "2026-02-13",
-          "value": 261.1881
+          "value": 261.1882
         },
         {
           "date": "2026-02-20",
-          "value": 262.827
+          "value": 262.8271
         },
         {
           "date": "2026-02-27",
@@ -1796,11 +1796,11 @@
         },
         {
           "date": "2025-10-03",
-          "value": 85.7618
+          "value": 85.7619
         },
         {
           "date": "2025-10-10",
-          "value": 86.9516
+          "value": 86.9517
         },
         {
           "date": "2025-10-17",
@@ -1808,7 +1808,7 @@
         },
         {
           "date": "2025-10-24",
-          "value": 87.7673
+          "value": 87.7672
         },
         {
           "date": "2025-10-31",
@@ -1820,7 +1820,7 @@
         },
         {
           "date": "2025-11-14",
-          "value": 85.5805
+          "value": 85.5806
         },
         {
           "date": "2025-11-21",
@@ -1828,11 +1828,11 @@
         },
         {
           "date": "2025-11-28",
-          "value": 86.8709
+          "value": 86.871
         },
         {
           "date": "2025-12-05",
-          "value": 85.2096
+          "value": 85.2097
         },
         {
           "date": "2025-12-12",
@@ -1896,7 +1896,7 @@
         },
         {
           "date": "2026-03-27",
-          "value": 83.6819
+          "value": 83.6818
         },
         {
           "date": "2026-04-03",
@@ -1960,7 +1960,7 @@
         },
         {
           "date": "2026-07-17",
-          "value": 83.8595
+          "value": 83.8596
         },
         {
           "date": "2026-07-24",
@@ -2640,14 +2640,14 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-09-19T02:08:26.122529Z",
+    "computed_at": "2026-09-19T15:01:18.959842Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
     "benchmark": "SPY",
-    "price_as_of": "2026-09-17",
+    "price_as_of": "2026-09-18",
     "fund_flow_as_of": "2026-09-17",
-    "options_as_of": "2026-09-11",
+    "options_as_of": "2026-09-18",
     "price_basis": "yahoo_adjusted_close",
     "coverage": {
       "expected_sectors": 11,
@@ -2701,16 +2701,15 @@
       "leaders": [
         "technology",
         "energy",
-        "financials"
+        "health_care"
       ],
       "laggards": [
-        "industrials",
+        "communication_services",
         "consumer_discretionary",
         "utilities"
       ],
       "improving": [
-        "communication_services",
-        "materials"
+        "communication_services"
       ],
       "strongest_inflows": [
         "real_estate",
@@ -2718,25 +2717,25 @@
         "communication_services"
       ],
       "most_active_options": [
-        "consumer_discretionary",
         "financials",
-        "health_care"
+        "communication_services",
+        "utilities"
       ]
     },
     "sectors": [
       {
         "id": "technology",
         "name": "Technology",
-        "price_as_of": "2026-09-17",
-        "return_21d": 0.01306,
-        "return_63d": 0.013282,
-        "return_126d": 0.312232,
-        "excess_21d": 0.019399,
-        "excess_63d": -0.018078,
-        "excess_126d": 0.164602,
-        "relative_strength": 0.073262,
-        "acceleration": 0.025425,
-        "absolute_trend": 1.498009,
+        "price_as_of": "2026-09-18",
+        "return_21d": 0.031939,
+        "return_63d": -0.008466,
+        "return_126d": 0.316986,
+        "excess_21d": 0.039088,
+        "excess_63d": -0.030769,
+        "excess_126d": 0.165603,
+        "relative_strength": 0.067417,
+        "acceleration": 0.049345,
+        "absolute_trend": 1.551084,
         "above_200d": true,
         "phase": "leading",
         "fund_flow": {
@@ -2751,7 +2750,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 96.5,
+        "price_score": 100.0,
         "rank": 1,
         "ticker": "XLK",
         "options_activity": {
@@ -2759,16 +2758,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 38954,
-          "put_volume": 64655,
-          "total_volume": 103609,
-          "put_call_ratio": 1.6598,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 77937,
+          "put_volume": 76457,
+          "total_volume": 154394,
+          "put_call_ratio": 0.981,
           "prior_month_daily_average": 31553.0,
-          "activity_ratio": 0.821,
+          "activity_ratio": 0.979,
           "excluded_adjusted_roots": [
             "2XLK"
           ]
@@ -2778,16 +2777,16 @@
       {
         "id": "energy",
         "name": "Energy",
-        "price_as_of": "2026-09-17",
-        "return_21d": 0.012485,
-        "return_63d": 0.172226,
-        "return_126d": 0.112224,
-        "excess_21d": 0.018824,
-        "excess_63d": 0.140866,
-        "excess_126d": -0.035406,
-        "relative_strength": 0.05273,
-        "acceleration": -0.028131,
-        "absolute_trend": 0.745674,
+        "price_as_of": "2026-09-18",
+        "return_21d": 0.011416,
+        "return_63d": 0.186185,
+        "return_126d": 0.093793,
+        "excess_21d": 0.018565,
+        "excess_63d": 0.163883,
+        "excess_126d": -0.05759,
+        "relative_strength": 0.053146,
+        "acceleration": -0.036062,
+        "absolute_trend": 0.633171,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2810,16 +2809,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 326460,
-          "put_volume": 336054,
-          "total_volume": 662514,
-          "put_call_ratio": 1.0294,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 482321,
+          "put_volume": 565866,
+          "total_volume": 1048187,
+          "put_call_ratio": 1.1732,
           "prior_month_daily_average": 155652.1,
-          "activity_ratio": 1.064,
+          "activity_ratio": 1.347,
           "excluded_adjusted_roots": [
             "2XLE"
           ]
@@ -2827,69 +2826,18 @@
         "flow_confirmation": "supports"
       },
       {
-        "id": "financials",
-        "name": "Financials",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.034474,
-        "return_63d": 0.036794,
-        "return_126d": 0.140623,
-        "excess_21d": -0.028134,
-        "excess_63d": 0.005434,
-        "excess_126d": -0.007007,
-        "relative_strength": -0.000787,
-        "acceleration": -0.029946,
-        "absolute_trend": 1.541862,
-        "above_200d": true,
-        "phase": "lagging",
-        "fund_flow": {
-          "as_of": "2026-09-17",
-          "aum_usd": 53615126497.31,
-          "flow_1d_usd": -622947433.75,
-          "flow_5d_usd": 205074290.4,
-          "flow_20d_usd": -1159204653.35,
-          "flow_5d_pct_aum": 0.00377,
-          "flow_20d_pct_aum": -0.020587,
-          "flow_20d_z": -0.541,
-          "history_observations": 252,
-          "split_adjustments": 0
-        },
-        "price_score": 80.5,
-        "rank": 3,
-        "ticker": "XLF",
-        "options_activity": {
-          "evidence_level": "cleared_activity",
-          "direction": null,
-          "trade_side": "unavailable",
-          "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 257958,
-          "put_volume": 748475,
-          "total_volume": 1006433,
-          "put_call_ratio": 2.9015,
-          "prior_month_daily_average": 142392.0,
-          "activity_ratio": 1.767,
-          "excluded_adjusted_roots": [
-            "2XLF"
-          ]
-        },
-        "flow_confirmation": "supports"
-      },
-      {
         "id": "health_care",
         "name": "Health Care",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.005435,
-        "return_63d": 0.117817,
-        "return_126d": 0.145892,
-        "excess_21d": 0.000905,
-        "excess_63d": 0.086457,
-        "excess_126d": -0.001737,
-        "relative_strength": 0.04236,
-        "acceleration": -0.027914,
-        "absolute_trend": 1.084428,
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.042381,
+        "return_63d": 0.124056,
+        "return_126d": 0.14701,
+        "excess_21d": -0.035232,
+        "excess_63d": 0.101753,
+        "excess_126d": -0.004373,
+        "relative_strength": 0.04869,
+        "acceleration": -0.06915,
+        "absolute_trend": 1.098544,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2905,23 +2853,23 @@
           "split_adjustments": 0
         },
         "price_score": 80.0,
-        "rank": 4,
+        "rank": 3,
         "ticker": "XLV",
         "options_activity": {
           "evidence_level": "cleared_activity",
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 41001,
-          "put_volume": 74194,
-          "total_volume": 115195,
-          "put_call_ratio": 1.8096,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 46315,
+          "put_volume": 70465,
+          "total_volume": 116780,
+          "put_call_ratio": 1.5214,
           "prior_month_daily_average": 18611.38,
-          "activity_ratio": 1.547,
+          "activity_ratio": 1.255,
           "excluded_adjusted_roots": [
             "2XLV"
           ]
@@ -2929,20 +2877,71 @@
         "flow_confirmation": "supports"
       },
       {
+        "id": "financials",
+        "name": "Financials",
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.028588,
+        "return_63d": 0.045356,
+        "return_126d": 0.139856,
+        "excess_21d": -0.021439,
+        "excess_63d": 0.023053,
+        "excess_126d": -0.011527,
+        "relative_strength": 0.005763,
+        "acceleration": -0.029124,
+        "absolute_trend": 1.550721,
+        "above_200d": true,
+        "phase": "weakening",
+        "fund_flow": {
+          "as_of": "2026-09-17",
+          "aum_usd": 53615126497.31,
+          "flow_1d_usd": -622947433.75,
+          "flow_5d_usd": 205074290.4,
+          "flow_20d_usd": -1159204653.35,
+          "flow_5d_pct_aum": 0.00377,
+          "flow_20d_pct_aum": -0.020587,
+          "flow_20d_z": -0.541,
+          "history_observations": 252,
+          "split_adjustments": 0
+        },
+        "price_score": 77.0,
+        "rank": 4,
+        "ticker": "XLF",
+        "options_activity": {
+          "evidence_level": "cleared_activity",
+          "direction": null,
+          "trade_side": "unavailable",
+          "open_close": "unavailable",
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 481980,
+          "put_volume": 828540,
+          "total_volume": 1310520,
+          "put_call_ratio": 1.719,
+          "prior_month_daily_average": 142392.0,
+          "activity_ratio": 1.841,
+          "excluded_adjusted_roots": [
+            "2XLF"
+          ]
+        },
+        "flow_confirmation": "supports"
+      },
+      {
         "id": "materials",
         "name": "Materials",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.020881,
-        "return_63d": -0.021773,
-        "return_126d": 0.053141,
-        "excess_21d": -0.014541,
-        "excess_63d": -0.053133,
-        "excess_126d": -0.094489,
-        "relative_strength": -0.073811,
-        "acceleration": 0.00317,
-        "absolute_trend": 0.438731,
-        "above_200d": true,
-        "phase": "improving",
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.049371,
+        "return_63d": -0.032028,
+        "return_126d": 0.054223,
+        "excess_21d": -0.042222,
+        "excess_63d": -0.054331,
+        "excess_126d": -0.09716,
+        "relative_strength": -0.075746,
+        "acceleration": -0.024112,
+        "absolute_trend": 0.442201,
+        "above_200d": false,
+        "phase": "lagging",
         "fund_flow": {
           "as_of": "2026-09-17",
           "aum_usd": 8315852458.08,
@@ -2955,7 +2954,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 60.0,
+        "price_score": 53.5,
         "rank": 5,
         "ticker": "XLB",
         "options_activity": {
@@ -2963,34 +2962,34 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 7931,
-          "put_volume": 9697,
-          "total_volume": 17628,
-          "put_call_ratio": 1.2227,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 17825,
+          "put_volume": 11892,
+          "total_volume": 29717,
+          "put_call_ratio": 0.6672,
           "prior_month_daily_average": 20711.81,
-          "activity_ratio": 0.213,
+          "activity_ratio": 0.287,
           "excluded_adjusted_roots": []
         },
-        "flow_confirmation": "diverges"
+        "flow_confirmation": "supports"
       },
       {
         "id": "consumer_staples",
         "name": "Consumer Staples",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.024725,
-        "return_63d": 0.004641,
-        "return_126d": 0.022761,
-        "excess_21d": -0.018385,
-        "excess_63d": -0.026718,
-        "excess_126d": -0.124869,
-        "relative_strength": -0.075794,
-        "acceleration": -0.009479,
-        "absolute_trend": 0.19714,
-        "above_200d": true,
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.044179,
+        "return_63d": 0.000894,
+        "return_126d": 0.022602,
+        "excess_21d": -0.037029,
+        "excess_63d": -0.021409,
+        "excess_126d": -0.128781,
+        "relative_strength": -0.075095,
+        "acceleration": -0.029893,
+        "absolute_trend": 0.19505,
+        "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
           "as_of": "2026-09-17",
@@ -3004,7 +3003,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 43.0,
+        "price_score": 49.5,
         "rank": 6,
         "ticker": "XLP",
         "options_activity": {
@@ -3012,16 +3011,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 40794,
-          "put_volume": 42580,
-          "total_volume": 83374,
-          "put_call_ratio": 1.0438,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 42585,
+          "put_volume": 114084,
+          "total_volume": 156669,
+          "put_call_ratio": 2.679,
           "prior_month_daily_average": 29179.86,
-          "activity_ratio": 0.714,
+          "activity_ratio": 1.074,
           "excluded_adjusted_roots": [
             "2XLP"
           ]
@@ -3031,17 +3030,17 @@
       {
         "id": "real_estate",
         "name": "Real Estate",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.038603,
-        "return_63d": -0.014979,
-        "return_126d": 0.037082,
-        "excess_21d": -0.032263,
-        "excess_63d": -0.046339,
-        "excess_126d": -0.110548,
-        "relative_strength": -0.078444,
-        "acceleration": -0.016816,
-        "absolute_trend": 0.381997,
-        "above_200d": true,
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.056231,
+        "return_63d": -0.022068,
+        "return_126d": 0.02987,
+        "excess_21d": -0.049081,
+        "excess_63d": -0.044371,
+        "excess_126d": -0.121513,
+        "relative_strength": -0.082942,
+        "acceleration": -0.034291,
+        "absolute_trend": 0.305036,
+        "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
           "as_of": "2026-09-17",
@@ -3055,7 +3054,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 37.0,
+        "price_score": 40.0,
         "rank": 7,
         "ticker": "XLRE",
         "options_activity": {
@@ -3063,16 +3062,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 1857,
-          "put_volume": 321,
-          "total_volume": 2178,
-          "put_call_ratio": 0.1729,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 2974,
+          "put_volume": 1500,
+          "total_volume": 4474,
+          "put_call_ratio": 0.5044,
           "prior_month_daily_average": 798.38,
-          "activity_ratio": 0.682,
+          "activity_ratio": 1.121,
           "excluded_adjusted_roots": [
             "2XLRE"
           ]
@@ -3080,69 +3079,18 @@
         "flow_confirmation": "diverges"
       },
       {
-        "id": "communication_services",
-        "name": "Communication Services",
-        "price_as_of": "2026-09-17",
-        "return_21d": 0.016784,
-        "return_63d": 0.031036,
-        "return_126d": -0.005808,
-        "excess_21d": 0.023124,
-        "excess_63d": -0.000324,
-        "excess_126d": -0.153438,
-        "relative_strength": -0.076881,
-        "acceleration": 0.023232,
-        "absolute_trend": -0.04171,
-        "above_200d": false,
-        "phase": "improving",
-        "fund_flow": {
-          "as_of": "2026-09-17",
-          "aum_usd": 22597975656.81,
-          "flow_1d_usd": 67406340.6,
-          "flow_5d_usd": -162996585.3,
-          "flow_20d_usd": -101614808.3,
-          "flow_5d_pct_aum": -0.007218,
-          "flow_20d_pct_aum": -0.004519,
-          "flow_20d_z": 0.087,
-          "history_observations": 252,
-          "split_adjustments": 0
-        },
-        "price_score": 29.5,
-        "rank": 8,
-        "ticker": "XLC",
-        "options_activity": {
-          "evidence_level": "cleared_activity",
-          "direction": null,
-          "trade_side": "unavailable",
-          "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 5045,
-          "put_volume": 3587,
-          "total_volume": 8632,
-          "put_call_ratio": 0.711,
-          "prior_month_daily_average": 1930.57,
-          "activity_ratio": 1.118,
-          "excluded_adjusted_roots": [
-            "2XLC"
-          ]
-        },
-        "flow_confirmation": "diverges"
-      },
-      {
         "id": "industrials",
         "name": "Industrials",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.082638,
-        "return_63d": -0.058317,
-        "return_126d": 0.028185,
-        "excess_21d": -0.076299,
-        "excess_63d": -0.089677,
-        "excess_126d": -0.119444,
-        "relative_strength": -0.104561,
-        "acceleration": -0.046406,
-        "absolute_trend": 0.24345,
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.069405,
+        "return_63d": -0.061216,
+        "return_126d": 0.039358,
+        "excess_21d": -0.062256,
+        "excess_63d": -0.083518,
+        "excess_126d": -0.112025,
+        "relative_strength": -0.097772,
+        "acceleration": -0.034417,
+        "absolute_trend": 0.340968,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
@@ -3157,24 +3105,24 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 20.5,
-        "rank": 9,
+        "price_score": 30.5,
+        "rank": 8,
         "ticker": "XLI",
         "options_activity": {
           "evidence_level": "cleared_activity",
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 21364,
-          "put_volume": 42217,
-          "total_volume": 63581,
-          "put_call_ratio": 1.9761,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 34859,
+          "put_volume": 134064,
+          "total_volume": 168923,
+          "put_call_ratio": 3.8459,
           "prior_month_daily_average": 28779.62,
-          "activity_ratio": 0.552,
+          "activity_ratio": 1.174,
           "excluded_adjusted_roots": [
             "2XLI"
           ]
@@ -3182,18 +3130,69 @@
         "flow_confirmation": "supports"
       },
       {
+        "id": "communication_services",
+        "name": "Communication Services",
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.004592,
+        "return_63d": 0.014947,
+        "return_126d": -0.015025,
+        "excess_21d": 0.002557,
+        "excess_63d": -0.007355,
+        "excess_126d": -0.166408,
+        "relative_strength": -0.086882,
+        "acceleration": 0.005009,
+        "absolute_trend": -0.106796,
+        "above_200d": false,
+        "phase": "improving",
+        "fund_flow": {
+          "as_of": "2026-09-17",
+          "aum_usd": 22597975656.81,
+          "flow_1d_usd": 67406340.6,
+          "flow_5d_usd": -162996585.3,
+          "flow_20d_usd": -101614808.3,
+          "flow_5d_pct_aum": -0.007218,
+          "flow_20d_pct_aum": -0.004519,
+          "flow_20d_z": 0.087,
+          "history_observations": 252,
+          "split_adjustments": 0
+        },
+        "price_score": 23.0,
+        "rank": 9,
+        "ticker": "XLC",
+        "options_activity": {
+          "evidence_level": "cleared_activity",
+          "direction": null,
+          "trade_side": "unavailable",
+          "open_close": "unavailable",
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 6825,
+          "put_volume": 8486,
+          "total_volume": 15311,
+          "put_call_ratio": 1.2434,
+          "prior_month_daily_average": 1930.57,
+          "activity_ratio": 1.586,
+          "excluded_adjusted_roots": [
+            "2XLC"
+          ]
+        },
+        "flow_confirmation": "diverges"
+      },
+      {
         "id": "consumer_discretionary",
         "name": "Consumer Discretionary",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.043651,
-        "return_63d": -0.034156,
-        "return_126d": 0.011386,
-        "excess_21d": -0.037312,
-        "excess_63d": -0.065516,
-        "excess_126d": -0.136243,
-        "relative_strength": -0.10088,
-        "acceleration": -0.015473,
-        "absolute_trend": 0.079105,
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.065872,
+        "return_63d": -0.051749,
+        "return_126d": 0.016049,
+        "excess_21d": -0.058723,
+        "excess_63d": -0.074052,
+        "excess_126d": -0.135335,
+        "relative_strength": -0.104693,
+        "acceleration": -0.034038,
+        "absolute_trend": 0.112717,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
@@ -3208,7 +3207,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 20.0,
+        "price_score": 13.5,
         "rank": 10,
         "ticker": "XLY",
         "options_activity": {
@@ -3216,16 +3215,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 23135,
-          "put_volume": 100544,
-          "total_volume": 123679,
-          "put_call_ratio": 4.346,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 12506,
+          "put_volume": 33268,
+          "total_volume": 45774,
+          "put_call_ratio": 2.6602,
           "prior_month_daily_average": 12425.48,
-          "activity_ratio": 2.488,
+          "activity_ratio": 0.737,
           "excluded_adjusted_roots": [
             "2XLY"
           ]
@@ -3235,16 +3234,16 @@
       {
         "id": "utilities",
         "name": "Utilities",
-        "price_as_of": "2026-09-17",
-        "return_21d": -0.054383,
-        "return_63d": -0.057963,
-        "return_126d": -0.100793,
-        "excess_21d": -0.048043,
-        "excess_63d": -0.089323,
-        "excess_126d": -0.248423,
-        "relative_strength": -0.168873,
-        "acceleration": -0.018269,
-        "absolute_trend": -0.986043,
+        "price_as_of": "2026-09-18",
+        "return_21d": -0.068636,
+        "return_63d": -0.078942,
+        "return_126d": -0.110972,
+        "excess_21d": -0.061487,
+        "excess_63d": -0.101244,
+        "excess_126d": -0.262355,
+        "relative_strength": -0.1818,
+        "acceleration": -0.027739,
+        "absolute_trend": -1.073952,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
@@ -3267,16 +3266,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-09-11",
-          "week_start": "2026-09-08",
-          "week_end": "2026-09-11",
-          "sessions": 4,
-          "call_volume": 65112,
-          "put_volume": 41417,
-          "total_volume": 106529,
-          "put_call_ratio": 0.6361,
+          "as_of": "2026-09-18",
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-18",
+          "sessions": 5,
+          "call_volume": 136849,
+          "put_volume": 177080,
+          "total_volume": 313929,
+          "put_call_ratio": 1.294,
           "prior_month_daily_average": 45115.33,
-          "activity_ratio": 0.59,
+          "activity_ratio": 1.392,
           "excluded_adjusted_roots": [
             "2XLU"
           ]

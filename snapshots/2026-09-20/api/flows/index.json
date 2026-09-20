@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-20T02:13:26.191384",
+  "computed_at": "2026-09-20T15:04:31.233990",
   "as_of": "2026-09-18",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1348,7 +1348,7 @@
       "spark": [
         {
           "date": "2025-09-26",
-          "value": 238.9126
+          "value": 238.9127
         },
         {
           "date": "2025-10-03",
@@ -1408,7 +1408,7 @@
         },
         {
           "date": "2026-01-09",
-          "value": 258.4766
+          "value": 258.4765
         },
         {
           "date": "2026-01-16",
@@ -1420,7 +1420,7 @@
         },
         {
           "date": "2026-01-30",
-          "value": 257.9004
+          "value": 257.9005
         },
         {
           "date": "2026-02-06",
@@ -1820,7 +1820,7 @@
         },
         {
           "date": "2025-11-14",
-          "value": 85.5805
+          "value": 85.5806
         },
         {
           "date": "2025-11-21",
@@ -1832,7 +1832,7 @@
         },
         {
           "date": "2025-12-05",
-          "value": 85.2097
+          "value": 85.2096
         },
         {
           "date": "2025-12-12",
@@ -1848,7 +1848,7 @@
         },
         {
           "date": "2026-01-02",
-          "value": 84.4352
+          "value": 84.4353
         },
         {
           "date": "2026-01-09",
@@ -1896,7 +1896,7 @@
         },
         {
           "date": "2026-03-27",
-          "value": 83.6818
+          "value": 83.6819
         },
         {
           "date": "2026-04-03",
@@ -1960,7 +1960,7 @@
         },
         {
           "date": "2026-07-17",
-          "value": 83.8595
+          "value": 83.8596
         },
         {
           "date": "2026-07-24",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-09-20T02:13:43.200152Z",
+    "computed_at": "2026-09-20T15:04:49.470320Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -2834,7 +2834,7 @@
         "return_126d": 0.14701,
         "excess_21d": -0.035232,
         "excess_63d": 0.101753,
-        "excess_126d": -0.004374,
+        "excess_126d": -0.004373,
         "relative_strength": 0.04869,
         "acceleration": -0.06915,
         "absolute_trend": 1.098544,
@@ -2888,7 +2888,7 @@
         "excess_126d": -0.011527,
         "relative_strength": 0.005763,
         "acceleration": -0.029124,
-        "absolute_trend": 1.55072,
+        "absolute_trend": 1.550721,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2936,10 +2936,10 @@
         "return_126d": 0.054223,
         "excess_21d": -0.042222,
         "excess_63d": -0.054331,
-        "excess_126d": -0.097161,
+        "excess_126d": -0.09716,
         "relative_strength": -0.075746,
         "acceleration": -0.024112,
-        "absolute_trend": 0.442201,
+        "absolute_trend": 0.4422,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
@@ -2988,7 +2988,7 @@
         "excess_126d": -0.128781,
         "relative_strength": -0.075095,
         "acceleration": -0.029893,
-        "absolute_trend": 0.195051,
+        "absolute_trend": 0.19505,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {

@@ -2,34 +2,22 @@
   "id": "sp500_price",
   "name": "S&P 500",
   "category": "Large Cap Equities",
-  "current_sharpe": 0.66,
-  "annualized_return": 14.41,
-  "annualized_volatility": 18.07,
+  "current_sharpe": 0.65,
+  "annualized_return": 14.26,
+  "annualized_volatility": 18.08,
   "max_drawdown": -33.92,
   "sharpe_by_regime": {
     "tight": 0.48,
-    "neutral": 0.08,
+    "neutral": 0.09,
     "loose": 1.93
   },
   "return_by_regime": {
     "tight": 23.84,
-    "neutral": 5.52,
+    "neutral": 5.65,
     "loose": 27.68
   },
   "correlation_with_glci": 0.404,
   "rolling_sharpe": [
-    {
-      "date": "2017-09-19",
-      "value": 2.002
-    },
-    {
-      "date": "2017-09-20",
-      "value": 2.006
-    },
-    {
-      "date": "2017-09-21",
-      "value": 1.839
-    },
     {
       "date": "2017-09-22",
       "value": 1.767
@@ -9061,6 +9049,10 @@
     {
       "date": "2026-09-17",
       "value": 0.894
+    },
+    {
+      "date": "2026-09-18",
+      "value": 0.914
     }
   ]
 }

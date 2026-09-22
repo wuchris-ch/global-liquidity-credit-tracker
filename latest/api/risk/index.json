@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-22T02:18:52.474934",
+  "computed_at": "2026-09-22T15:56:33.137316",
   "current_regime": "neutral",
   "assets": [
     {
@@ -9069,17 +9069,17 @@
       "name": "Nasdaq 100",
       "category": "Large Cap Equities",
       "current_sharpe": 0.52,
-      "annualized_return": 16.73,
+      "annualized_return": 16.8,
       "annualized_volatility": 26.12,
       "max_drawdown": -82.9,
       "sharpe_by_regime": {
         "tight": 0.63,
-        "neutral": 0.23,
+        "neutral": 0.34,
         "loose": 1.49
       },
       "return_by_regime": {
         "tight": 36.0,
-        "neutral": 8.91,
+        "neutral": 11.38,
         "loose": 32.47
       },
       "correlation_with_glci": 0.383,
@@ -49111,6 +49111,10 @@
         {
           "date": "2026-09-18",
           "value": 0.931
+        },
+        {
+          "date": "2026-09-21",
+          "value": 1.018
         }
       ]
     },
@@ -59510,7 +59514,7 @@
         },
         {
           "date": "2019-01-18",
-          "value": -0.28
+          "value": -0.281
         },
         {
           "date": "2019-01-22",
@@ -62710,7 +62714,7 @@
         },
         {
           "date": "2022-03-23",
-          "value": -0.031
+          "value": -0.03
         },
         {
           "date": "2022-03-24",
@@ -62970,7 +62974,7 @@
         },
         {
           "date": "2022-06-27",
-          "value": -0.955
+          "value": -0.954
         },
         {
           "date": "2022-06-28",
@@ -114675,17 +114679,17 @@
       "name": "Zcash",
       "category": "Crypto",
       "current_sharpe": 0.71,
-      "annualized_return": 83.09,
-      "annualized_volatility": 113.3,
+      "annualized_return": 82.79,
+      "annualized_volatility": 113.29,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": 1.79,
-        "neutral": 2.56,
+        "neutral": 2.54,
         "loose": 1.34
       },
       "return_by_regime": {
         "tight": 288.54,
-        "neutral": 352.79,
+        "neutral": 349.8,
         "loose": 167.48
       },
       "correlation_with_glci": 0.014,
@@ -126181,6 +126185,10 @@
         {
           "date": "2026-09-20",
           "value": 2.81
+        },
+        {
+          "date": "2026-09-21",
+          "value": 2.78
         }
       ]
     },
@@ -126338,7 +126346,7 @@
         },
         {
           "date": "2017-11-10",
-          "value": 0.335
+          "value": 0.334
         },
         {
           "date": "2017-11-13",
@@ -129290,7 +129298,7 @@
         },
         {
           "date": "2020-10-19",
-          "value": 0.809
+          "value": 0.81
         },
         {
           "date": "2020-10-20",
@@ -131166,7 +131174,7 @@
         },
         {
           "date": "2022-08-30",
-          "value": -1.415
+          "value": -1.414
         },
         {
           "date": "2022-08-31",
@@ -135265,7 +135273,7 @@
       ],
       [
         0.63,
-        0.23,
+        0.34,
         1.49
       ],
       [
@@ -135300,7 +135308,7 @@
       ],
       [
         1.79,
-        2.56,
+        2.54,
         1.34
       ],
       [
@@ -135317,7 +135325,7 @@
       ],
       [
         36.0,
-        8.91,
+        11.38,
         32.47
       ],
       [
@@ -135352,7 +135360,7 @@
       ],
       [
         288.54,
-        352.79,
+        349.8,
         167.48
       ],
       [

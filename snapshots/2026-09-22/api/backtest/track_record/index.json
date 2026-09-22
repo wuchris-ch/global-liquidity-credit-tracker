@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-22T02:18:31.230583",
+  "computed_at": "2026-09-22T15:56:06.915949",
   "date_range": {
     "start": "2024-06-14",
     "end": "2026-09-18"
@@ -2527,7 +2527,7 @@
               "hit_rate": 0.9423,
               "n": 52,
               "ci_median_low": 0.09098,
-              "ci_median_high": 0.180843,
+              "ci_median_high": 0.180844,
               "ci_hit_rate_low": 0.8182,
               "ci_hit_rate_high": 1.0,
               "edge": 0.2032,
@@ -4670,7 +4670,7 @@
           "neutral": {
             "4": {
               "median": 0.010814,
-              "p25": -0.010348,
+              "p25": -0.010349,
               "p75": 0.021726,
               "hit_rate": 0.6429,
               "n": 56,
@@ -4749,7 +4749,7 @@
               "hit_rate": 0.3261,
               "n": 46,
               "ci_median_low": -0.036327,
-              "ci_median_high": 0.020176,
+              "ci_median_high": 0.020177,
               "ci_hit_rate_low": 0.1386,
               "ci_hit_rate_high": 0.697,
               "edge": -0.112,
@@ -4965,9 +4965,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 131,
+      "vintage_count": 132,
       "unique_signal_dates": 11,
-      "duplicate_vintages": 120,
+      "duplicate_vintages": 121,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-09-18"
     },

@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-23T02:19:00.720267",
+  "computed_at": "2026-09-23T15:45:13.318545",
   "as_of": "2026-09-18",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -456,7 +456,7 @@
       "group": "Crypto",
       "last_date": "2026-09-18",
       "flow_z": 0.57,
-      "glci_corr_52w": 0.11,
+      "glci_corr_52w": 0.1,
       "spark": [
         {
           "date": "2025-09-26",
@@ -1420,7 +1420,7 @@
         },
         {
           "date": "2026-01-30",
-          "value": 257.9004
+          "value": 257.9005
         },
         {
           "date": "2026-02-06",
@@ -1464,7 +1464,7 @@
         },
         {
           "date": "2026-04-17",
-          "value": 274.4091
+          "value": 274.409
         },
         {
           "date": "2026-04-24",
@@ -1476,7 +1476,7 @@
         },
         {
           "date": "2026-05-08",
-          "value": 282.7573
+          "value": 282.7574
         },
         {
           "date": "2026-05-15",
@@ -1566,7 +1566,7 @@
       "group": "Hedges",
       "last_date": "2026-09-18",
       "flow_z": -0.37,
-      "glci_corr_52w": 0.13,
+      "glci_corr_52w": 0.14,
       "spark": [
         {
           "date": "2025-09-26",
@@ -1800,7 +1800,7 @@
         },
         {
           "date": "2025-10-10",
-          "value": 86.9516
+          "value": 86.9517
         },
         {
           "date": "2025-10-17",
@@ -1808,7 +1808,7 @@
         },
         {
           "date": "2025-10-24",
-          "value": 87.7673
+          "value": 87.7672
         },
         {
           "date": "2025-10-31",
@@ -1820,7 +1820,7 @@
         },
         {
           "date": "2025-11-14",
-          "value": 85.5806
+          "value": 85.5805
         },
         {
           "date": "2025-11-21",
@@ -1896,7 +1896,7 @@
         },
         {
           "date": "2026-03-27",
-          "value": 83.6818
+          "value": 83.6819
         },
         {
           "date": "2026-04-03",
@@ -2640,13 +2640,13 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-09-23T02:19:17.987870Z",
+    "computed_at": "2026-09-23T15:45:30.374413Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
     "benchmark": "SPY",
     "price_as_of": "2026-09-21",
-    "fund_flow_as_of": "2026-09-21",
+    "fund_flow_as_of": "2026-09-22",
     "options_as_of": "2026-09-18",
     "price_basis": "yahoo_adjusted_close",
     "coverage": {
@@ -2739,14 +2739,14 @@
         "above_200d": true,
         "phase": "leading",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 126496834839.32,
-          "flow_1d_usd": -38969358.2,
-          "flow_5d_usd": 148389584.0,
-          "flow_20d_usd": -651457519.4,
-          "flow_5d_pct_aum": 0.001242,
-          "flow_20d_pct_aum": -0.005445,
-          "flow_20d_z": -0.586,
+          "as_of": "2026-09-22",
+          "aum_usd": 127701232974.87,
+          "flow_1d_usd": 284582235.95,
+          "flow_5d_usd": 359470630.35,
+          "flow_20d_usd": -240847216.25,
+          "flow_5d_pct_aum": 0.003015,
+          "flow_20d_pct_aum": -0.002052,
+          "flow_20d_z": -0.246,
           "history_observations": 252,
           "split_adjustments": 1
         },
@@ -2786,18 +2786,18 @@
         "excess_126d": -0.017935,
         "relative_strength": 0.031983,
         "acceleration": -0.059954,
-        "absolute_trend": 1.221206,
+        "absolute_trend": 1.221205,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 42809495296.04,
-          "flow_1d_usd": -819473038.05,
-          "flow_5d_usd": -1088424006.0,
-          "flow_20d_usd": -940348901.5,
-          "flow_5d_pct_aum": -0.024978,
-          "flow_20d_pct_aum": -0.0208,
-          "flow_20d_z": -1.414,
+          "as_of": "2026-09-22",
+          "aum_usd": 43318833165.34,
+          "flow_1d_usd": 280281488.85,
+          "flow_5d_usd": -799759085.95,
+          "flow_20d_usd": -144858346.7,
+          "flow_5d_pct_aum": -0.018362,
+          "flow_20d_pct_aum": -0.00324,
+          "flow_20d_z": -0.3,
           "history_observations": 252,
           "split_adjustments": 0
         },
@@ -2841,14 +2841,14 @@
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 51547946727.52,
-          "flow_1d_usd": -1282349196.9,
-          "flow_5d_usd": -2305028470.9,
-          "flow_20d_usd": -2988093265.2,
-          "flow_5d_pct_aum": -0.041927,
-          "flow_20d_pct_aum": -0.053288,
-          "flow_20d_z": -1.402,
+          "as_of": "2026-09-22",
+          "aum_usd": 51561995188.65,
+          "flow_1d_usd": 1035133514.1,
+          "flow_5d_usd": -1605273589.2,
+          "flow_20d_usd": -1452435150.1,
+          "flow_5d_pct_aum": -0.02912,
+          "flow_20d_pct_aum": -0.025811,
+          "flow_20d_z": -0.669,
           "history_observations": 252,
           "split_adjustments": 0
         },
@@ -2892,14 +2892,14 @@
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 40021937894.28,
-          "flow_1d_usd": -56188806.3,
-          "flow_5d_usd": -891152632.65,
-          "flow_20d_usd": -1087132703.55,
-          "flow_5d_pct_aum": -0.021084,
-          "flow_20d_pct_aum": -0.025959,
-          "flow_20d_z": -0.893,
+          "as_of": "2026-09-22",
+          "aum_usd": 39654329159.79,
+          "flow_1d_usd": 64845272.1,
+          "flow_5d_usd": -661445398.05,
+          "flow_20d_usd": -753973911.2,
+          "flow_5d_pct_aum": -0.015376,
+          "flow_20d_pct_aum": -0.018262,
+          "flow_20d_z": -0.536,
           "history_observations": 252,
           "split_adjustments": 1
         },
@@ -2943,14 +2943,14 @@
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 7781927731.49,
-          "flow_1d_usd": 6387355.2,
-          "flow_5d_usd": -90594459.95,
-          "flow_20d_usd": -200205590.45,
-          "flow_5d_pct_aum": -0.011358,
-          "flow_20d_pct_aum": -0.023695,
-          "flow_20d_z": -1.427,
+          "as_of": "2026-09-22",
+          "aum_usd": 7805845526.01,
+          "flow_1d_usd": 38253530.7,
+          "flow_5d_usd": -20027319.5,
+          "flow_20d_usd": -159685045.85,
+          "flow_5d_pct_aum": -0.002524,
+          "flow_20d_pct_aum": -0.018789,
+          "flow_20d_z": -1.189,
           "history_observations": 252,
           "split_adjustments": 0
         },
@@ -2994,14 +2994,14 @@
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 8016201231.91,
-          "flow_1d_usd": -39783265.6,
-          "flow_5d_usd": -102021510.65,
-          "flow_20d_usd": -228834286.65,
-          "flow_5d_pct_aum": -0.012383,
-          "flow_20d_pct_aum": -0.025805,
-          "flow_20d_z": -1.042,
+          "as_of": "2026-09-22",
+          "aum_usd": 8239925034.68,
+          "flow_1d_usd": 93493405.6,
+          "flow_5d_usd": 16842154.95,
+          "flow_20d_usd": -135340881.05,
+          "flow_5d_pct_aum": 0.00204,
+          "flow_20d_pct_aum": -0.015248,
+          "flow_20d_z": -0.835,
           "history_observations": 252,
           "split_adjustments": 1
         },
@@ -3043,14 +3043,14 @@
         "above_200d": true,
         "phase": "improving",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 23284390975.51,
-          "flow_1d_usd": 86047269.0,
-          "flow_5d_usd": 139142852.0,
-          "flow_20d_usd": 206317654.95,
-          "flow_5d_pct_aum": 0.005998,
-          "flow_20d_pct_aum": 0.009209,
-          "flow_20d_z": 0.843,
+          "as_of": "2026-09-22",
+          "aum_usd": 23231648440.9,
+          "flow_1d_usd": 192982175.9,
+          "flow_5d_usd": 423311795.9,
+          "flow_20d_usd": 449853468.95,
+          "flow_5d_pct_aum": 0.018486,
+          "flow_20d_pct_aum": 0.019957,
+          "flow_20d_z": 1.436,
           "history_observations": 252,
           "split_adjustments": 0
         },
@@ -3094,14 +3094,14 @@
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 13636469727.92,
-          "flow_1d_usd": -131023988.8,
-          "flow_5d_usd": -343369219.8,
-          "flow_20d_usd": -554111839.9,
-          "flow_5d_pct_aum": -0.023835,
-          "flow_20d_pct_aum": -0.037228,
-          "flow_20d_z": -1.016,
+          "as_of": "2026-09-22",
+          "aum_usd": 13856688942.61,
+          "flow_1d_usd": 82715731.0,
+          "flow_5d_usd": -285771088.7,
+          "flow_20d_usd": -252823153.9,
+          "flow_5d_pct_aum": -0.019964,
+          "flow_20d_pct_aum": -0.016953,
+          "flow_20d_z": -0.382,
           "history_observations": 252,
           "split_adjustments": 0
         },
@@ -3141,18 +3141,18 @@
         "excess_126d": -0.123138,
         "relative_strength": -0.114261,
         "acceleration": -0.034858,
-        "absolute_trend": 0.504804,
+        "absolute_trend": 0.504803,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 30417352821.18,
-          "flow_1d_usd": -203942558.4,
-          "flow_5d_usd": -381870508.1,
-          "flow_20d_usd": -1148785322.35,
-          "flow_5d_pct_aum": -0.0124,
-          "flow_20d_pct_aum": -0.034349,
-          "flow_20d_z": -1.976,
+          "as_of": "2026-09-22",
+          "aum_usd": 30465909298.5,
+          "flow_1d_usd": -8513550.1,
+          "flow_5d_usd": -179324713.2,
+          "flow_20d_usd": -1112552182.95,
+          "flow_5d_pct_aum": -0.005901,
+          "flow_20d_pct_aum": -0.03354,
+          "flow_20d_z": -1.921,
           "history_observations": 252,
           "split_adjustments": 0
         },
@@ -3196,14 +3196,14 @@
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 22002657275.5,
-          "flow_1d_usd": 0.0,
-          "flow_5d_usd": 711502316.65,
-          "flow_20d_usd": -60203158.55,
-          "flow_5d_pct_aum": 0.033253,
-          "flow_20d_pct_aum": -0.002597,
-          "flow_20d_z": -0.081,
+          "as_of": "2026-09-22",
+          "aum_usd": 22094705211.08,
+          "flow_1d_usd": 67393923.6,
+          "flow_5d_usd": 801065959.65,
+          "flow_20d_usd": 48588129.1,
+          "flow_5d_pct_aum": 0.038144,
+          "flow_20d_pct_aum": 0.002095,
+          "flow_20d_z": 0.131,
           "history_observations": 252,
           "split_adjustments": 1
         },
@@ -3229,7 +3229,7 @@
             "2XLY"
           ]
         },
-        "flow_confirmation": "supports"
+        "flow_confirmation": "diverges"
       },
       {
         "id": "utilities",
@@ -3247,14 +3247,14 @@
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
-          "as_of": "2026-09-21",
-          "aum_usd": 20948191039.59,
-          "flow_1d_usd": 32512576.0,
-          "flow_5d_usd": -172772050.0,
-          "flow_20d_usd": 54791271.5,
-          "flow_5d_pct_aum": -0.007953,
-          "flow_20d_pct_aum": 0.002492,
-          "flow_20d_z": 0.013,
+          "as_of": "2026-09-22",
+          "aum_usd": 21200900909.21,
+          "flow_1d_usd": 314043407.5,
+          "flow_5d_usd": 87556439.1,
+          "flow_20d_usd": 368834679.0,
+          "flow_5d_pct_aum": 0.004068,
+          "flow_20d_pct_aum": 0.016601,
+          "flow_20d_z": 0.617,
           "history_observations": 252,
           "split_adjustments": 1
         },

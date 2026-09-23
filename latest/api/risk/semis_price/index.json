@@ -16,7 +16,7 @@
     "neutral": 11.75,
     "loose": 64.08
   },
-  "correlation_with_glci": 0.398,
+  "correlation_with_glci": 0.397,
   "rolling_sharpe": [
     {
       "date": "2017-09-26",
@@ -4576,7 +4576,7 @@
     },
     {
       "date": "2022-04-05",
-      "value": 0.234
+      "value": 0.233
     },
     {
       "date": "2022-04-06",

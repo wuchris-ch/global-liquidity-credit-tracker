@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-27T02:23:30.925272",
+  "computed_at": "2026-09-27T15:59:41.101709",
   "current_regime": "loose",
   "assets": [
     {
@@ -53708,7 +53708,7 @@
         },
         {
           "date": "2022-04-05",
-          "value": 0.234
+          "value": 0.233
         },
         {
           "date": "2022-04-06",
@@ -59530,7 +59530,7 @@
         },
         {
           "date": "2019-01-18",
-          "value": -0.28
+          "value": -0.281
         },
         {
           "date": "2019-01-22",
@@ -65334,7 +65334,7 @@
         },
         {
           "date": "2024-10-24",
-          "value": 1.226
+          "value": 1.225
         },
         {
           "date": "2024-10-25",
@@ -114758,19 +114758,19 @@
       "id": "zcash_price",
       "name": "Zcash",
       "category": "Crypto",
-      "current_sharpe": 0.71,
-      "annualized_return": 83.39,
+      "current_sharpe": 0.72,
+      "annualized_return": 84.07,
       "annualized_volatility": 113.31,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": 2.29,
         "neutral": 2.62,
-        "loose": 1.42
+        "loose": 1.47
       },
       "return_by_regime": {
         "tight": 338.49,
         "neutral": 365.62,
-        "loose": 178.18
+        "loose": 183.45
       },
       "correlation_with_glci": 0.02,
       "rolling_sharpe": [
@@ -126285,6 +126285,10 @@
         {
           "date": "2026-09-25",
           "value": 2.786
+        },
+        {
+          "date": "2026-09-26",
+          "value": 2.803
         }
       ]
     },
@@ -130402,7 +130406,7 @@
         },
         {
           "date": "2021-10-22",
-          "value": -0.476
+          "value": -0.477
         },
         {
           "date": "2021-10-25",
@@ -132946,7 +132950,7 @@
         },
         {
           "date": "2024-05-06",
-          "value": -0.946
+          "value": -0.947
         },
         {
           "date": "2024-05-07",
@@ -135409,7 +135413,7 @@
       [
         2.29,
         2.62,
-        1.42
+        1.47
       ],
       [
         -3.6,
@@ -135461,7 +135465,7 @@
       [
         338.49,
         365.62,
-        178.18
+        183.45
       ],
       [
         -58.61,

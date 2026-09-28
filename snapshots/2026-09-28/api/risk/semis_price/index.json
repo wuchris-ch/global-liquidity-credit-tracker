@@ -8,15 +8,15 @@
   "max_drawdown": -45.3,
   "sharpe_by_regime": {
     "tight": 2.1,
-    "neutral": 0.21,
-    "loose": 1.57
+    "neutral": 0.23,
+    "loose": 1.55
   },
   "return_by_regime": {
     "tight": 152.63,
-    "neutral": 11.75,
-    "loose": 64.78
+    "neutral": 12.65,
+    "loose": 64.09
   },
-  "correlation_with_glci": 0.397,
+  "correlation_with_glci": 0.394,
   "rolling_sharpe": [
     {
       "date": "2017-10-02",
@@ -108,7 +108,7 @@
     },
     {
       "date": "2017-11-01",
-      "value": 2.515
+      "value": 2.516
     },
     {
       "date": "2017-11-02",
@@ -6768,7 +6768,7 @@
     },
     {
       "date": "2024-06-17",
-      "value": 2.05
+      "value": 2.049
     },
     {
       "date": "2024-06-18",

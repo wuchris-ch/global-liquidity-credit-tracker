@@ -13,10 +13,10 @@
   },
   "return_by_regime": {
     "tight": 67.12,
-    "neutral": -11.06,
-    "loose": 42.47
+    "neutral": -10.92,
+    "loose": 42.52
   },
-  "correlation_with_glci": 0.308,
+  "correlation_with_glci": 0.309,
   "rolling_sharpe": [
     {
       "date": "2017-10-02",
@@ -1324,7 +1324,7 @@
     },
     {
       "date": "2019-01-18",
-      "value": -0.281
+      "value": -0.28
     },
     {
       "date": "2019-01-22",
@@ -1856,7 +1856,7 @@
     },
     {
       "date": "2019-07-31",
-      "value": -0.228
+      "value": -0.229
     },
     {
       "date": "2019-08-01",
@@ -7128,7 +7128,7 @@
     },
     {
       "date": "2024-10-24",
-      "value": 1.226
+      "value": 1.225
     },
     {
       "date": "2024-10-25",

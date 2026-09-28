@@ -13,10 +13,10 @@
   },
   "return_by_regime": {
     "tight": 127.19,
-    "neutral": -26.13,
-    "loose": 34.82
+    "neutral": -25.95,
+    "loose": 35.1
   },
-  "correlation_with_glci": 0.098,
+  "correlation_with_glci": 0.097,
   "rolling_sharpe": [
     {
       "date": "2017-05-20",

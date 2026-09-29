@@ -2,7 +2,7 @@
   "periods": [
     {
       "regime": "neutral",
-      "start": "2024-06-21",
+      "start": "2024-06-28",
       "end": "2024-07-05"
     },
     {
@@ -13,6 +13,16 @@
     {
       "regime": "neutral",
       "start": "2024-07-26",
+      "end": "2024-08-02"
+    },
+    {
+      "regime": "tight",
+      "start": "2024-08-02",
+      "end": "2024-08-09"
+    },
+    {
+      "regime": "neutral",
+      "start": "2024-08-09",
       "end": "2024-08-16"
     },
     {
@@ -148,8 +158,8 @@
   ],
   "counts": {
     "loose": 57,
-    "neutral": 56,
-    "tight": 6
+    "neutral": 54,
+    "tight": 7
   },
   "current": "neutral"
 }

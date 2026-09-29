@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-29T03:11:24.264802",
+  "computed_at": "2026-09-29T17:14:22.384218",
   "current_regime": "neutral",
   "assets": [
     {
@@ -11,13 +11,13 @@
       "annualized_volatility": 18.07,
       "max_drawdown": -33.92,
       "sharpe_by_regime": {
-        "tight": 1.26,
-        "neutral": 0.09,
+        "tight": 0.64,
+        "neutral": 0.25,
         "loose": 1.51
       },
       "return_by_regime": {
-        "tight": 55.06,
-        "neutral": 5.66,
+        "tight": 29.39,
+        "neutral": 7.92,
         "loose": 22.78
       },
       "correlation_with_glci": 0.399,
@@ -9069,20 +9069,20 @@
       "name": "Nasdaq 100",
       "category": "Large Cap Equities",
       "current_sharpe": 0.52,
-      "annualized_return": 16.8,
+      "annualized_return": 16.77,
       "annualized_volatility": 26.11,
       "max_drawdown": -82.9,
       "sharpe_by_regime": {
-        "tight": 1.51,
-        "neutral": 0.23,
+        "tight": 0.91,
+        "neutral": 0.31,
         "loose": 1.28
       },
       "return_by_regime": {
-        "tight": 77.97,
-        "neutral": 8.87,
+        "tight": 47.64,
+        "neutral": 10.29,
         "loose": 28.73
       },
-      "correlation_with_glci": 0.375,
+      "correlation_with_glci": 0.377,
       "rolling_sharpe": [
         {
           "date": "1986-12-31",
@@ -49131,6 +49131,10 @@
         {
           "date": "2026-09-25",
           "value": 1.028
+        },
+        {
+          "date": "2026-09-28",
+          "value": 0.994
         }
       ]
     },
@@ -49143,16 +49147,16 @@
       "annualized_volatility": 33.54,
       "max_drawdown": -45.3,
       "sharpe_by_regime": {
-        "tight": 2.1,
-        "neutral": 0.2,
+        "tight": 1.54,
+        "neutral": 0.39,
         "loose": 1.55
       },
       "return_by_regime": {
-        "tight": 152.63,
-        "neutral": 11.59,
+        "tight": 112.38,
+        "neutral": 17.85,
         "loose": 64.09
       },
-      "correlation_with_glci": 0.394,
+      "correlation_with_glci": 0.395,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -52088,7 +52092,7 @@
         },
         {
           "date": "2020-09-01",
-          "value": 1.313
+          "value": 1.312
         },
         {
           "date": "2020-09-02",
@@ -55900,7 +55904,7 @@
         },
         {
           "date": "2024-06-17",
-          "value": 2.05
+          "value": 2.049
         },
         {
           "date": "2024-06-18",
@@ -58197,16 +58201,16 @@
       "annualized_volatility": 23.01,
       "max_drawdown": -41.13,
       "sharpe_by_regime": {
-        "tight": 1.55,
-        "neutral": -0.76,
+        "tight": 0.46,
+        "neutral": -0.63,
         "loose": 2.03
       },
       "return_by_regime": {
-        "tight": 67.12,
-        "neutral": -11.53,
+        "tight": 23.21,
+        "neutral": -8.72,
         "loose": 42.52
       },
-      "correlation_with_glci": 0.309,
+      "correlation_with_glci": 0.308,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -64678,7 +64682,7 @@
         },
         {
           "date": "2024-03-08",
-          "value": 0.413
+          "value": 0.412
         },
         {
           "date": "2024-03-11",
@@ -67251,16 +67255,16 @@
       "annualized_volatility": 16.44,
       "max_drawdown": -26.4,
       "sharpe_by_regime": {
-        "tight": 3.35,
-        "neutral": 1.12,
+        "tight": 2.75,
+        "neutral": 1.26,
         "loose": 0.57
       },
       "return_by_regime": {
-        "tight": 99.78,
-        "neutral": 28.68,
+        "tight": 78.87,
+        "neutral": 31.94,
         "loose": 18.08
       },
-      "correlation_with_glci": 0.089,
+      "correlation_with_glci": 0.091,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -76305,16 +76309,16 @@
       "annualized_volatility": 32.5,
       "max_drawdown": -52.28,
       "sharpe_by_regime": {
-        "tight": 3.41,
-        "neutral": 1.26,
+        "tight": 2.04,
+        "neutral": 1.56,
         "loose": 0.32
       },
       "return_by_regime": {
-        "tight": 130.69,
-        "neutral": 51.47,
+        "tight": 81.56,
+        "neutral": 62.69,
         "loose": 21.87
       },
-      "correlation_with_glci": 0.203,
+      "correlation_with_glci": 0.201,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -85359,16 +85363,16 @@
       "annualized_volatility": 71.25,
       "max_drawdown": -83.8,
       "sharpe_by_regime": {
-        "tight": 1.86,
-        "neutral": -0.89,
+        "tight": 0.83,
+        "neutral": -0.75,
         "loose": 1.37
       },
       "return_by_regime": {
-        "tight": 112.66,
-        "neutral": -34.42,
+        "tight": 62.75,
+        "neutral": -26.52,
         "loose": 65.73
       },
-      "correlation_with_glci": 0.123,
+      "correlation_with_glci": 0.121,
       "rolling_sharpe": [
         {
           "date": "2016-01-04",
@@ -101061,16 +101065,16 @@
       "annualized_volatility": 92.7,
       "max_drawdown": -94.01,
       "sharpe_by_regime": {
-        "tight": 1.08,
-        "neutral": -0.44,
+        "tight": -0.09,
+        "neutral": -0.21,
         "loose": 0.5
       },
       "return_by_regime": {
-        "tight": 127.19,
-        "neutral": -25.91,
+        "tight": -6.79,
+        "neutral": -10.02,
         "loose": 35.1
       },
-      "correlation_with_glci": 0.097,
+      "correlation_with_glci": 0.094,
       "rolling_sharpe": [
         {
           "date": "2017-05-20",
@@ -114751,17 +114755,17 @@
       "name": "Zcash",
       "category": "Crypto",
       "current_sharpe": 0.71,
-      "annualized_return": 83.64,
-      "annualized_volatility": 113.3,
+      "annualized_return": 82.86,
+      "annualized_volatility": 113.31,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
-        "tight": 2.29,
-        "neutral": 2.63,
+        "tight": 2.64,
+        "neutral": 2.53,
         "loose": 1.42
       },
       "return_by_regime": {
-        "tight": 338.49,
-        "neutral": 365.72,
+        "tight": 371.7,
+        "neutral": 357.04,
         "loose": 178.19
       },
       "correlation_with_glci": 0.02,
@@ -126285,6 +126289,10 @@
         {
           "date": "2026-09-27",
           "value": 2.785
+        },
+        {
+          "date": "2026-09-28",
+          "value": 2.687
         }
       ]
     },
@@ -126297,16 +126305,16 @@
       "annualized_volatility": 14.83,
       "max_drawdown": -48.35,
       "sharpe_by_regime": {
-        "tight": -3.6,
-        "neutral": 0.44,
+        "tight": -2.73,
+        "neutral": 0.53,
         "loose": -1.24
       },
       "return_by_regime": {
-        "tight": -58.61,
-        "neutral": 9.56,
+        "tight": -49.05,
+        "neutral": 10.29,
         "loose": -9.35
       },
-      "correlation_with_glci": -0.143,
+      "correlation_with_glci": -0.142,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -126422,7 +126430,7 @@
         },
         {
           "date": "2017-11-10",
-          "value": 0.335
+          "value": 0.334
         },
         {
           "date": "2017-11-13",
@@ -130394,7 +130402,7 @@
         },
         {
           "date": "2021-10-22",
-          "value": -0.476
+          "value": -0.477
         },
         {
           "date": "2021-10-25",
@@ -131998,7 +132006,7 @@
         },
         {
           "date": "2023-05-30",
-          "value": -0.713
+          "value": -0.712
         },
         {
           "date": "2023-05-31",
@@ -135363,105 +135371,105 @@
     ],
     "sharpe_data": [
       [
-        1.26,
-        0.09,
+        0.64,
+        0.25,
         1.51
       ],
       [
-        1.51,
-        0.23,
+        0.91,
+        0.31,
         1.28
       ],
       [
-        2.1,
-        0.2,
+        1.54,
+        0.39,
         1.55
       ],
       [
-        1.55,
-        -0.76,
+        0.46,
+        -0.63,
         2.03
       ],
       [
-        3.35,
-        1.12,
+        2.75,
+        1.26,
         0.57
       ],
       [
-        3.41,
-        1.26,
+        2.04,
+        1.56,
         0.32
       ],
       [
-        1.86,
-        -0.89,
+        0.83,
+        -0.75,
         1.37
       ],
       [
-        1.08,
-        -0.44,
+        -0.09,
+        -0.21,
         0.5
       ],
       [
-        2.29,
-        2.63,
+        2.64,
+        2.53,
         1.42
       ],
       [
-        -3.6,
-        0.44,
+        -2.73,
+        0.53,
         -1.24
       ]
     ],
     "return_data": [
       [
-        55.06,
-        5.66,
+        29.39,
+        7.92,
         22.78
       ],
       [
-        77.97,
-        8.87,
+        47.64,
+        10.29,
         28.73
       ],
       [
-        152.63,
-        11.59,
+        112.38,
+        17.85,
         64.09
       ],
       [
-        67.12,
-        -11.53,
+        23.21,
+        -8.72,
         42.52
       ],
       [
-        99.78,
-        28.68,
+        78.87,
+        31.94,
         18.08
       ],
       [
-        130.69,
-        51.47,
+        81.56,
+        62.69,
         21.87
       ],
       [
-        112.66,
-        -34.42,
+        62.75,
+        -26.52,
         65.73
       ],
       [
-        127.19,
-        -25.91,
+        -6.79,
+        -10.02,
         35.1
       ],
       [
-        338.49,
-        365.72,
+        371.7,
+        357.04,
         178.19
       ],
       [
-        -58.61,
-        9.56,
+        -49.05,
+        10.29,
         -9.35
       ]
     ]

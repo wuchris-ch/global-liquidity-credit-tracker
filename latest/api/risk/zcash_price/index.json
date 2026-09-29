@@ -3,17 +3,17 @@
   "name": "Zcash",
   "category": "Crypto",
   "current_sharpe": 0.71,
-  "annualized_return": 83.64,
-  "annualized_volatility": 113.3,
+  "annualized_return": 82.86,
+  "annualized_volatility": 113.31,
   "max_drawdown": -97.92,
   "sharpe_by_regime": {
-    "tight": 2.29,
-    "neutral": 2.63,
+    "tight": 2.64,
+    "neutral": 2.53,
     "loose": 1.42
   },
   "return_by_regime": {
-    "tight": 338.49,
-    "neutral": 365.72,
+    "tight": 371.7,
+    "neutral": 357.04,
     "loose": 178.19
   },
   "correlation_with_glci": 0.02,
@@ -11537,6 +11537,10 @@
     {
       "date": "2026-09-27",
       "value": 2.785
+    },
+    {
+      "date": "2026-09-28",
+      "value": 2.687
     }
   ]
 }

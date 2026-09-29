@@ -7,16 +7,16 @@
   "annualized_volatility": 14.83,
   "max_drawdown": -48.35,
   "sharpe_by_regime": {
-    "tight": -3.6,
-    "neutral": 0.44,
+    "tight": -2.73,
+    "neutral": 0.53,
     "loose": -1.24
   },
   "return_by_regime": {
-    "tight": -58.61,
-    "neutral": 9.56,
+    "tight": -49.05,
+    "neutral": 10.29,
     "loose": -9.35
   },
-  "correlation_with_glci": -0.143,
+  "correlation_with_glci": -0.142,
   "rolling_sharpe": [
     {
       "date": "2017-10-03",
@@ -132,7 +132,7 @@
     },
     {
       "date": "2017-11-10",
-      "value": 0.335
+      "value": 0.334
     },
     {
       "date": "2017-11-13",
@@ -4104,7 +4104,7 @@
     },
     {
       "date": "2021-10-22",
-      "value": -0.476
+      "value": -0.477
     },
     {
       "date": "2021-10-25",
@@ -5708,7 +5708,7 @@
     },
     {
       "date": "2023-05-30",
-      "value": -0.713
+      "value": -0.712
     },
     {
       "date": "2023-05-31",

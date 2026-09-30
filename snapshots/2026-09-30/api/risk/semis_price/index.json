@@ -16,7 +16,7 @@
     "neutral": 18.9,
     "loose": 64.09
   },
-  "correlation_with_glci": 0.394,
+  "correlation_with_glci": 0.393,
   "rolling_sharpe": [
     {
       "date": "2017-10-03",
@@ -2952,7 +2952,7 @@
     },
     {
       "date": "2020-09-01",
-      "value": 1.313
+      "value": 1.312
     },
     {
       "date": "2020-09-02",
@@ -6764,7 +6764,7 @@
     },
     {
       "date": "2024-06-17",
-      "value": 2.049
+      "value": 2.05
     },
     {
       "date": "2024-06-18",

@@ -4,23 +4,23 @@
   "point_in_time": false,
   "frequency": "W-FRI",
   "snapshots": {
-    "count": 145,
+    "count": 146,
     "unique_signal_dates": 12,
-    "duplicate_vintages": 133,
+    "duplicate_vintages": 134,
     "first_signal_date": "2026-07-10",
     "latest_signal_date": "2026-09-25",
     "first_computed_at": "2026-07-11T04:12:17.432117Z",
-    "last_computed_at": "2026-09-30T02:51:58.040603Z",
+    "last_computed_at": "2026-09-30T17:11:01.814467Z",
     "latest_signal_revision": {
-      "vintage_count": 8,
+      "vintage_count": 9,
       "first_glci": 113.48272960315956,
-      "latest_glci": 112.06871857195256,
-      "glci_change": -1.4140110312069964,
-      "glci_min": 112.06871857195256,
+      "latest_glci": 111.4542493538323,
+      "glci_change": -2.0284802493272593,
+      "glci_min": 111.4542493538323,
       "glci_max": 113.48272960315957,
       "first_zscore": 1.1337153721531685,
-      "latest_zscore": 0.9790791428452369,
-      "zscore_change": -0.15463622930793164,
+      "latest_zscore": 0.911054882838376,
+      "zscore_change": -0.22266048931479254,
       "first_regime": "loose",
       "latest_regime": "neutral",
       "regime_changed": true
@@ -49,18 +49,18 @@
   "pillar_stats": {
     "liquidity": {
       "method": "pca_shrunk",
-      "explained_variance": 0.3382350455990597,
+      "explained_variance": 0.3382345125873065,
       "n_variables": 9,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 17,
       "constraint_exclusion_share": 0.35714285714285715,
-      "max_series_loading_share": 0.25673390366914467,
+      "max_series_loading_share": 0.2567333860492682,
       "series_loading_shares": {
-        "boj_total_assets": 0.18418492881839696,
-        "ecb_total_assets": 0.25673390366914467,
-        "fed_reserve_balances": 0.08949728818583293,
-        "fed_total_assets": 0.24355727322803675,
-        "us_m2": 0.2260266060985888
+        "boj_total_assets": 0.18418587078459261,
+        "ecb_total_assets": 0.2567333860492682,
+        "fed_reserve_balances": 0.08949749044086583,
+        "fed_total_assets": 0.24355707351913636,
+        "us_m2": 0.22602617920613707
       },
       "data_quality": {
         "total_series": 7,
@@ -141,17 +141,17 @@
     },
     "stress": {
       "method": "pca_shrunk",
-      "explained_variance": 0.5238913132902636,
+      "explained_variance": 0.5256603600572778,
       "n_variables": 4,
       "loading_semantics": "joint_rank_one_decoder_loadings",
       "constraint_solver_iterations": 13,
       "constraint_exclusion_share": 0.3333333333333333,
-      "max_series_loading_share": 0.26811999627780425,
+      "max_series_loading_share": 0.2676951251323153,
       "series_loading_shares": {
-        "ice_bofa_us_high_yield_spread": 0.26811999627780425,
-        "ice_bofa_us_ig_spread": 0.26163775450760113,
-        "nfci": 0.2346246668432672,
-        "vix": 0.23561758237132752
+        "ice_bofa_us_high_yield_spread": 0.2676951251323153,
+        "ice_bofa_us_ig_spread": 0.2614806111420444,
+        "nfci": 0.23576417808108116,
+        "vix": 0.23506008564455907
       },
       "data_quality": {
         "total_series": 6,

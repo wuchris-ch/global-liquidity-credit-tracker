@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-09-30T02:52:38.690730",
+  "computed_at": "2026-09-30T17:11:42.682817",
   "current_regime": "neutral",
   "assets": [
     {
@@ -9074,15 +9074,15 @@
       "max_drawdown": -82.9,
       "sharpe_by_regime": {
         "tight": 0.91,
-        "neutral": 0.31,
+        "neutral": 0.32,
         "loose": 1.28
       },
       "return_by_regime": {
         "tight": 47.64,
-        "neutral": 10.29,
+        "neutral": 10.46,
         "loose": 28.73
       },
-      "correlation_with_glci": 0.377,
+      "correlation_with_glci": 0.375,
       "rolling_sharpe": [
         {
           "date": "1986-12-31",
@@ -49135,6 +49135,10 @@
         {
           "date": "2026-09-28",
           "value": 0.994
+        },
+        {
+          "date": "2026-09-29",
+          "value": 0.982
         }
       ]
     },
@@ -49156,7 +49160,7 @@
         "neutral": 18.9,
         "loose": 64.09
       },
-      "correlation_with_glci": 0.394,
+      "correlation_with_glci": 0.393,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -52092,7 +52096,7 @@
         },
         {
           "date": "2020-09-01",
-          "value": 1.313
+          "value": 1.312
         },
         {
           "date": "2020-09-02",
@@ -55904,7 +55908,7 @@
         },
         {
           "date": "2024-06-17",
-          "value": 2.049
+          "value": 2.05
         },
         {
           "date": "2024-06-18",
@@ -62718,7 +62722,7 @@
         },
         {
           "date": "2022-03-23",
-          "value": -0.031
+          "value": -0.03
         },
         {
           "date": "2022-03-24",
@@ -63930,7 +63934,7 @@
         },
         {
           "date": "2023-06-07",
-          "value": 0.028
+          "value": 0.029
         },
         {
           "date": "2023-06-08",
@@ -65322,7 +65326,7 @@
         },
         {
           "date": "2024-10-24",
-          "value": 1.226
+          "value": 1.225
         },
         {
           "date": "2024-10-25",
@@ -66294,7 +66298,7 @@
         },
         {
           "date": "2025-10-15",
-          "value": 0.504
+          "value": 0.505
         },
         {
           "date": "2025-10-16",
@@ -67272,7 +67276,7 @@
         "neutral": 33.1,
         "loose": 18.08
       },
-      "correlation_with_glci": 0.091,
+      "correlation_with_glci": 0.092,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -85388,7 +85392,7 @@
         "neutral": -26.27,
         "loose": 65.73
       },
-      "correlation_with_glci": 0.121,
+      "correlation_with_glci": 0.12,
       "rolling_sharpe": [
         {
           "date": "2016-01-04",
@@ -101094,7 +101098,7 @@
         "neutral": -10.44,
         "loose": 35.1
       },
-      "correlation_with_glci": 0.094,
+      "correlation_with_glci": 0.093,
       "rolling_sharpe": [
         {
           "date": "2017-05-20",
@@ -114778,18 +114782,18 @@
       "id": "zcash_price",
       "name": "Zcash",
       "category": "Crypto",
-      "current_sharpe": 0.71,
-      "annualized_return": 82.86,
-      "annualized_volatility": 113.31,
+      "current_sharpe": 0.7,
+      "annualized_return": 82.32,
+      "annualized_volatility": 113.3,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": 2.64,
-        "neutral": 2.53,
+        "neutral": 2.49,
         "loose": 1.42
       },
       "return_by_regime": {
         "tight": 371.7,
-        "neutral": 357.04,
+        "neutral": 351.69,
         "loose": 178.19
       },
       "correlation_with_glci": 0.02,
@@ -126317,6 +126321,10 @@
         {
           "date": "2026-09-28",
           "value": 2.687
+        },
+        {
+          "date": "2026-09-29",
+          "value": 2.562
         }
       ]
     },
@@ -126331,14 +126339,14 @@
       "sharpe_by_regime": {
         "tight": -2.73,
         "neutral": 0.48,
-        "loose": -1.23
+        "loose": -1.24
       },
       "return_by_regime": {
         "tight": -49.05,
         "neutral": 9.77,
         "loose": -9.35
       },
-      "correlation_with_glci": -0.141,
+      "correlation_with_glci": -0.14,
       "rolling_sharpe": [
         {
           "date": "2017-10-03",
@@ -128426,7 +128434,7 @@
         },
         {
           "date": "2019-10-29",
-          "value": 1.679
+          "value": 1.678
         },
         {
           "date": "2019-10-30",
@@ -129350,7 +129358,7 @@
         },
         {
           "date": "2020-09-29",
-          "value": 0.808
+          "value": 0.809
         },
         {
           "date": "2020-09-30",
@@ -129406,7 +129414,7 @@
         },
         {
           "date": "2020-10-19",
-          "value": 0.809
+          "value": 0.81
         },
         {
           "date": "2020-10-20",
@@ -135405,7 +135413,7 @@
       ],
       [
         0.91,
-        0.31,
+        0.32,
         1.28
       ],
       [
@@ -135440,13 +135448,13 @@
       ],
       [
         2.64,
-        2.53,
+        2.49,
         1.42
       ],
       [
         -2.73,
         0.48,
-        -1.23
+        -1.24
       ]
     ],
     "return_data": [
@@ -135457,7 +135465,7 @@
       ],
       [
         47.64,
-        10.29,
+        10.46,
         28.73
       ],
       [
@@ -135492,7 +135500,7 @@
       ],
       [
         371.7,
-        357.04,
+        351.69,
         178.19
       ],
       [

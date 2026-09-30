@@ -8,15 +8,15 @@
   "max_drawdown": -82.9,
   "sharpe_by_regime": {
     "tight": 0.91,
-    "neutral": 0.31,
+    "neutral": 0.32,
     "loose": 1.28
   },
   "return_by_regime": {
     "tight": 47.64,
-    "neutral": 10.29,
+    "neutral": 10.46,
     "loose": 28.73
   },
-  "correlation_with_glci": 0.377,
+  "correlation_with_glci": 0.375,
   "rolling_sharpe": [
     {
       "date": "1986-12-31",
@@ -40069,6 +40069,10 @@
     {
       "date": "2026-09-28",
       "value": 0.994
+    },
+    {
+      "date": "2026-09-29",
+      "value": 0.982
     }
   ]
 }

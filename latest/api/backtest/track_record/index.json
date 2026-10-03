@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-03T02:47:45.072184",
+  "computed_at": "2026-10-03T15:24:36.682549",
   "date_range": {
     "start": "2024-06-28",
     "end": "2026-10-02"
@@ -1815,7 +1815,7 @@
             "4": {
               "median": 0.00714,
               "p25": -0.019907,
-              "p75": 0.034383,
+              "p75": 0.034701,
               "hit_rate": 0.5818,
               "n": 55,
               "ci_median_low": -0.011591,
@@ -1831,7 +1831,7 @@
               "fdr_significant": false
             },
             "13": {
-              "median": 0.044779,
+              "median": 0.050418,
               "p25": -0.002927,
               "p75": 0.075672,
               "hit_rate": 0.7143,
@@ -1985,7 +1985,7 @@
             "4": {
               "median": 0.008011,
               "p25": -0.018498,
-              "p75": 0.035726,
+              "p75": 0.036064,
               "hit_rate": 0.62,
               "n": 50,
               "ci_median_low": -0.01688,
@@ -2526,8 +2526,8 @@
               "p75": 0.190074,
               "hit_rate": 0.9388,
               "n": 49,
-              "ci_median_low": 0.083599,
-              "ci_median_high": 0.180843,
+              "ci_median_low": 0.083598,
+              "ci_median_high": 0.180844,
               "ci_hit_rate_low": 0.7751,
               "ci_hit_rate_high": 1.0,
               "edge": 0.1996,
@@ -2713,7 +2713,7 @@
             "4": {
               "median": 0.012179,
               "p25": -0.042222,
-              "p75": 0.037845,
+              "p75": 0.037844,
               "hit_rate": 0.6,
               "n": 50,
               "ci_median_low": -0.018404,
@@ -4363,7 +4363,7 @@
             "4": {
               "median": 0.07747,
               "p25": -0.159701,
-              "p75": 0.341241,
+              "p75": 0.290462,
               "hit_rate": 0.5636,
               "n": 55,
               "ci_median_low": -0.125527,
@@ -4533,7 +4533,7 @@
             "4": {
               "median": 0.057131,
               "p25": -0.119441,
-              "p75": 0.692889,
+              "p75": 0.688872,
               "hit_rate": 0.52,
               "n": 50,
               "ci_median_low": -0.096279,
@@ -4599,7 +4599,7 @@
           "n": 114
         },
         "13": {
-          "median": -0.00789,
+          "median": -0.007891,
           "hit_rate": 0.419,
           "n": 105
         },
@@ -4705,9 +4705,9 @@
               "fdr_significant": false
             },
             "26": {
-              "median": -0.000772,
+              "median": -0.000771,
               "p25": -0.026988,
-              "p75": 0.02558,
+              "p75": 0.025579,
               "hit_rate": 0.4898,
               "n": 49,
               "ci_median_low": -0.024169,
@@ -4744,11 +4744,11 @@
             },
             "13": {
               "median": -0.018258,
-              "p25": -0.045277,
+              "p25": -0.045276,
               "p75": 0.00278,
               "hit_rate": 0.3265,
               "n": 49,
-              "ci_median_low": -0.031906,
+              "ci_median_low": -0.031907,
               "ci_median_high": 0.013716,
               "ci_hit_rate_low": 0.1429,
               "ci_hit_rate_high": 0.6887,
@@ -4766,7 +4766,7 @@
               "p75": -0.006507,
               "hit_rate": 0.2222,
               "n": 36,
-              "ci_median_low": -0.042607,
+              "ci_median_low": -0.042606,
               "ci_median_high": 0.023092,
               "ci_hit_rate_low": 0.0518,
               "ci_hit_rate_high": 0.6364,
@@ -4858,7 +4858,7 @@
             },
             "13": {
               "median": -0.019721,
-              "p25": -0.031906,
+              "p25": -0.031907,
               "p75": 0.012356,
               "hit_rate": 0.3103,
               "n": 29,
@@ -4965,9 +4965,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 151,
+      "vintage_count": 152,
       "unique_signal_dates": 13,
-      "duplicate_vintages": 138,
+      "duplicate_vintages": 139,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-10-02"
     },
@@ -5112,12 +5112,12 @@
         "horizons": {
           "4": {
             "issued": 13,
-            "matured": 7,
-            "pending": 6,
+            "matured": 8,
+            "pending": 5,
             "unavailable": 0,
             "median": null,
             "hit_rate": null,
-            "next_maturity_date": "2026-10-02",
+            "next_maturity_date": "2026-10-09",
             "status": "collecting",
             "by_regime": {
               "tight": {
@@ -5132,12 +5132,12 @@
               },
               "neutral": {
                 "issued": 11,
-                "matured": 6,
-                "pending": 5,
+                "matured": 7,
+                "pending": 4,
                 "unavailable": 0,
                 "median": null,
                 "hit_rate": null,
-                "next_maturity_date": "2026-10-02",
+                "next_maturity_date": "2026-10-09",
                 "status": "collecting"
               },
               "loose": {
@@ -6043,12 +6043,12 @@
         "horizons": {
           "4": {
             "issued": 13,
-            "matured": 7,
-            "pending": 6,
+            "matured": 8,
+            "pending": 5,
             "unavailable": 0,
             "median": null,
             "hit_rate": null,
-            "next_maturity_date": "2026-10-02",
+            "next_maturity_date": "2026-10-09",
             "status": "collecting",
             "by_regime": {
               "tight": {
@@ -6063,12 +6063,12 @@
               },
               "neutral": {
                 "issued": 11,
-                "matured": 6,
-                "pending": 5,
+                "matured": 7,
+                "pending": 4,
                 "unavailable": 0,
                 "median": null,
                 "hit_rate": null,
-                "next_maturity_date": "2026-10-02",
+                "next_maturity_date": "2026-10-09",
                 "status": "collecting"
               },
               "loose": {

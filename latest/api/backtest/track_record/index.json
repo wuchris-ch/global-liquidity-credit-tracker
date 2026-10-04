@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-04T03:18:02.682904",
+  "computed_at": "2026-10-04T16:08:25.470198",
   "date_range": {
     "start": "2024-06-28",
     "end": "2026-10-02"
@@ -2713,7 +2713,7 @@
             "4": {
               "median": 0.012179,
               "p25": -0.042222,
-              "p75": 0.037845,
+              "p75": 0.037844,
               "hit_rate": 0.6,
               "n": 50,
               "ci_median_low": -0.018404,
@@ -4687,7 +4687,7 @@
               "fdr_significant": false
             },
             "13": {
-              "median": 0.001397,
+              "median": 0.001396,
               "p25": -0.024271,
               "p75": 0.027251,
               "hit_rate": 0.5102,
@@ -4705,7 +4705,7 @@
               "fdr_significant": false
             },
             "26": {
-              "median": -0.000771,
+              "median": -0.000772,
               "p25": -0.026988,
               "p75": 0.025579,
               "hit_rate": 0.4898,
@@ -4841,7 +4841,7 @@
             "4": {
               "median": -0.008958,
               "p25": -0.018986,
-              "p75": 0.014656,
+              "p75": 0.014655,
               "hit_rate": 0.4333,
               "n": 30,
               "ci_median_low": -0.016297,
@@ -4918,7 +4918,7 @@
               "p75": 0.033939,
               "hit_rate": 0.5,
               "n": 42,
-              "ci_median_low": -0.021846,
+              "ci_median_low": -0.021845,
               "ci_median_high": 0.039166,
               "ci_hit_rate_low": 0.2258,
               "ci_hit_rate_high": 0.7725,
@@ -4933,7 +4933,7 @@
             "26": {
               "median": -0.011415,
               "p25": -0.027695,
-              "p75": 0.022506,
+              "p75": 0.022507,
               "hit_rate": 0.4286,
               "n": 42,
               "ci_median_low": -0.023873,
@@ -4965,9 +4965,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 153,
+      "vintage_count": 154,
       "unique_signal_dates": 13,
-      "duplicate_vintages": 140,
+      "duplicate_vintages": 141,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-10-02"
     },

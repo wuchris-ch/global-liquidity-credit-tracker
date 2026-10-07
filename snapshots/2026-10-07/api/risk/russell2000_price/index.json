@@ -8,13 +8,13 @@
   "max_drawdown": -41.13,
   "sharpe_by_regime": {
     "tight": 0.41,
-    "neutral": -0.56,
-    "loose": 1.92
+    "neutral": -0.8,
+    "loose": 2.29
   },
   "return_by_regime": {
     "tight": 20.77,
-    "neutral": -6.95,
-    "loose": 40.37
+    "neutral": -11.73,
+    "loose": 47.66
   },
   "correlation_with_glci": 0.307,
   "rolling_sharpe": [
@@ -1620,7 +1620,7 @@
     },
     {
       "date": "2019-05-15",
-      "value": -0.155
+      "value": -0.156
     },
     {
       "date": "2019-05-16",
@@ -7104,7 +7104,7 @@
     },
     {
       "date": "2024-10-24",
-      "value": 1.225
+      "value": 1.226
     },
     {
       "date": "2024-10-25",
@@ -8076,7 +8076,7 @@
     },
     {
       "date": "2025-10-15",
-      "value": 0.505
+      "value": 0.504
     },
     {
       "date": "2025-10-16",

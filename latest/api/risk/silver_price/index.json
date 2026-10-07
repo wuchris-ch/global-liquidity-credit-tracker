@@ -8,15 +8,15 @@
   "max_drawdown": -52.28,
   "sharpe_by_regime": {
     "tight": 3.47,
-    "neutral": 1.35,
-    "loose": 0.26
+    "neutral": 0.99,
+    "loose": 0.46
   },
   "return_by_regime": {
     "tight": 134.97,
-    "neutral": 54.08,
-    "loose": 18.41
+    "neutral": 41.13,
+    "loose": 29.47
   },
-  "correlation_with_glci": 0.214,
+  "correlation_with_glci": 0.215,
   "rolling_sharpe": [
     {
       "date": "2017-10-10",

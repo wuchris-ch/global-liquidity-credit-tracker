@@ -148,22 +148,22 @@
     {
       "regime": "neutral",
       "start": "2026-08-21",
-      "end": "2026-08-28"
+      "end": "2026-09-11"
     },
     {
       "regime": "loose",
-      "start": "2026-08-28",
-      "end": "2026-09-25"
+      "start": "2026-09-11",
+      "end": "2026-09-18"
     },
     {
       "regime": "neutral",
-      "start": "2026-09-25",
+      "start": "2026-09-18",
       "end": "2026-10-02"
     }
   ],
   "counts": {
-    "loose": 58,
-    "neutral": 52,
+    "loose": 55,
+    "neutral": 55,
     "tight": 8
   },
   "current": "neutral"

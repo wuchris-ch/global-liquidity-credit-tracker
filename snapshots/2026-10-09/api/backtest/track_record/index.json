@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-09T03:32:47.417715",
+  "computed_at": "2026-10-09T17:42:01.323393",
   "date_range": {
     "start": "2024-07-05",
     "end": "2026-10-02"
@@ -2514,7 +2514,7 @@
               "p75": 0.193791,
               "hit_rate": 0.9362,
               "n": 47,
-              "ci_median_low": 0.083599,
+              "ci_median_low": 0.083598,
               "ci_median_high": 0.18107,
               "ci_hit_rate_low": 0.7714,
               "ci_hit_rate_high": 1.0,
@@ -4663,7 +4663,7 @@
               "hit_rate": 0.6275,
               "n": 51,
               "ci_median_low": -0.005428,
-              "ci_median_high": 0.015945,
+              "ci_median_high": 0.015944,
               "ci_hit_rate_low": 0.4762,
               "ci_hit_rate_high": 0.7917,
               "edge": 0.1319,
@@ -4732,7 +4732,7 @@
             },
             "13": {
               "median": -0.018258,
-              "p25": -0.045276,
+              "p25": -0.045277,
               "p75": 0.00278,
               "hit_rate": 0.3265,
               "n": 49,
@@ -4829,7 +4829,7 @@
             "4": {
               "median": -0.008958,
               "p25": -0.018986,
-              "p75": 0.014656,
+              "p75": 0.014655,
               "hit_rate": 0.4333,
               "n": 30,
               "ci_median_low": -0.016413,
@@ -4885,7 +4885,7 @@
             "4": {
               "median": 0.001149,
               "p25": -0.013707,
-              "p75": 0.01535,
+              "p75": 0.015349,
               "hit_rate": 0.5102,
               "n": 49,
               "ci_median_low": -0.010444,
@@ -4953,9 +4953,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 162,
+      "vintage_count": 163,
       "unique_signal_dates": 13,
-      "duplicate_vintages": 149,
+      "duplicate_vintages": 150,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-10-02"
     },

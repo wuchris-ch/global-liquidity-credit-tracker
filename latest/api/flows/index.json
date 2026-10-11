@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-11T02:46:22.714990",
+  "computed_at": "2026-10-11T16:59:03.825633",
   "as_of": "2026-10-09",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1384,7 +1384,7 @@
         },
         {
           "date": "2025-12-19",
-          "value": 249.1001
+          "value": 249.1002
         },
         {
           "date": "2025-12-26",
@@ -1408,7 +1408,7 @@
         },
         {
           "date": "2026-01-30",
-          "value": 257.9004
+          "value": 257.9005
         },
         {
           "date": "2026-02-06",
@@ -1416,7 +1416,7 @@
         },
         {
           "date": "2026-02-13",
-          "value": 261.1882
+          "value": 261.1881
         },
         {
           "date": "2026-02-20",
@@ -1452,7 +1452,7 @@
         },
         {
           "date": "2026-04-17",
-          "value": 274.4091
+          "value": 274.409
         },
         {
           "date": "2026-04-24",
@@ -1464,7 +1464,7 @@
         },
         {
           "date": "2026-05-08",
-          "value": 282.7573
+          "value": 282.7574
         },
         {
           "date": "2026-05-15",
@@ -1792,7 +1792,7 @@
       "spark": [
         {
           "date": "2025-10-17",
-          "value": 87.1572
+          "value": 87.1571
         },
         {
           "date": "2025-10-24",
@@ -1820,7 +1820,7 @@
         },
         {
           "date": "2025-12-05",
-          "value": 84.8679
+          "value": 84.8678
         },
         {
           "date": "2025-12-12",
@@ -1836,7 +1836,7 @@
         },
         {
           "date": "2026-01-02",
-          "value": 84.0966
+          "value": 84.0965
         },
         {
           "date": "2026-01-09",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-10-11T02:46:42.141746Z",
+    "computed_at": "2026-10-11T16:59:21.533639Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -3189,10 +3189,10 @@
         "return_126d": -0.011558,
         "excess_21d": -0.05512,
         "excess_63d": -0.104224,
-        "excess_126d": -0.152772,
+        "excess_126d": -0.152771,
         "relative_strength": -0.128498,
         "acceleration": -0.020378,
-        "absolute_trend": -0.126067,
+        "absolute_trend": -0.126066,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {

@@ -8,15 +8,15 @@
   "max_drawdown": -82.9,
   "sharpe_by_regime": {
     "tight": 0.57,
-    "neutral": 0.53,
-    "loose": 1.13
+    "neutral": 0.7,
+    "loose": 0.98
   },
   "return_by_regime": {
     "tight": 30.22,
-    "neutral": 14.33,
-    "loose": 25.98
+    "neutral": 17.68,
+    "loose": 23.04
   },
-  "correlation_with_glci": 0.356,
+  "correlation_with_glci": 0.357,
   "rolling_sharpe": [
     {
       "date": "1986-12-31",

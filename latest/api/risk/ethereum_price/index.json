@@ -3,17 +3,17 @@
   "name": "Ethereum",
   "category": "Crypto",
   "current_sharpe": 0.98,
-  "annualized_return": 93.36,
-  "annualized_volatility": 92.57,
+  "annualized_return": 92.99,
+  "annualized_volatility": 92.56,
   "max_drawdown": -94.01,
   "sharpe_by_regime": {
     "tight": -0.05,
-    "neutral": 0.0,
+    "neutral": -0.05,
     "loose": 0.36
   },
   "return_by_regime": {
     "tight": -1.71,
-    "neutral": 4.47,
+    "neutral": 1.06,
     "loose": 26.5
   },
   "correlation_with_glci": 0.082,
@@ -13741,6 +13741,10 @@
     {
       "date": "2026-10-11",
       "value": -0.615
+    },
+    {
+      "date": "2026-10-12",
+      "value": -0.711
     }
   ]
 }

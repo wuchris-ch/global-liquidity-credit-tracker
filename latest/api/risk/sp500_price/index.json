@@ -13,15 +13,11 @@
   },
   "return_by_regime": {
     "tight": 15.35,
-    "neutral": 13.32,
+    "neutral": 13.25,
     "loose": 19.38
   },
   "correlation_with_glci": 0.393,
   "rolling_sharpe": [
-    {
-      "date": "2017-10-13",
-      "value": 2.406
-    },
     {
       "date": "2017-10-16",
       "value": 2.426
@@ -9057,6 +9053,10 @@
     {
       "date": "2026-10-12",
       "value": 0.907
+    },
+    {
+      "date": "2026-10-13",
+      "value": 1.14
     }
   ]
 }

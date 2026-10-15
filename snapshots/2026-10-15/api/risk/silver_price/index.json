@@ -8,13 +8,13 @@
   "max_drawdown": -52.44,
   "sharpe_by_regime": {
     "tight": 3.47,
-    "neutral": 0.82,
-    "loose": 0.34
+    "neutral": 0.9,
+    "loose": 0.3
   },
   "return_by_regime": {
     "tight": 134.97,
-    "neutral": 35.02,
-    "loose": 23.15
+    "neutral": 37.76,
+    "loose": 20.63
   },
   "correlation_with_glci": 0.213,
   "rolling_sharpe": [

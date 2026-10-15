@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-15T02:15:54.663210",
+  "computed_at": "2026-10-15T15:57:16.269007",
   "current_regime": "neutral",
   "assets": [
     {
@@ -12,13 +12,13 @@
       "max_drawdown": -33.92,
       "sharpe_by_regime": {
         "tight": 0.3,
-        "neutral": 0.56,
-        "loose": 1.23
+        "neutral": 0.52,
+        "loose": 1.26
       },
       "return_by_regime": {
         "tight": 15.35,
-        "neutral": 12.16,
-        "loose": 19.38
+        "neutral": 11.55,
+        "loose": 19.85
       },
       "correlation_with_glci": 0.393,
       "rolling_sharpe": [
@@ -9069,20 +9069,20 @@
       "name": "Nasdaq 100",
       "category": "Large Cap Equities",
       "current_sharpe": 0.52,
-      "annualized_return": 16.78,
+      "annualized_return": 16.73,
       "annualized_volatility": 26.1,
       "max_drawdown": -82.9,
       "sharpe_by_regime": {
         "tight": 0.57,
-        "neutral": 0.68,
-        "loose": 0.98
+        "neutral": 0.42,
+        "loose": 1.13
       },
       "return_by_regime": {
         "tight": 30.22,
-        "neutral": 17.32,
-        "loose": 23.04
+        "neutral": 12.34,
+        "loose": 25.94
       },
-      "correlation_with_glci": 0.357,
+      "correlation_with_glci": 0.358,
       "rolling_sharpe": [
         {
           "date": "1986-12-31",
@@ -49179,6 +49179,10 @@
         {
           "date": "2026-10-13",
           "value": 1.091
+        },
+        {
+          "date": "2026-10-14",
+          "value": 0.876
         }
       ]
     },
@@ -49192,15 +49196,15 @@
       "max_drawdown": -45.3,
       "sharpe_by_regime": {
         "tight": 1.34,
-        "neutral": 0.45,
-        "loose": 1.29
+        "neutral": 0.27,
+        "loose": 1.44
       },
       "return_by_regime": {
         "tight": 96.01,
-        "neutral": 19.8,
-        "loose": 54.61
+        "neutral": 13.52,
+        "loose": 60.26
       },
-      "correlation_with_glci": 0.352,
+      "correlation_with_glci": 0.355,
       "rolling_sharpe": [
         {
           "date": "2017-10-17",
@@ -49248,7 +49252,7 @@
         },
         {
           "date": "2017-11-01",
-          "value": 2.515
+          "value": 2.516
         },
         {
           "date": "2017-11-02",
@@ -49984,7 +49988,7 @@
         },
         {
           "date": "2018-07-27",
-          "value": 1.036
+          "value": 1.035
         },
         {
           "date": "2018-07-30",
@@ -58254,13 +58258,13 @@
       "max_drawdown": -41.13,
       "sharpe_by_regime": {
         "tight": 0.41,
-        "neutral": -0.74,
-        "loose": 1.89
+        "neutral": -0.68,
+        "loose": 1.79
       },
       "return_by_regime": {
         "tight": 20.77,
-        "neutral": -10.41,
-        "loose": 39.75
+        "neutral": -9.37,
+        "loose": 37.75
       },
       "correlation_with_glci": 0.293,
       "rolling_sharpe": [
@@ -59526,7 +59530,7 @@
         },
         {
           "date": "2019-01-18",
-          "value": -0.28
+          "value": -0.281
         },
         {
           "date": "2019-01-22",
@@ -59846,7 +59850,7 @@
         },
         {
           "date": "2019-05-15",
-          "value": -0.155
+          "value": -0.156
         },
         {
           "date": "2019-05-16",
@@ -62986,7 +62990,7 @@
         },
         {
           "date": "2022-06-27",
-          "value": -0.954
+          "value": -0.955
         },
         {
           "date": "2022-06-28",
@@ -67316,15 +67320,15 @@
       "max_drawdown": -26.4,
       "sharpe_by_regime": {
         "tight": 4.48,
-        "neutral": 0.77,
-        "loose": 0.52
+        "neutral": 0.86,
+        "loose": 0.44
       },
       "return_by_regime": {
         "tight": 123.04,
-        "neutral": 20.87,
-        "loose": 16.98
+        "neutral": 22.85,
+        "loose": 15.07
       },
-      "correlation_with_glci": 0.112,
+      "correlation_with_glci": 0.111,
       "rolling_sharpe": [
         {
           "date": "2017-10-17",
@@ -76378,13 +76382,13 @@
       "max_drawdown": -52.44,
       "sharpe_by_regime": {
         "tight": 3.47,
-        "neutral": 0.82,
-        "loose": 0.34
+        "neutral": 0.9,
+        "loose": 0.3
       },
       "return_by_regime": {
         "tight": 134.97,
-        "neutral": 35.02,
-        "loose": 23.15
+        "neutral": 37.76,
+        "loose": 20.63
       },
       "correlation_with_glci": 0.213,
       "rolling_sharpe": [
@@ -85440,15 +85444,15 @@
       "max_drawdown": -83.8,
       "sharpe_by_regime": {
         "tight": 0.19,
-        "neutral": -0.22,
-        "loose": 1.2
+        "neutral": -0.47,
+        "loose": 1.39
       },
       "return_by_regime": {
         "tight": 17.31,
-        "neutral": -4.58,
-        "loose": 57.92
+        "neutral": -14.62,
+        "loose": 66.79
       },
-      "correlation_with_glci": 0.089,
+      "correlation_with_glci": 0.09,
       "rolling_sharpe": [
         {
           "date": "2016-01-04",
@@ -101206,15 +101210,15 @@
       "max_drawdown": -94.01,
       "sharpe_by_regime": {
         "tight": -0.05,
-        "neutral": -0.13,
-        "loose": 0.43
+        "neutral": -0.27,
+        "loose": 0.57
       },
       "return_by_regime": {
         "tight": -1.71,
-        "neutral": -4.0,
-        "loose": 30.51
+        "neutral": -13.49,
+        "loose": 39.35
       },
-      "correlation_with_glci": 0.07,
+      "correlation_with_glci": 0.071,
       "rolling_sharpe": [
         {
           "date": "2017-05-20",
@@ -114958,19 +114962,19 @@
       "id": "zcash_price",
       "name": "Zcash",
       "category": "Crypto",
-      "current_sharpe": 0.69,
-      "annualized_return": 80.46,
+      "current_sharpe": 0.68,
+      "annualized_return": 79.77,
       "annualized_volatility": 113.22,
       "max_drawdown": -97.92,
       "sharpe_by_regime": {
         "tight": 2.07,
-        "neutral": 2.44,
-        "loose": 1.29
+        "neutral": 2.39,
+        "loose": 1.32
       },
       "return_by_regime": {
         "tight": 327.75,
-        "neutral": 333.98,
-        "loose": 163.11
+        "neutral": 327.46,
+        "loose": 166.19
       },
       "correlation_with_glci": 0.027,
       "rolling_sharpe": [
@@ -126557,6 +126561,10 @@
         {
           "date": "2026-10-13",
           "value": 1.786
+        },
+        {
+          "date": "2026-10-14",
+          "value": 1.747
         }
       ]
     },
@@ -126570,15 +126578,15 @@
       "max_drawdown": -48.35,
       "sharpe_by_regime": {
         "tight": -1.63,
-        "neutral": 0.23,
-        "loose": -1.18
+        "neutral": 0.49,
+        "loose": -1.4
       },
       "return_by_regime": {
         "tight": -26.62,
-        "neutral": 6.76,
-        "loose": -8.64
+        "neutral": 9.65,
+        "loose": -11.25
       },
-      "correlation_with_glci": -0.121,
+      "correlation_with_glci": -0.123,
       "rolling_sharpe": [
         {
           "date": "2017-10-17",
@@ -126654,7 +126662,7 @@
         },
         {
           "date": "2017-11-10",
-          "value": 0.335
+          "value": 0.334
         },
         {
           "date": "2017-11-13",
@@ -126846,7 +126854,7 @@
         },
         {
           "date": "2018-01-23",
-          "value": 0.426
+          "value": 0.425
         },
         {
           "date": "2018-01-24",
@@ -128626,7 +128634,7 @@
         },
         {
           "date": "2019-10-29",
-          "value": 1.679
+          "value": 1.678
         },
         {
           "date": "2019-10-30",
@@ -129550,7 +129558,7 @@
         },
         {
           "date": "2020-09-29",
-          "value": 0.809
+          "value": 0.808
         },
         {
           "date": "2020-09-30",
@@ -131482,7 +131490,7 @@
         },
         {
           "date": "2022-08-30",
-          "value": -1.414
+          "value": -1.415
         },
         {
           "date": "2022-08-31",
@@ -132230,7 +132238,7 @@
         },
         {
           "date": "2023-05-30",
-          "value": -0.713
+          "value": -0.712
         },
         {
           "date": "2023-05-31",
@@ -133170,7 +133178,7 @@
         },
         {
           "date": "2024-05-06",
-          "value": -0.947
+          "value": -0.946
         },
         {
           "date": "2024-05-07",
@@ -135644,105 +135652,105 @@
     "sharpe_data": [
       [
         0.3,
-        0.56,
-        1.23
+        0.52,
+        1.26
       ],
       [
         0.57,
-        0.68,
-        0.98
+        0.42,
+        1.13
       ],
       [
         1.34,
-        0.45,
-        1.29
+        0.27,
+        1.44
       ],
       [
         0.41,
-        -0.74,
-        1.89
+        -0.68,
+        1.79
       ],
       [
         4.48,
-        0.77,
-        0.52
+        0.86,
+        0.44
       ],
       [
         3.47,
-        0.82,
-        0.34
+        0.9,
+        0.3
       ],
       [
         0.19,
-        -0.22,
-        1.2
+        -0.47,
+        1.39
       ],
       [
         -0.05,
-        -0.13,
-        0.43
+        -0.27,
+        0.57
       ],
       [
         2.07,
-        2.44,
-        1.29
+        2.39,
+        1.32
       ],
       [
         -1.63,
-        0.23,
-        -1.18
+        0.49,
+        -1.4
       ]
     ],
     "return_data": [
       [
         15.35,
-        12.16,
-        19.38
+        11.55,
+        19.85
       ],
       [
         30.22,
-        17.32,
-        23.04
+        12.34,
+        25.94
       ],
       [
         96.01,
-        19.8,
-        54.61
+        13.52,
+        60.26
       ],
       [
         20.77,
-        -10.41,
-        39.75
+        -9.37,
+        37.75
       ],
       [
         123.04,
-        20.87,
-        16.98
+        22.85,
+        15.07
       ],
       [
         134.97,
-        35.02,
-        23.15
+        37.76,
+        20.63
       ],
       [
         17.31,
-        -4.58,
-        57.92
+        -14.62,
+        66.79
       ],
       [
         -1.71,
-        -4.0,
-        30.51
+        -13.49,
+        39.35
       ],
       [
         327.75,
-        333.98,
-        163.11
+        327.46,
+        166.19
       ],
       [
         -26.62,
-        6.76,
-        -8.64
+        9.65,
+        -11.25
       ]
     ]
   }

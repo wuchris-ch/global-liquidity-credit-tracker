@@ -153,17 +153,17 @@
     {
       "regime": "loose",
       "start": "2026-09-04",
-      "end": "2026-09-18"
+      "end": "2026-09-25"
     },
     {
       "regime": "neutral",
-      "start": "2026-09-18",
+      "start": "2026-09-25",
       "end": "2026-10-09"
     }
   ],
   "counts": {
-    "neutral": 56,
-    "loose": 54,
+    "loose": 55,
+    "neutral": 55,
     "tight": 8
   },
   "current": "neutral"

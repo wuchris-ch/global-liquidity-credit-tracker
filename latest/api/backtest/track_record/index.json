@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-14T16:08:29.438290",
+  "computed_at": "2026-10-15T02:15:33.511386",
   "date_range": {
     "start": "2024-07-12",
     "end": "2026-10-09"
@@ -2514,7 +2514,7 @@
               "p75": 0.191933,
               "hit_rate": 0.9167,
               "n": 48,
-              "ci_median_low": 0.069682,
+              "ci_median_low": 0.069681,
               "ci_median_high": 0.18107,
               "ci_hit_rate_low": 0.7179,
               "ci_hit_rate_high": 1.0,
@@ -2566,11 +2566,11 @@
             },
             "26": {
               "median": -0.018439,
-              "p25": -0.092273,
+              "p25": -0.092274,
               "p75": 0.124148,
               "hit_rate": 0.4286,
               "n": 35,
-              "ci_median_low": -0.085479,
+              "ci_median_low": -0.08548,
               "ci_median_high": 0.13831,
               "ci_hit_rate_low": 0.0585,
               "ci_hit_rate_high": 0.9,
@@ -2662,7 +2662,7 @@
             },
             "13": {
               "median": 0.076473,
-              "p25": 0.035203,
+              "p25": 0.035202,
               "p75": 0.146326,
               "hit_rate": 0.8333,
               "n": 30,
@@ -4658,7 +4658,7 @@
           "neutral": {
             "4": {
               "median": 0.010427,
-              "p25": -0.011292,
+              "p25": -0.011291,
               "p75": 0.019219,
               "hit_rate": 0.6346,
               "n": 52,
@@ -4677,7 +4677,7 @@
             "13": {
               "median": 0.001609,
               "p25": -0.022452,
-              "p75": 0.027861,
+              "p75": 0.02786,
               "hit_rate": 0.5208,
               "n": 48,
               "ci_median_low": -0.019808,
@@ -4715,7 +4715,7 @@
             "4": {
               "median": -0.009582,
               "p25": -0.032236,
-              "p75": 0.013634,
+              "p75": 0.013633,
               "hit_rate": 0.3774,
               "n": 53,
               "ci_median_low": -0.016297,
@@ -4828,11 +4828,11 @@
           "neutral": {
             "4": {
               "median": -0.009954,
-              "p25": -0.020956,
-              "p75": 0.012772,
+              "p25": -0.020957,
+              "p75": 0.012771,
               "hit_rate": 0.4194,
               "n": 31,
-              "ci_median_low": -0.018166,
+              "ci_median_low": -0.018167,
               "ci_median_high": 0.009003,
               "ci_hit_rate_low": 0.2,
               "ci_hit_rate_high": 0.6429,
@@ -4953,9 +4953,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 173,
+      "vintage_count": 174,
       "unique_signal_dates": 14,
-      "duplicate_vintages": 159,
+      "duplicate_vintages": 160,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-10-09"
     },

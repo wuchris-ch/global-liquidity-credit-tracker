@@ -2,18 +2,18 @@
   "id": "silver_price",
   "name": "Silver",
   "category": "Commodities",
-  "current_sharpe": 0.45,
-  "annualized_return": 17.16,
-  "annualized_volatility": 32.47,
-  "max_drawdown": -52.28,
+  "current_sharpe": 0.43,
+  "annualized_return": 16.54,
+  "annualized_volatility": 32.52,
+  "max_drawdown": -52.44,
   "sharpe_by_regime": {
     "tight": 3.47,
-    "neutral": 0.99,
+    "neutral": 0.82,
     "loose": 0.34
   },
   "return_by_regime": {
     "tight": 134.97,
-    "neutral": 40.87,
+    "neutral": 35.02,
     "loose": 23.15
   },
   "correlation_with_glci": 0.213,
@@ -9053,6 +9053,10 @@
     {
       "date": "2026-10-13",
       "value": 0.531
+    },
+    {
+      "date": "2026-10-14",
+      "value": 0.369
     }
   ]
 }

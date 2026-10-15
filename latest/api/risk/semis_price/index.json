@@ -2,18 +2,18 @@
   "id": "semis_price",
   "name": "Semiconductors (SMH)",
   "category": "AI Trade",
-  "current_sharpe": 0.98,
-  "annualized_return": 35.31,
-  "annualized_volatility": 33.56,
+  "current_sharpe": 0.96,
+  "annualized_return": 34.89,
+  "annualized_volatility": 33.58,
   "max_drawdown": -45.3,
   "sharpe_by_regime": {
     "tight": 1.34,
-    "neutral": 0.57,
+    "neutral": 0.45,
     "loose": 1.29
   },
   "return_by_regime": {
     "tight": 96.01,
-    "neutral": 23.6,
+    "neutral": 19.8,
     "loose": 54.61
   },
   "correlation_with_glci": 0.352,
@@ -800,7 +800,7 @@
     },
     {
       "date": "2018-07-27",
-      "value": 1.035
+      "value": 1.036
     },
     {
       "date": "2018-07-30",
@@ -6724,7 +6724,7 @@
     },
     {
       "date": "2024-06-17",
-      "value": 2.049
+      "value": 2.05
     },
     {
       "date": "2024-06-18",
@@ -9053,6 +9053,10 @@
     {
       "date": "2026-10-13",
       "value": 1.61
+    },
+    {
+      "date": "2026-10-14",
+      "value": 1.397
     }
   ]
 }

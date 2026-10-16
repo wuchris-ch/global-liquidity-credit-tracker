@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-15T15:56:50.291830",
+  "computed_at": "2026-10-16T02:07:27.668545",
   "as_of": "2026-10-09",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1348,7 +1348,7 @@
       "spark": [
         {
           "date": "2025-10-17",
-          "value": 240.9618
+          "value": 240.9619
         },
         {
           "date": "2025-10-24",
@@ -1416,11 +1416,11 @@
         },
         {
           "date": "2026-02-13",
-          "value": 261.1881
+          "value": 261.1882
         },
         {
           "date": "2026-02-20",
-          "value": 262.827
+          "value": 262.8271
         },
         {
           "date": "2026-02-27",
@@ -1792,7 +1792,7 @@
       "spark": [
         {
           "date": "2025-10-17",
-          "value": 87.1571
+          "value": 87.1572
         },
         {
           "date": "2025-10-24",
@@ -1820,7 +1820,7 @@
         },
         {
           "date": "2025-12-05",
-          "value": 84.8678
+          "value": 84.8679
         },
         {
           "date": "2025-12-12",
@@ -1896,7 +1896,7 @@
         },
         {
           "date": "2026-04-17",
-          "value": 85.0765
+          "value": 85.0764
         },
         {
           "date": "2026-04-24",
@@ -2640,12 +2640,12 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-10-15T15:57:09.111750Z",
+    "computed_at": "2026-10-16T02:07:46.536312Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
     "benchmark": "SPY",
-    "price_as_of": "2026-10-14",
+    "price_as_of": "2026-10-15",
     "fund_flow_as_of": "2026-10-14",
     "options_as_of": "2026-10-09",
     "price_basis": "yahoo_adjusted_close",
@@ -2700,12 +2700,12 @@
     "opportunities": {
       "leaders": [
         "energy",
-        "health_care",
-        "technology"
+        "technology",
+        "health_care"
       ],
       "laggards": [
+        "communication_services",
         "real_estate",
-        "consumer_discretionary",
         "utilities"
       ],
       "improving": [
@@ -2728,16 +2728,16 @@
       {
         "id": "energy",
         "name": "Energy",
-        "price_as_of": "2026-10-14",
-        "return_21d": 0.031384,
-        "return_63d": 0.176576,
-        "return_126d": 0.206107,
-        "excess_21d": 0.012912,
-        "excess_63d": 0.149258,
-        "excess_126d": 0.106178,
-        "relative_strength": 0.127718,
-        "acceleration": -0.036841,
-        "absolute_trend": 1.404712,
+        "price_as_of": "2026-10-15",
+        "return_21d": 0.044678,
+        "return_63d": 0.14912,
+        "return_126d": 0.17556,
+        "excess_21d": 0.018945,
+        "excess_63d": 0.109013,
+        "excess_126d": 0.075244,
+        "relative_strength": 0.092129,
+        "acceleration": -0.017393,
+        "absolute_trend": 1.181895,
         "above_200d": true,
         "phase": "weakening",
         "fund_flow": {
@@ -2752,7 +2752,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 96.5,
+        "price_score": 93.0,
         "rank": 1,
         "ticker": "XLE",
         "options_activity": {
@@ -2777,18 +2777,69 @@
         "flow_confirmation": "diverges"
       },
       {
+        "id": "technology",
+        "name": "Technology",
+        "price_as_of": "2026-10-15",
+        "return_21d": 0.029363,
+        "return_63d": 0.075766,
+        "return_126d": 0.221098,
+        "excess_21d": 0.003629,
+        "excess_63d": 0.03566,
+        "excess_126d": 0.120781,
+        "relative_strength": 0.078221,
+        "acceleration": -0.008258,
+        "absolute_trend": 1.254534,
+        "above_200d": true,
+        "phase": "weakening",
+        "fund_flow": {
+          "as_of": "2026-10-14",
+          "aum_usd": 125566797367.45,
+          "flow_1d_usd": 57105079.5,
+          "flow_5d_usd": 324276589.8,
+          "flow_20d_usd": 2135293756.6,
+          "flow_5d_pct_aum": 0.002446,
+          "flow_20d_pct_aum": 0.017885,
+          "flow_20d_z": 1.62,
+          "history_observations": 252,
+          "split_adjustments": 1
+        },
+        "price_score": 90.0,
+        "rank": 2,
+        "ticker": "XLK",
+        "options_activity": {
+          "evidence_level": "cleared_activity",
+          "direction": null,
+          "trade_side": "unavailable",
+          "open_close": "unavailable",
+          "as_of": "2026-10-09",
+          "week_start": "2026-10-05",
+          "week_end": "2026-10-09",
+          "sessions": 5,
+          "call_volume": 57220,
+          "put_volume": 82698,
+          "total_volume": 139918,
+          "put_call_ratio": 1.4453,
+          "prior_month_daily_average": 32537.24,
+          "activity_ratio": 0.86,
+          "excluded_adjusted_roots": [
+            "2XLK"
+          ]
+        },
+        "flow_confirmation": "diverges"
+      },
+      {
         "id": "health_care",
         "name": "Health Care",
-        "price_as_of": "2026-10-14",
-        "return_21d": 0.040707,
-        "return_63d": 0.076284,
-        "return_126d": 0.171389,
-        "excess_21d": 0.022234,
-        "excess_63d": 0.048966,
-        "excess_126d": 0.07146,
-        "relative_strength": 0.060213,
-        "acceleration": 0.005912,
-        "absolute_trend": 1.434334,
+        "price_as_of": "2026-10-15",
+        "return_21d": 0.058448,
+        "return_63d": 0.099079,
+        "return_126d": 0.197667,
+        "excess_21d": 0.032715,
+        "excess_63d": 0.058973,
+        "excess_126d": 0.09735,
+        "relative_strength": 0.078162,
+        "acceleration": 0.013057,
+        "absolute_trend": 1.624951,
         "above_200d": true,
         "phase": "leading",
         "fund_flow": {
@@ -2804,7 +2855,7 @@
           "split_adjustments": 0
         },
         "price_score": 87.0,
-        "rank": 2,
+        "rank": 3,
         "ticker": "XLV",
         "options_activity": {
           "evidence_level": "cleared_activity",
@@ -2828,69 +2879,18 @@
         "flow_confirmation": "diverges"
       },
       {
-        "id": "technology",
-        "name": "Technology",
-        "price_as_of": "2026-10-14",
-        "return_21d": 0.036929,
-        "return_63d": 0.071368,
-        "return_126d": 0.239009,
-        "excess_21d": 0.018457,
-        "excess_63d": 0.044049,
-        "excess_126d": 0.13908,
-        "relative_strength": 0.091565,
-        "acceleration": 0.003773,
-        "absolute_trend": 1.352319,
-        "above_200d": true,
-        "phase": "leading",
-        "fund_flow": {
-          "as_of": "2026-10-14",
-          "aum_usd": 125566797367.45,
-          "flow_1d_usd": 57105079.5,
-          "flow_5d_usd": 324276589.8,
-          "flow_20d_usd": 2135293756.6,
-          "flow_5d_pct_aum": 0.002446,
-          "flow_20d_pct_aum": 0.017885,
-          "flow_20d_z": 1.62,
-          "history_observations": 252,
-          "split_adjustments": 1
-        },
-        "price_score": 86.5,
-        "rank": 3,
-        "ticker": "XLK",
-        "options_activity": {
-          "evidence_level": "cleared_activity",
-          "direction": null,
-          "trade_side": "unavailable",
-          "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
-          "sessions": 5,
-          "call_volume": 57220,
-          "put_volume": 82698,
-          "total_volume": 139918,
-          "put_call_ratio": 1.4453,
-          "prior_month_daily_average": 32537.24,
-          "activity_ratio": 0.86,
-          "excluded_adjusted_roots": [
-            "2XLK"
-          ]
-        },
-        "flow_confirmation": "supports"
-      },
-      {
         "id": "consumer_staples",
         "name": "Consumer Staples",
-        "price_as_of": "2026-10-14",
-        "return_21d": 0.034003,
-        "return_63d": 0.009464,
-        "return_126d": 0.073325,
-        "excess_21d": 0.01553,
-        "excess_63d": -0.017854,
-        "excess_126d": -0.026604,
-        "relative_strength": -0.022229,
-        "acceleration": 0.021481,
-        "absolute_trend": 0.691991,
+        "price_as_of": "2026-10-15",
+        "return_21d": 0.04597,
+        "return_63d": 0.023894,
+        "return_126d": 0.075949,
+        "excess_21d": 0.020236,
+        "excess_63d": -0.016212,
+        "excess_126d": -0.024367,
+        "relative_strength": -0.02029,
+        "acceleration": 0.02564,
+        "absolute_trend": 0.717322,
         "above_200d": true,
         "phase": "improving",
         "fund_flow": {
@@ -2905,7 +2905,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 70.0,
+        "price_score": 66.5,
         "rank": 4,
         "ticker": "XLP",
         "options_activity": {
@@ -2932,16 +2932,16 @@
       {
         "id": "financials",
         "name": "Financials",
-        "price_as_of": "2026-10-14",
-        "return_21d": -0.038316,
-        "return_63d": -0.036555,
-        "return_126d": 0.05109,
-        "excess_21d": -0.056788,
-        "excess_63d": -0.063873,
-        "excess_126d": -0.048839,
-        "relative_strength": -0.056356,
-        "acceleration": -0.035497,
-        "absolute_trend": 0.596347,
+        "price_as_of": "2026-10-15",
+        "return_21d": -0.008338,
+        "return_63d": -0.014221,
+        "return_126d": 0.06744,
+        "excess_21d": -0.034072,
+        "excess_63d": -0.054327,
+        "excess_126d": -0.032877,
+        "relative_strength": -0.043602,
+        "acceleration": -0.015963,
+        "absolute_trend": 0.77345,
         "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
@@ -2956,7 +2956,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 60.0,
+        "price_score": 63.5,
         "rank": 5,
         "ticker": "XLF",
         "options_activity": {
@@ -2983,17 +2983,17 @@
       {
         "id": "materials",
         "name": "Materials",
-        "price_as_of": "2026-10-14",
-        "return_21d": -0.016525,
-        "return_63d": -0.019674,
-        "return_126d": -0.025524,
-        "excess_21d": -0.034998,
-        "excess_63d": -0.046992,
-        "excess_126d": -0.125454,
-        "relative_strength": -0.086223,
-        "acceleration": -0.019333,
-        "absolute_trend": -0.224763,
-        "above_200d": false,
+        "price_as_of": "2026-10-15",
+        "return_21d": 0.008555,
+        "return_63d": 0.005185,
+        "return_126d": -0.01494,
+        "excess_21d": -0.017179,
+        "excess_63d": -0.034921,
+        "excess_126d": -0.115257,
+        "relative_strength": -0.075089,
+        "acceleration": -0.005538,
+        "absolute_trend": -0.128841,
+        "above_200d": true,
         "phase": "lagging",
         "fund_flow": {
           "as_of": "2026-10-14",
@@ -3032,16 +3032,16 @@
       {
         "id": "industrials",
         "name": "Industrials",
-        "price_as_of": "2026-10-14",
-        "return_21d": -0.008093,
-        "return_63d": -0.072873,
-        "return_126d": -0.019341,
-        "excess_21d": -0.026566,
-        "excess_63d": -0.100191,
-        "excess_126d": -0.11927,
-        "relative_strength": -0.109731,
-        "acceleration": 0.006831,
-        "absolute_trend": -0.182444,
+        "price_as_of": "2026-10-15",
+        "return_21d": -0.002188,
+        "return_63d": -0.063681,
+        "return_126d": -0.009287,
+        "excess_21d": -0.027922,
+        "excess_63d": -0.103787,
+        "excess_126d": -0.109604,
+        "relative_strength": -0.106696,
+        "acceleration": 0.006673,
+        "absolute_trend": -0.087381,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {
@@ -3056,7 +3056,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 37.0,
+        "price_score": 30.5,
         "rank": 7,
         "ticker": "XLI",
         "options_activity": {
@@ -3081,18 +3081,69 @@
         "flow_confirmation": "supports"
       },
       {
+        "id": "consumer_discretionary",
+        "name": "Consumer Discretionary",
+        "price_as_of": "2026-10-15",
+        "return_21d": 0.031094,
+        "return_63d": -0.015541,
+        "return_126d": -0.032344,
+        "excess_21d": 0.00536,
+        "excess_63d": -0.055648,
+        "excess_126d": -0.13266,
+        "relative_strength": -0.094154,
+        "acceleration": 0.02391,
+        "absolute_trend": -0.241591,
+        "above_200d": false,
+        "phase": "improving",
+        "fund_flow": {
+          "as_of": "2026-10-14",
+          "aum_usd": 21830063953.07,
+          "flow_1d_usd": 5574397.05,
+          "flow_5d_usd": -72929163.1,
+          "flow_20d_usd": 94447397.15,
+          "flow_5d_pct_aum": -0.003332,
+          "flow_20d_pct_aum": 0.004397,
+          "flow_20d_z": 0.171,
+          "history_observations": 252,
+          "split_adjustments": 1
+        },
+        "price_score": 30.0,
+        "rank": 8,
+        "ticker": "XLY",
+        "options_activity": {
+          "evidence_level": "cleared_activity",
+          "direction": null,
+          "trade_side": "unavailable",
+          "open_close": "unavailable",
+          "as_of": "2026-10-09",
+          "week_start": "2026-10-05",
+          "week_end": "2026-10-09",
+          "sessions": 5,
+          "call_volume": 12862,
+          "put_volume": 40549,
+          "total_volume": 53411,
+          "put_call_ratio": 3.1526,
+          "prior_month_daily_average": 12771.67,
+          "activity_ratio": 0.836,
+          "excluded_adjusted_roots": [
+            "2XLY"
+          ]
+        },
+        "flow_confirmation": "supports"
+      },
+      {
         "id": "communication_services",
         "name": "Communication Services",
-        "price_as_of": "2026-10-14",
-        "return_21d": -0.025264,
-        "return_63d": -0.013088,
-        "return_126d": -0.05145,
-        "excess_21d": -0.043737,
-        "excess_63d": -0.040406,
-        "excess_126d": -0.15138,
-        "relative_strength": -0.095893,
-        "acceleration": -0.030268,
-        "absolute_trend": -0.353407,
+        "price_as_of": "2026-10-15",
+        "return_21d": -0.001678,
+        "return_63d": 0.019338,
+        "return_126d": -0.049386,
+        "excess_21d": -0.027412,
+        "excess_63d": -0.020768,
+        "excess_126d": -0.149702,
+        "relative_strength": -0.085235,
+        "acceleration": -0.020489,
+        "absolute_trend": -0.341085,
         "above_200d": false,
         "phase": "lagging",
         "fund_flow": {
@@ -3107,8 +3158,8 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 33.0,
-        "rank": 8,
+        "price_score": 29.5,
+        "rank": 9,
         "ticker": "XLC",
         "options_activity": {
           "evidence_level": "cleared_activity",
@@ -3134,18 +3185,18 @@
       {
         "id": "real_estate",
         "name": "Real Estate",
-        "price_as_of": "2026-10-14",
-        "return_21d": -0.028992,
-        "return_63d": -0.082998,
-        "return_126d": -0.028131,
-        "excess_21d": -0.047465,
-        "excess_63d": -0.110317,
-        "excess_126d": -0.12806,
-        "relative_strength": -0.119188,
-        "acceleration": -0.010693,
-        "absolute_trend": -0.320569,
+        "price_as_of": "2026-10-15",
+        "return_21d": -0.010958,
+        "return_63d": -0.070139,
+        "return_126d": -0.025324,
+        "excess_21d": -0.036692,
+        "excess_63d": -0.110245,
+        "excess_126d": -0.12564,
+        "relative_strength": -0.117943,
+        "acceleration": 5.6e-05,
+        "absolute_trend": -0.282179,
         "above_200d": false,
-        "phase": "lagging",
+        "phase": "improving",
         "fund_flow": {
           "as_of": "2026-10-14",
           "aum_usd": 7692437432.69,
@@ -3158,8 +3209,8 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 17.0,
-        "rank": 9,
+        "price_score": 13.5,
+        "rank": 10,
         "ticker": "XLRE",
         "options_activity": {
           "evidence_level": "cleared_activity",
@@ -3180,72 +3231,21 @@
             "2XLRE"
           ]
         },
-        "flow_confirmation": "diverges"
-      },
-      {
-        "id": "consumer_discretionary",
-        "name": "Consumer Discretionary",
-        "price_as_of": "2026-10-14",
-        "return_21d": 0.007776,
-        "return_63d": -0.048851,
-        "return_126d": -0.053994,
-        "excess_21d": -0.010697,
-        "excess_63d": -0.076169,
-        "excess_126d": -0.153923,
-        "relative_strength": -0.115046,
-        "acceleration": 0.014693,
-        "absolute_trend": -0.404592,
-        "above_200d": false,
-        "phase": "improving",
-        "fund_flow": {
-          "as_of": "2026-10-14",
-          "aum_usd": 21830063953.07,
-          "flow_1d_usd": 5574397.05,
-          "flow_5d_usd": -72929163.1,
-          "flow_20d_usd": 94447397.15,
-          "flow_5d_pct_aum": -0.003332,
-          "flow_20d_pct_aum": 0.004397,
-          "flow_20d_z": 0.171,
-          "history_observations": 252,
-          "split_adjustments": 1
-        },
-        "price_score": 16.5,
-        "rank": 10,
-        "ticker": "XLY",
-        "options_activity": {
-          "evidence_level": "cleared_activity",
-          "direction": null,
-          "trade_side": "unavailable",
-          "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
-          "sessions": 5,
-          "call_volume": 12862,
-          "put_volume": 40549,
-          "total_volume": 53411,
-          "put_call_ratio": 3.1526,
-          "prior_month_daily_average": 12771.67,
-          "activity_ratio": 0.836,
-          "excluded_adjusted_roots": [
-            "2XLY"
-          ]
-        },
         "flow_confirmation": "supports"
       },
       {
         "id": "utilities",
         "name": "Utilities",
-        "price_as_of": "2026-10-14",
-        "return_21d": 0.01696,
-        "return_63d": -0.078746,
-        "return_126d": -0.084404,
-        "excess_21d": -0.001513,
-        "excess_63d": -0.106064,
-        "excess_126d": -0.184334,
-        "relative_strength": -0.145199,
-        "acceleration": 0.033842,
-        "absolute_trend": -0.805654,
+        "price_as_of": "2026-10-15",
+        "return_21d": 0.015281,
+        "return_63d": -0.073806,
+        "return_126d": -0.093229,
+        "excess_21d": -0.010453,
+        "excess_63d": -0.113912,
+        "excess_126d": -0.193545,
+        "relative_strength": -0.153729,
+        "acceleration": 0.027518,
+        "absolute_trend": -0.892286,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {

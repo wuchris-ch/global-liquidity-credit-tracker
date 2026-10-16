@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-15T15:57:16.269007",
+  "computed_at": "2026-10-16T02:07:51.377726",
   "current_regime": "neutral",
   "assets": [
     {
@@ -7,17 +7,17 @@
       "name": "S&P 500",
       "category": "Large Cap Equities",
       "current_sharpe": 0.67,
-      "annualized_return": 14.58,
+      "annualized_return": 14.61,
       "annualized_volatility": 18.07,
       "max_drawdown": -33.92,
       "sharpe_by_regime": {
         "tight": 0.3,
-        "neutral": 0.52,
+        "neutral": 0.53,
         "loose": 1.26
       },
       "return_by_regime": {
         "tight": 15.35,
-        "neutral": 11.55,
+        "neutral": 11.82,
         "loose": 19.85
       },
       "correlation_with_glci": 0.393,
@@ -9061,6 +9061,10 @@
         {
           "date": "2026-10-14",
           "value": 0.932
+        },
+        {
+          "date": "2026-10-15",
+          "value": 0.97
         }
       ]
     },
@@ -49191,25 +49195,21 @@
       "name": "Semiconductors (SMH)",
       "category": "AI Trade",
       "current_sharpe": 0.96,
-      "annualized_return": 34.89,
+      "annualized_return": 34.67,
       "annualized_volatility": 33.58,
       "max_drawdown": -45.3,
       "sharpe_by_regime": {
         "tight": 1.34,
-        "neutral": 0.27,
+        "neutral": 0.24,
         "loose": 1.44
       },
       "return_by_regime": {
         "tight": 96.01,
-        "neutral": 13.52,
+        "neutral": 12.48,
         "loose": 60.26
       },
       "correlation_with_glci": 0.355,
       "rolling_sharpe": [
-        {
-          "date": "2017-10-17",
-          "value": 2.324
-        },
         {
           "date": "2017-10-18",
           "value": 2.282
@@ -58245,6 +58245,10 @@
         {
           "date": "2026-10-14",
           "value": 1.397
+        },
+        {
+          "date": "2026-10-15",
+          "value": 1.418
         }
       ]
     },
@@ -58253,25 +58257,21 @@
       "name": "Russell 2000",
       "category": "Small Cap Equities",
       "current_sharpe": 0.42,
-      "annualized_return": 12.08,
+      "annualized_return": 12.16,
       "annualized_volatility": 23.01,
       "max_drawdown": -41.13,
       "sharpe_by_regime": {
         "tight": 0.41,
-        "neutral": -0.68,
+        "neutral": -0.62,
         "loose": 1.79
       },
       "return_by_regime": {
         "tight": 20.77,
-        "neutral": -9.37,
+        "neutral": -8.04,
         "loose": 37.75
       },
       "correlation_with_glci": 0.293,
       "rolling_sharpe": [
-        {
-          "date": "2017-10-17",
-          "value": 1.744
-        },
         {
           "date": "2017-10-18",
           "value": 1.737
@@ -58506,7 +58506,7 @@
         },
         {
           "date": "2018-01-11",
-          "value": 1.318
+          "value": 1.319
         },
         {
           "date": "2018-01-12",
@@ -62730,7 +62730,7 @@
         },
         {
           "date": "2022-03-23",
-          "value": -0.03
+          "value": -0.031
         },
         {
           "date": "2022-03-24",
@@ -62990,7 +62990,7 @@
         },
         {
           "date": "2022-06-27",
-          "value": -0.955
+          "value": -0.954
         },
         {
           "date": "2022-06-28",
@@ -66306,7 +66306,7 @@
         },
         {
           "date": "2025-10-15",
-          "value": 0.504
+          "value": 0.505
         },
         {
           "date": "2025-10-16",
@@ -67307,6 +67307,10 @@
         {
           "date": "2026-10-14",
           "value": 0.509
+        },
+        {
+          "date": "2026-10-15",
+          "value": 0.506
         }
       ]
     },
@@ -67314,26 +67318,22 @@
       "id": "gold_price",
       "name": "Gold",
       "category": "Commodities",
-      "current_sharpe": 0.63,
-      "annualized_return": 12.84,
-      "annualized_volatility": 16.42,
+      "current_sharpe": 0.64,
+      "annualized_return": 12.96,
+      "annualized_volatility": 16.43,
       "max_drawdown": -26.4,
       "sharpe_by_regime": {
         "tight": 4.48,
-        "neutral": 0.86,
+        "neutral": 0.93,
         "loose": 0.44
       },
       "return_by_regime": {
         "tight": 123.04,
-        "neutral": 22.85,
+        "neutral": 24.45,
         "loose": 15.07
       },
       "correlation_with_glci": 0.111,
       "rolling_sharpe": [
-        {
-          "date": "2017-10-17",
-          "value": 0.169
-        },
         {
           "date": "2017-10-18",
           "value": 0.077
@@ -76369,6 +76369,10 @@
         {
           "date": "2026-10-14",
           "value": -0.001
+        },
+        {
+          "date": "2026-10-15",
+          "value": 0.036
         }
       ]
     },
@@ -76376,26 +76380,22 @@
       "id": "silver_price",
       "name": "Silver",
       "category": "Commodities",
-      "current_sharpe": 0.43,
-      "annualized_return": 16.54,
-      "annualized_volatility": 32.52,
+      "current_sharpe": 0.44,
+      "annualized_return": 16.79,
+      "annualized_volatility": 32.54,
       "max_drawdown": -52.44,
       "sharpe_by_regime": {
         "tight": 3.47,
-        "neutral": 0.9,
+        "neutral": 0.98,
         "loose": 0.3
       },
       "return_by_regime": {
         "tight": 134.97,
-        "neutral": 37.76,
+        "neutral": 40.82,
         "loose": 20.63
       },
       "correlation_with_glci": 0.213,
       "rolling_sharpe": [
-        {
-          "date": "2017-10-17",
-          "value": -0.113
-        },
         {
           "date": "2017-10-18",
           "value": -0.173
@@ -85431,6 +85431,10 @@
         {
           "date": "2026-10-14",
           "value": 0.369
+        },
+        {
+          "date": "2026-10-15",
+          "value": 0.437
         }
       ]
     },
@@ -85439,17 +85443,17 @@
       "name": "Bitcoin",
       "category": "Crypto",
       "current_sharpe": 0.97,
-      "annualized_return": 71.35,
+      "annualized_return": 71.38,
       "annualized_volatility": 71.13,
       "max_drawdown": -83.8,
       "sharpe_by_regime": {
         "tight": 0.19,
-        "neutral": -0.47,
+        "neutral": -0.46,
         "loose": 1.39
       },
       "return_by_regime": {
         "tight": 17.31,
-        "neutral": -14.62,
+        "neutral": -14.06,
         "loose": 66.79
       },
       "correlation_with_glci": 0.09,
@@ -101197,6 +101201,10 @@
         {
           "date": "2026-10-14",
           "value": -0.602
+        },
+        {
+          "date": "2026-10-15",
+          "value": -0.534
         }
       ]
     },
@@ -101205,17 +101213,17 @@
       "name": "Ethereum",
       "category": "Crypto",
       "current_sharpe": 0.98,
-      "annualized_return": 92.87,
-      "annualized_volatility": 92.54,
+      "annualized_return": 92.9,
+      "annualized_volatility": 92.53,
       "max_drawdown": -94.01,
       "sharpe_by_regime": {
         "tight": -0.05,
-        "neutral": -0.27,
+        "neutral": -0.26,
         "loose": 0.57
       },
       "return_by_regime": {
         "tight": -1.71,
-        "neutral": -13.49,
+        "neutral": -12.84,
         "loose": 39.35
       },
       "correlation_with_glci": 0.071,
@@ -114955,6 +114963,10 @@
         {
           "date": "2026-10-14",
           "value": -0.62
+        },
+        {
+          "date": "2026-10-15",
+          "value": -0.57
         }
       ]
     },
@@ -126573,25 +126585,21 @@
       "name": "Long Bonds (TLT)",
       "category": "Fixed Income",
       "current_sharpe": -0.25,
-      "annualized_return": -1.22,
-      "annualized_volatility": 14.82,
+      "annualized_return": -1.11,
+      "annualized_volatility": 14.83,
       "max_drawdown": -48.35,
       "sharpe_by_regime": {
         "tight": -1.63,
-        "neutral": 0.49,
+        "neutral": 0.6,
         "loose": -1.4
       },
       "return_by_regime": {
         "tight": -26.62,
-        "neutral": 9.65,
+        "neutral": 10.91,
         "loose": -11.25
       },
       "correlation_with_glci": -0.123,
       "rolling_sharpe": [
-        {
-          "date": "2017-10-17",
-          "value": -0.253
-        },
         {
           "date": "2017-10-18",
           "value": -0.344
@@ -126662,7 +126670,7 @@
         },
         {
           "date": "2017-11-10",
-          "value": 0.334
+          "value": 0.335
         },
         {
           "date": "2017-11-13",
@@ -126854,7 +126862,7 @@
         },
         {
           "date": "2018-01-23",
-          "value": 0.425
+          "value": 0.426
         },
         {
           "date": "2018-01-24",
@@ -128634,7 +128642,7 @@
         },
         {
           "date": "2019-10-29",
-          "value": 1.678
+          "value": 1.679
         },
         {
           "date": "2019-10-30",
@@ -129558,7 +129566,7 @@
         },
         {
           "date": "2020-09-29",
-          "value": 0.808
+          "value": 0.809
         },
         {
           "date": "2020-09-30",
@@ -130634,7 +130642,7 @@
         },
         {
           "date": "2021-10-22",
-          "value": -0.477
+          "value": -0.476
         },
         {
           "date": "2021-10-25",
@@ -133178,7 +133186,7 @@
         },
         {
           "date": "2024-05-06",
-          "value": -0.946
+          "value": -0.947
         },
         {
           "date": "2024-05-07",
@@ -135627,6 +135635,10 @@
         {
           "date": "2026-10-14",
           "value": -1.365
+        },
+        {
+          "date": "2026-10-15",
+          "value": -1.239
         }
       ]
     }
@@ -135652,7 +135664,7 @@
     "sharpe_data": [
       [
         0.3,
-        0.52,
+        0.53,
         1.26
       ],
       [
@@ -135662,32 +135674,32 @@
       ],
       [
         1.34,
-        0.27,
+        0.24,
         1.44
       ],
       [
         0.41,
-        -0.68,
+        -0.62,
         1.79
       ],
       [
         4.48,
-        0.86,
+        0.93,
         0.44
       ],
       [
         3.47,
-        0.9,
+        0.98,
         0.3
       ],
       [
         0.19,
-        -0.47,
+        -0.46,
         1.39
       ],
       [
         -0.05,
-        -0.27,
+        -0.26,
         0.57
       ],
       [
@@ -135697,14 +135709,14 @@
       ],
       [
         -1.63,
-        0.49,
+        0.6,
         -1.4
       ]
     ],
     "return_data": [
       [
         15.35,
-        11.55,
+        11.82,
         19.85
       ],
       [
@@ -135714,32 +135726,32 @@
       ],
       [
         96.01,
-        13.52,
+        12.48,
         60.26
       ],
       [
         20.77,
-        -9.37,
+        -8.04,
         37.75
       ],
       [
         123.04,
-        22.85,
+        24.45,
         15.07
       ],
       [
         134.97,
-        37.76,
+        40.82,
         20.63
       ],
       [
         17.31,
-        -14.62,
+        -14.06,
         66.79
       ],
       [
         -1.71,
-        -13.49,
+        -12.84,
         39.35
       ],
       [
@@ -135749,7 +135761,7 @@
       ],
       [
         -26.62,
-        9.65,
+        10.91,
         -11.25
       ]
     ]

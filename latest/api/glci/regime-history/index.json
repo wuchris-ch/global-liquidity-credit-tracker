@@ -158,12 +158,12 @@
     {
       "regime": "neutral",
       "start": "2026-09-25",
-      "end": "2026-10-09"
+      "end": "2026-10-16"
     }
   ],
   "counts": {
+    "neutral": 56,
     "loose": 55,
-    "neutral": 55,
     "tight": 8
   },
   "current": "neutral"

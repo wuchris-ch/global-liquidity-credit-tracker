@@ -16,7 +16,7 @@
     "neutral": 12.24,
     "loose": 25.94
   },
-  "correlation_with_glci": 0.358,
+  "correlation_with_glci": 0.356,
   "rolling_sharpe": [
     {
       "date": "1986-12-31",

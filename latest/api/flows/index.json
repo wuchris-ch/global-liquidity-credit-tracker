@@ -1,6 +1,6 @@
 {
-  "computed_at": "2026-10-16T15:45:05.523020",
-  "as_of": "2026-10-09",
+  "computed_at": "2026-10-17T02:02:59.999688",
+  "as_of": "2026-10-16",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
   "glci_corr_window_weeks": 52,
@@ -10,14 +10,10 @@
       "series_id": "semis_price",
       "name": "Semiconductors (SMH)",
       "group": "AI trade",
-      "last_date": "2026-10-09",
-      "flow_z": -0.83,
+      "last_date": "2026-10-16",
+      "flow_z": -0.94,
       "glci_corr_52w": 0.22,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 341.7665
-        },
         {
           "date": "2025-10-24",
           "value": 350.0508
@@ -221,11 +217,15 @@
         {
           "date": "2026-10-09",
           "value": 603.33
+        },
+        {
+          "date": "2026-10-16",
+          "value": 539.79
         }
       ],
-      "ret_4w": 0.0612,
-      "ret_13w": -0.0126,
-      "ret_26w": 0.381
+      "ret_4w": -0.058,
+      "ret_13w": -0.0301,
+      "ret_26w": 0.1629
     },
     {
       "id": "megacap_tech",
@@ -454,14 +454,10 @@
       "series_id": "bitcoin_price",
       "name": "Bitcoin",
       "group": "Crypto",
-      "last_date": "2026-10-09",
-      "flow_z": 0.6,
+      "last_date": "2026-10-16",
+      "flow_z": 0.54,
       "glci_corr_52w": 0.09,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 107208.91
-        },
         {
           "date": "2025-10-24",
           "value": 111666.21
@@ -665,25 +661,25 @@
         {
           "date": "2026-10-09",
           "value": 82543.3
+        },
+        {
+          "date": "2026-10-16",
+          "value": 81475.05
         }
       ],
-      "ret_4w": 0.0682,
-      "ret_13w": 0.2886,
-      "ret_26w": 0.1322
+      "ret_4w": 0.0078,
+      "ret_13w": 0.275,
+      "ret_26w": 0.0758
     },
     {
       "id": "ethereum",
       "series_id": "ethereum_price",
       "name": "Ethereum",
       "group": "Crypto",
-      "last_date": "2026-10-09",
-      "flow_z": 0.76,
+      "last_date": "2026-10-16",
+      "flow_z": 0.57,
       "glci_corr_52w": 0.05,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 3890.4
-        },
         {
           "date": "2025-10-24",
           "value": 3954.52
@@ -887,11 +883,15 @@
         {
           "date": "2026-10-09",
           "value": 2484.7
+        },
+        {
+          "date": "2026-10-16",
+          "value": 2418.33
         }
       ],
-      "ret_4w": -0.0125,
-      "ret_13w": 0.3852,
-      "ret_26w": 0.1081
+      "ret_4w": -0.0727,
+      "ret_13w": 0.3145,
+      "ret_26w": 0.0285
     },
     {
       "id": "zcash",
@@ -1120,14 +1120,10 @@
       "series_id": "sp500_price",
       "name": "S&P 500",
       "group": "Broad equities",
-      "last_date": "2026-10-09",
-      "flow_z": -0.29,
+      "last_date": "2026-10-16",
+      "flow_z": -0.37,
       "glci_corr_52w": 0.35,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 6664.01
-        },
         {
           "date": "2025-10-24",
           "value": 6791.69
@@ -1331,25 +1327,25 @@
         {
           "date": "2026-10-09",
           "value": 7811.54
+        },
+        {
+          "date": "2026-10-16",
+          "value": 7659.44
         }
       ],
-      "ret_4w": 0.0202,
-      "ret_13w": 0.0312,
-      "ret_26w": 0.1459
+      "ret_4w": 0.0012,
+      "ret_13w": 0.0271,
+      "ret_26w": 0.0748
     },
     {
       "id": "small_caps",
       "series_id": "russell2000_price",
       "name": "Small caps (IWM)",
       "group": "Broad equities",
-      "last_date": "2026-10-09",
-      "flow_z": -1.15,
+      "last_date": "2026-10-16",
+      "flow_z": -1.43,
       "glci_corr_52w": 0.33,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 240.9618
-        },
         {
           "date": "2025-10-24",
           "value": 246.9213
@@ -1396,7 +1392,7 @@
         },
         {
           "date": "2026-01-09",
-          "value": 258.4765
+          "value": 258.4766
         },
         {
           "date": "2026-01-16",
@@ -1416,7 +1412,7 @@
         },
         {
           "date": "2026-02-13",
-          "value": 261.1882
+          "value": 261.1881
         },
         {
           "date": "2026-02-20",
@@ -1452,7 +1448,7 @@
         },
         {
           "date": "2026-04-17",
-          "value": 274.4091
+          "value": 274.409
         },
         {
           "date": "2026-04-24",
@@ -1464,7 +1460,7 @@
         },
         {
           "date": "2026-05-08",
-          "value": 282.7573
+          "value": 282.7574
         },
         {
           "date": "2026-05-15",
@@ -1553,25 +1549,25 @@
         {
           "date": "2026-10-09",
           "value": 278.94
+        },
+        {
+          "date": "2026-10-16",
+          "value": 270.44
         }
       ],
-      "ret_4w": -0.0319,
-      "ret_13w": -0.0551,
-      "ret_26w": 0.0728
+      "ret_4w": -0.0481,
+      "ret_13w": -0.0779,
+      "ret_26w": -0.0145
     },
     {
       "id": "gold",
       "series_id": "gold_price",
       "name": "Gold (GLD)",
       "group": "Hedges",
-      "last_date": "2026-10-09",
-      "flow_z": -0.56,
-      "glci_corr_52w": 0.23,
+      "last_date": "2026-10-16",
+      "flow_z": -0.38,
+      "glci_corr_52w": 0.24,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 388.99
-        },
         {
           "date": "2025-10-24",
           "value": 377.52
@@ -1775,25 +1771,25 @@
         {
           "date": "2026-10-09",
           "value": 384.58
+        },
+        {
+          "date": "2026-10-16",
+          "value": 382.01
         }
       ],
-      "ret_4w": -0.0356,
-      "ret_13w": 0.0201,
-      "ret_26w": -0.1202
+      "ret_4w": -0.0478,
+      "ret_13w": 0.0369,
+      "ret_26w": -0.1433
     },
     {
       "id": "long_bonds",
       "series_id": "long_bond_price",
       "name": "Long Treasuries (TLT)",
       "group": "Duration",
-      "last_date": "2026-10-09",
-      "flow_z": -1.22,
-      "glci_corr_52w": 0.15,
+      "last_date": "2026-10-16",
+      "flow_z": -0.81,
+      "glci_corr_52w": 0.13,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 87.1571
-        },
         {
           "date": "2025-10-24",
           "value": 87.4152
@@ -1836,7 +1832,7 @@
         },
         {
           "date": "2026-01-02",
-          "value": 84.0965
+          "value": 84.0966
         },
         {
           "date": "2026-01-09",
@@ -1896,7 +1892,7 @@
         },
         {
           "date": "2026-04-17",
-          "value": 85.0764
+          "value": 85.0765
         },
         {
           "date": "2026-04-24",
@@ -1997,11 +1993,15 @@
         {
           "date": "2026-10-09",
           "value": 77.98
+        },
+        {
+          "date": "2026-10-16",
+          "value": 80.05
         }
       ],
-      "ret_4w": -0.0319,
-      "ret_13w": -0.0658,
-      "ret_26w": -0.0773
+      "ret_4w": -0.0108,
+      "ret_13w": -0.0416,
+      "ret_26w": -0.0591
     }
   ],
   "pair": {
@@ -2009,643 +2009,643 @@
     "name": "Bitcoin priced in semiconductors",
     "numerator": "bitcoin_price",
     "denominator": "semis_price",
-    "spread_13w": 0.3012,
+    "spread_13w": 0.3051,
     "ratio": [
       {
-        "date": "2023-10-20",
+        "date": "2023-10-27",
         "value": 100.0
       },
       {
-        "date": "2023-10-27",
-        "value": 117.34
-      },
-      {
         "date": "2023-11-03",
-        "value": 111.21
+        "value": 94.78
       },
       {
         "date": "2023-11-10",
-        "value": 113.54
+        "value": 96.76
       },
       {
         "date": "2023-11-17",
-        "value": 107.84
+        "value": 91.91
       },
       {
         "date": "2023-11-24",
-        "value": 111.69
+        "value": 95.19
       },
       {
         "date": "2023-12-01",
-        "value": 115.01
+        "value": 98.01
       },
       {
         "date": "2023-12-08",
-        "value": 130.28
+        "value": 111.03
       },
       {
         "date": "2023-12-15",
-        "value": 115.32
+        "value": 98.28
       },
       {
         "date": "2023-12-22",
-        "value": 120.86
+        "value": 103.0
       },
       {
         "date": "2023-12-29",
-        "value": 114.43
+        "value": 97.52
       },
       {
         "date": "2024-01-05",
-        "value": 126.55
+        "value": 107.85
       },
       {
         "date": "2024-01-12",
-        "value": 117.74
+        "value": 100.34
       },
       {
         "date": "2024-01-19",
-        "value": 105.83
+        "value": 90.19
       },
       {
         "date": "2024-01-26",
-        "value": 105.62
+        "value": 90.01
       },
       {
         "date": "2024-02-02",
-        "value": 107.46
+        "value": 91.58
       },
       {
         "date": "2024-02-09",
-        "value": 110.06
+        "value": 93.8
       },
       {
         "date": "2024-02-16",
-        "value": 123.06
+        "value": 104.88
       },
       {
         "date": "2024-02-23",
-        "value": 115.75
+        "value": 98.64
       },
       {
         "date": "2024-03-01",
-        "value": 134.77
+        "value": 114.86
       },
       {
         "date": "2024-03-08",
-        "value": 144.47
+        "value": 123.12
       },
       {
         "date": "2024-03-15",
-        "value": 151.78
+        "value": 129.35
       },
       {
         "date": "2024-03-22",
-        "value": 133.17
+        "value": 113.49
       },
       {
         "date": "2024-03-29",
-        "value": 147.89
+        "value": 126.04
       },
       {
         "date": "2024-04-05",
-        "value": 145.06
+        "value": 123.63
       },
       {
         "date": "2024-04-12",
-        "value": 144.69
+        "value": 123.31
       },
       {
         "date": "2024-04-19",
-        "value": 152.47
+        "value": 129.94
       },
       {
         "date": "2024-04-26",
-        "value": 139.36
+        "value": 118.77
       },
       {
         "date": "2024-05-03",
-        "value": 137.36
+        "value": 117.06
       },
       {
         "date": "2024-05-10",
-        "value": 129.55
+        "value": 110.41
       },
       {
         "date": "2024-05-17",
-        "value": 138.33
+        "value": 117.89
       },
       {
         "date": "2024-05-24",
-        "value": 133.56
+        "value": 113.83
       },
       {
         "date": "2024-05-31",
-        "value": 133.56
+        "value": 113.83
       },
       {
         "date": "2024-06-07",
-        "value": 130.7
+        "value": 111.39
       },
       {
         "date": "2024-06-14",
-        "value": 117.26
+        "value": 99.93
       },
       {
         "date": "2024-06-21",
-        "value": 115.2
+        "value": 98.18
       },
       {
         "date": "2024-06-28",
-        "value": 110.09
+        "value": 93.82
       },
       {
         "date": "2024-07-05",
-        "value": 99.89
+        "value": 85.13
       },
       {
         "date": "2024-07-12",
-        "value": 100.4
+        "value": 85.56
       },
       {
         "date": "2024-07-19",
-        "value": 128.03
+        "value": 109.11
       },
       {
         "date": "2024-07-26",
-        "value": 134.5
+        "value": 114.62
       },
       {
         "date": "2024-08-02",
-        "value": 133.89
+        "value": 114.11
       },
       {
         "date": "2024-08-09",
-        "value": 128.7
+        "value": 109.68
       },
       {
         "date": "2024-08-16",
-        "value": 113.55
+        "value": 96.77
       },
       {
         "date": "2024-08-23",
-        "value": 122.84
+        "value": 104.69
       },
       {
         "date": "2024-08-30",
-        "value": 115.53
+        "value": 98.46
       },
       {
         "date": "2024-09-06",
-        "value": 119.35
+        "value": 101.71
       },
       {
         "date": "2024-09-13",
-        "value": 120.53
+        "value": 102.72
       },
       {
         "date": "2024-09-20",
-        "value": 126.73
+        "value": 108.0
       },
       {
         "date": "2024-09-27",
-        "value": 126.49
+        "value": 107.79
       },
       {
         "date": "2024-10-04",
-        "value": 119.13
+        "value": 101.53
       },
       {
         "date": "2024-10-11",
-        "value": 117.12
+        "value": 99.82
       },
       {
         "date": "2024-10-18",
-        "value": 129.33
+        "value": 110.22
       },
       {
         "date": "2024-10-25",
-        "value": 126.05
+        "value": 107.42
       },
       {
         "date": "2024-11-01",
-        "value": 134.83
+        "value": 114.91
       },
       {
         "date": "2024-11-08",
-        "value": 140.75
+        "value": 119.95
       },
       {
         "date": "2024-11-15",
-        "value": 179.72
+        "value": 153.16
       },
       {
         "date": "2024-11-22",
-        "value": 190.18
+        "value": 162.08
       },
       {
         "date": "2024-11-29",
-        "value": 189.56
+        "value": 161.55
       },
       {
         "date": "2024-12-06",
-        "value": 191.25
+        "value": 162.99
       },
       {
         "date": "2024-12-13",
-        "value": 193.38
+        "value": 164.8
       },
       {
         "date": "2024-12-20",
-        "value": 190.61
+        "value": 162.44
       },
       {
         "date": "2024-12-27",
-        "value": 181.41
+        "value": 154.61
       },
       {
         "date": "2025-01-03",
-        "value": 184.7
+        "value": 157.41
       },
       {
         "date": "2025-01-10",
-        "value": 181.23
+        "value": 154.45
       },
       {
         "date": "2025-01-17",
-        "value": 191.56
+        "value": 163.25
       },
       {
         "date": "2025-01-24",
-        "value": 189.7
+        "value": 161.67
       },
       {
         "date": "2025-01-31",
-        "value": 195.65
+        "value": 166.74
       },
       {
         "date": "2025-02-07",
-        "value": 186.53
+        "value": 158.97
       },
       {
         "date": "2025-02-14",
-        "value": 183.04
+        "value": 155.99
       },
       {
         "date": "2025-02-21",
-        "value": 183.01
+        "value": 155.97
       },
       {
         "date": "2025-02-28",
-        "value": 175.05
+        "value": 149.18
       },
       {
         "date": "2025-03-07",
-        "value": 181.42
+        "value": 154.61
       },
       {
         "date": "2025-03-14",
-        "value": 176.36
+        "value": 150.3
       },
       {
         "date": "2025-03-21",
-        "value": 176.72
+        "value": 150.6
       },
       {
         "date": "2025-03-28",
-        "value": 184.45
+        "value": 157.2
       },
       {
         "date": "2025-04-04",
-        "value": 218.77
+        "value": 186.44
       },
       {
         "date": "2025-04-11",
-        "value": 200.65
+        "value": 171.0
       },
       {
         "date": "2025-04-18",
-        "value": 209.32
+        "value": 178.39
       },
       {
         "date": "2025-04-25",
-        "value": 211.56
+        "value": 180.29
       },
       {
         "date": "2025-05-02",
-        "value": 207.32
+        "value": 176.68
       },
       {
         "date": "2025-05-09",
-        "value": 222.26
+        "value": 189.42
       },
       {
         "date": "2025-05-16",
-        "value": 198.31
+        "value": 169.0
       },
       {
         "date": "2025-05-23",
-        "value": 215.05
+        "value": 183.27
       },
       {
         "date": "2025-05-30",
-        "value": 206.76
+        "value": 176.21
       },
       {
         "date": "2025-06-06",
-        "value": 197.96
+        "value": 168.71
       },
       {
         "date": "2025-06-13",
-        "value": 194.4
+        "value": 165.67
       },
       {
         "date": "2025-06-20",
-        "value": 185.93
+        "value": 158.46
       },
       {
         "date": "2025-06-27",
-        "value": 182.65
+        "value": 155.66
       },
       {
         "date": "2025-07-04",
-        "value": 180.79
+        "value": 154.08
       },
       {
         "date": "2025-07-11",
-        "value": 193.56
+        "value": 164.96
       },
       {
         "date": "2025-07-18",
-        "value": 192.4
+        "value": 163.97
       },
       {
         "date": "2025-07-25",
-        "value": 194.38
+        "value": 165.66
       },
       {
         "date": "2025-08-01",
-        "value": 187.75
+        "value": 160.0
       },
       {
         "date": "2025-08-08",
-        "value": 188.0
+        "value": 160.21
       },
       {
         "date": "2025-08-15",
-        "value": 188.19
+        "value": 160.38
       },
       {
         "date": "2025-08-22",
-        "value": 186.14
+        "value": 158.63
       },
       {
         "date": "2025-08-29",
-        "value": 177.59
+        "value": 151.34
       },
       {
         "date": "2025-09-05",
-        "value": 178.01
+        "value": 151.71
       },
       {
         "date": "2025-09-12",
-        "value": 180.51
+        "value": 153.84
       },
       {
         "date": "2025-09-19",
-        "value": 173.68
+        "value": 148.01
       },
       {
         "date": "2025-09-26",
-        "value": 161.44
+        "value": 137.59
       },
       {
         "date": "2025-10-03",
-        "value": 172.3
+        "value": 146.83
       },
       {
         "date": "2025-10-10",
-        "value": 161.28
+        "value": 137.45
       },
       {
         "date": "2025-10-17",
-        "value": 148.13
+        "value": 126.24
       },
       {
         "date": "2025-10-24",
-        "value": 150.64
+        "value": 128.38
       },
       {
         "date": "2025-10-31",
-        "value": 143.61
+        "value": 122.38
       },
       {
         "date": "2025-11-07",
-        "value": 140.0
+        "value": 119.31
       },
       {
         "date": "2025-11-14",
-        "value": 130.21
+        "value": 110.97
       },
       {
         "date": "2025-11-21",
-        "value": 123.21
+        "value": 105.0
       },
       {
         "date": "2025-11-28",
-        "value": 122.26
+        "value": 104.19
       },
       {
         "date": "2025-12-05",
-        "value": 116.14
+        "value": 98.98
       },
       {
         "date": "2025-12-12",
-        "value": 120.86
+        "value": 103.0
       },
       {
         "date": "2025-12-19",
-        "value": 117.04
+        "value": 99.74
       },
       {
         "date": "2025-12-26",
-        "value": 112.66
+        "value": 96.01
       },
       {
         "date": "2026-01-02",
-        "value": 113.99
+        "value": 97.15
       },
       {
         "date": "2026-01-09",
-        "value": 109.77
+        "value": 93.55
       },
       {
         "date": "2026-01-16",
-        "value": 112.6
+        "value": 95.96
       },
       {
         "date": "2026-01-23",
-        "value": 105.48
+        "value": 89.89
       },
       {
         "date": "2026-01-30",
-        "value": 98.3
+        "value": 83.78
       },
       {
         "date": "2026-02-06",
-        "value": 82.23
+        "value": 70.07
       },
       {
         "date": "2026-02-13",
-        "value": 79.88
+        "value": 68.08
       },
       {
         "date": "2026-02-20",
-        "value": 77.24
-      },
-      {
-        "date": "2026-02-27",
-        "value": 76.64
-      },
-      {
-        "date": "2026-03-06",
-        "value": 84.81
-      },
-      {
-        "date": "2026-03-13",
-        "value": 86.37
-      },
-      {
-        "date": "2026-03-20",
-        "value": 86.61
-      },
-      {
-        "date": "2026-03-27",
-        "value": 83.77
-      },
-      {
-        "date": "2026-04-03",
-        "value": 80.54
-      },
-      {
-        "date": "2026-04-10",
-        "value": 78.8
-      },
-      {
-        "date": "2026-04-17",
-        "value": 77.05
-      },
-      {
-        "date": "2026-04-24",
-        "value": 72.26
-      },
-      {
-        "date": "2026-05-01",
-        "value": 72.51
-      },
-      {
-        "date": "2026-05-08",
-        "value": 66.81
-      },
-      {
-        "date": "2026-05-15",
-        "value": 67.08
-      },
-      {
-        "date": "2026-05-22",
-        "value": 61.85
-      },
-      {
-        "date": "2026-05-29",
-        "value": 58.26
-      },
-      {
-        "date": "2026-06-05",
-        "value": 50.79
-      },
-      {
-        "date": "2026-06-12",
-        "value": 48.41
-      },
-      {
-        "date": "2026-06-19",
-        "value": 45.46
-      },
-      {
-        "date": "2026-06-26",
-        "value": 46.32
-      },
-      {
-        "date": "2026-07-03",
-        "value": 49.86
-      },
-      {
-        "date": "2026-07-10",
-        "value": 49.51
-      },
-      {
-        "date": "2026-07-17",
-        "value": 54.22
-      },
-      {
-        "date": "2026-07-24",
-        "value": 53.95
-      },
-      {
-        "date": "2026-07-31",
-        "value": 54.94
-      },
-      {
-        "date": "2026-08-07",
-        "value": 52.58
-      },
-      {
-        "date": "2026-08-14",
-        "value": 50.59
-      },
-      {
-        "date": "2026-08-21",
         "value": 65.83
       },
       {
+        "date": "2026-02-27",
+        "value": 65.31
+      },
+      {
+        "date": "2026-03-06",
+        "value": 72.28
+      },
+      {
+        "date": "2026-03-13",
+        "value": 73.6
+      },
+      {
+        "date": "2026-03-20",
+        "value": 73.81
+      },
+      {
+        "date": "2026-03-27",
+        "value": 71.39
+      },
+      {
+        "date": "2026-04-03",
+        "value": 68.64
+      },
+      {
+        "date": "2026-04-10",
+        "value": 67.16
+      },
+      {
+        "date": "2026-04-17",
+        "value": 65.67
+      },
+      {
+        "date": "2026-04-24",
+        "value": 61.58
+      },
+      {
+        "date": "2026-05-01",
+        "value": 61.8
+      },
+      {
+        "date": "2026-05-08",
+        "value": 56.94
+      },
+      {
+        "date": "2026-05-15",
+        "value": 57.17
+      },
+      {
+        "date": "2026-05-22",
+        "value": 52.71
+      },
+      {
+        "date": "2026-05-29",
+        "value": 49.65
+      },
+      {
+        "date": "2026-06-05",
+        "value": 43.28
+      },
+      {
+        "date": "2026-06-12",
+        "value": 41.26
+      },
+      {
+        "date": "2026-06-19",
+        "value": 38.74
+      },
+      {
+        "date": "2026-06-26",
+        "value": 39.48
+      },
+      {
+        "date": "2026-07-03",
+        "value": 42.49
+      },
+      {
+        "date": "2026-07-10",
+        "value": 42.19
+      },
+      {
+        "date": "2026-07-17",
+        "value": 46.21
+      },
+      {
+        "date": "2026-07-24",
+        "value": 45.97
+      },
+      {
+        "date": "2026-07-31",
+        "value": 46.82
+      },
+      {
+        "date": "2026-08-07",
+        "value": 44.81
+      },
+      {
+        "date": "2026-08-14",
+        "value": 43.11
+      },
+      {
+        "date": "2026-08-21",
+        "value": 56.1
+      },
+      {
         "date": "2026-08-28",
-        "value": 66.46
+        "value": 56.64
       },
       {
         "date": "2026-09-04",
-        "value": 66.34
+        "value": 56.54
       },
       {
         "date": "2026-09-11",
-        "value": 64.19
+        "value": 54.7
       },
       {
         "date": "2026-09-18",
-        "value": 66.63
+        "value": 56.78
       },
       {
         "date": "2026-09-25",
-        "value": 65.43
+        "value": 55.77
       },
       {
         "date": "2026-10-02",
-        "value": 63.26
+        "value": 53.91
       },
       {
         "date": "2026-10-09",
-        "value": 64.61
+        "value": 55.06
+      },
+      {
+        "date": "2026-10-16",
+        "value": 60.74
       }
     ]
   },
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-10-16T15:45:22.090587Z",
+    "computed_at": "2026-10-17T02:03:18.497802Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
     "benchmark": "SPY",
-    "price_as_of": "2026-10-15",
+    "price_as_of": "2026-10-16",
     "fund_flow_as_of": "2026-10-15",
     "options_as_of": "2026-10-09",
     "price_basis": "yahoo_adjusted_close",
@@ -2700,18 +2700,18 @@
     "opportunities": {
       "leaders": [
         "energy",
-        "technology",
-        "health_care"
+        "health_care",
+        "technology"
       ],
       "laggards": [
-        "communication_services",
+        "consumer_discretionary",
         "real_estate",
         "utilities"
       ],
       "improving": [
         "utilities",
-        "consumer_staples",
-        "consumer_discretionary"
+        "consumer_discretionary",
+        "industrials"
       ],
       "strongest_inflows": [
         "communication_services",
@@ -2728,18 +2728,18 @@
       {
         "id": "energy",
         "name": "Energy",
-        "price_as_of": "2026-10-15",
-        "return_21d": 0.044678,
-        "return_63d": 0.14912,
-        "return_126d": 0.17556,
-        "excess_21d": 0.018945,
-        "excess_63d": 0.109013,
-        "excess_126d": 0.075244,
-        "relative_strength": 0.092129,
-        "acceleration": -0.017393,
-        "absolute_trend": 1.181895,
+        "price_as_of": "2026-10-16",
+        "return_21d": 0.062602,
+        "return_63d": 0.169549,
+        "return_126d": 0.228446,
+        "excess_21d": 0.05927,
+        "excess_63d": 0.138954,
+        "excess_126d": 0.15127,
+        "relative_strength": 0.145112,
+        "acceleration": 0.012952,
+        "absolute_trend": 1.503841,
         "above_200d": true,
-        "phase": "weakening",
+        "phase": "leading",
         "fund_flow": {
           "as_of": "2026-10-15",
           "aum_usd": 43542381362.7,
@@ -2752,7 +2752,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 93.0,
+        "price_score": 100.0,
         "rank": 1,
         "ticker": "XLE",
         "options_activity": {
@@ -2774,72 +2774,21 @@
             "2XLE"
           ]
         },
-        "flow_confirmation": "diverges"
-      },
-      {
-        "id": "technology",
-        "name": "Technology",
-        "price_as_of": "2026-10-15",
-        "return_21d": 0.029363,
-        "return_63d": 0.075766,
-        "return_126d": 0.221098,
-        "excess_21d": 0.003629,
-        "excess_63d": 0.03566,
-        "excess_126d": 0.120781,
-        "relative_strength": 0.078221,
-        "acceleration": -0.008258,
-        "absolute_trend": 1.254534,
-        "above_200d": true,
-        "phase": "weakening",
-        "fund_flow": {
-          "as_of": "2026-10-15",
-          "aum_usd": 124755214511.35,
-          "flow_1d_usd": -47297916.0,
-          "flow_5d_usd": 98986123.8,
-          "flow_20d_usd": 2191431685.75,
-          "flow_5d_pct_aum": 0.00076,
-          "flow_20d_pct_aum": 0.017971,
-          "flow_20d_z": 1.592,
-          "history_observations": 252,
-          "split_adjustments": 1
-        },
-        "price_score": 90.0,
-        "rank": 2,
-        "ticker": "XLK",
-        "options_activity": {
-          "evidence_level": "cleared_activity",
-          "direction": null,
-          "trade_side": "unavailable",
-          "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
-          "sessions": 5,
-          "call_volume": 57220,
-          "put_volume": 82698,
-          "total_volume": 139918,
-          "put_call_ratio": 1.4453,
-          "prior_month_daily_average": 32537.24,
-          "activity_ratio": 0.86,
-          "excluded_adjusted_roots": [
-            "2XLK"
-          ]
-        },
-        "flow_confirmation": "diverges"
+        "flow_confirmation": "supports"
       },
       {
         "id": "health_care",
         "name": "Health Care",
-        "price_as_of": "2026-10-15",
-        "return_21d": 0.058448,
-        "return_63d": 0.099079,
-        "return_126d": 0.197667,
-        "excess_21d": 0.032715,
-        "excess_63d": 0.058973,
-        "excess_126d": 0.09735,
-        "relative_strength": 0.078162,
-        "acceleration": 0.013057,
-        "absolute_trend": 1.624951,
+        "price_as_of": "2026-10-16",
+        "return_21d": 0.049556,
+        "return_63d": 0.107855,
+        "return_126d": 0.180127,
+        "excess_21d": 0.046224,
+        "excess_63d": 0.077259,
+        "excess_126d": 0.102951,
+        "relative_strength": 0.090105,
+        "acceleration": 0.020471,
+        "absolute_trend": 1.496616,
         "above_200d": true,
         "phase": "leading",
         "fund_flow": {
@@ -2854,8 +2803,8 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 87.0,
-        "rank": 3,
+        "price_score": 90.0,
+        "rank": 2,
         "ticker": "XLV",
         "options_activity": {
           "evidence_level": "cleared_activity",
@@ -2879,20 +2828,71 @@
         "flow_confirmation": "supports"
       },
       {
+        "id": "technology",
+        "name": "Technology",
+        "price_as_of": "2026-10-16",
+        "return_21d": -0.023544,
+        "return_63d": 0.044383,
+        "return_126d": 0.175186,
+        "excess_21d": -0.026876,
+        "excess_63d": 0.013787,
+        "excess_126d": 0.09801,
+        "relative_strength": 0.055899,
+        "acceleration": -0.031471,
+        "absolute_trend": 0.962965,
+        "above_200d": true,
+        "phase": "weakening",
+        "fund_flow": {
+          "as_of": "2026-10-15",
+          "aum_usd": 124755214511.35,
+          "flow_1d_usd": -47297916.0,
+          "flow_5d_usd": 98986123.8,
+          "flow_20d_usd": 2191431685.75,
+          "flow_5d_pct_aum": 0.00076,
+          "flow_20d_pct_aum": 0.017971,
+          "flow_20d_z": 1.592,
+          "history_observations": 252,
+          "split_adjustments": 1
+        },
+        "price_score": 80.0,
+        "rank": 3,
+        "ticker": "XLK",
+        "options_activity": {
+          "evidence_level": "cleared_activity",
+          "direction": null,
+          "trade_side": "unavailable",
+          "open_close": "unavailable",
+          "as_of": "2026-10-09",
+          "week_start": "2026-10-05",
+          "week_end": "2026-10-09",
+          "sessions": 5,
+          "call_volume": 57220,
+          "put_volume": 82698,
+          "total_volume": 139918,
+          "put_call_ratio": 1.4453,
+          "prior_month_daily_average": 32537.24,
+          "activity_ratio": 0.86,
+          "excluded_adjusted_roots": [
+            "2XLK"
+          ]
+        },
+        "flow_confirmation": "diverges"
+      },
+      {
         "id": "consumer_staples",
         "name": "Consumer Staples",
-        "price_as_of": "2026-10-15",
-        "return_21d": 0.04597,
-        "return_63d": 0.023894,
-        "return_126d": 0.075949,
-        "excess_21d": 0.020236,
-        "excess_63d": -0.016212,
-        "excess_126d": -0.024367,
-        "relative_strength": -0.02029,
-        "acceleration": 0.02564,
-        "absolute_trend": 0.717322,
+        "price_as_of": "2026-10-16",
+        "return_21d": 0.054838,
+        "return_63d": 0.038562,
+        "return_126d": 0.074166,
+        "excess_21d": 0.051506,
+        "excess_63d": 0.007967,
+        "excess_126d": -0.003011,
+        "relative_strength": 0.002478,
+        "acceleration": 0.04885,
+        "absolute_trend": 0.695035,
         "above_200d": true,
-        "phase": "improving",
+        "phase": "leading",
         "fund_flow": {
           "as_of": "2026-10-15",
           "aum_usd": 14552567923.89,
@@ -2932,18 +2932,18 @@
       {
         "id": "financials",
         "name": "Financials",
-        "price_as_of": "2026-10-15",
-        "return_21d": -0.008338,
-        "return_63d": -0.014221,
-        "return_126d": 0.06744,
-        "excess_21d": -0.034072,
-        "excess_63d": -0.054327,
-        "excess_126d": -0.032877,
-        "relative_strength": -0.043602,
-        "acceleration": -0.015963,
-        "absolute_trend": 0.77345,
+        "price_as_of": "2026-10-16",
+        "return_21d": -0.00293,
+        "return_63d": -0.005789,
+        "return_126d": 0.064294,
+        "excess_21d": -0.006262,
+        "excess_63d": -0.036385,
+        "excess_126d": -0.012882,
+        "relative_strength": -0.024634,
+        "acceleration": 0.005866,
+        "absolute_trend": 0.736618,
         "above_200d": true,
-        "phase": "lagging",
+        "phase": "improving",
         "fund_flow": {
           "as_of": "2026-10-15",
           "aum_usd": 51329937485.03,
@@ -2978,23 +2978,23 @@
             "2XLF"
           ]
         },
-        "flow_confirmation": "supports"
+        "flow_confirmation": "diverges"
       },
       {
         "id": "materials",
         "name": "Materials",
-        "price_as_of": "2026-10-15",
-        "return_21d": 0.008555,
-        "return_63d": 0.005185,
-        "return_126d": -0.01494,
-        "excess_21d": -0.017179,
-        "excess_63d": -0.034921,
-        "excess_126d": -0.115257,
-        "relative_strength": -0.075089,
-        "acceleration": -0.005538,
-        "absolute_trend": -0.128841,
+        "price_as_of": "2026-10-16",
+        "return_21d": 0.008724,
+        "return_63d": 0.022224,
+        "return_126d": -0.010354,
+        "excess_21d": 0.005392,
+        "excess_63d": -0.008371,
+        "excess_126d": -0.087531,
+        "relative_strength": -0.047951,
+        "acceleration": 0.008182,
+        "absolute_trend": -0.089671,
         "above_200d": true,
-        "phase": "lagging",
+        "phase": "improving",
         "fund_flow": {
           "as_of": "2026-10-15",
           "aum_usd": 8002215456.3,
@@ -3007,7 +3007,7 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 46.5,
+        "price_score": 50.0,
         "rank": 6,
         "ticker": "XLB",
         "options_activity": {
@@ -3027,21 +3027,72 @@
           "activity_ratio": 0.547,
           "excluded_adjusted_roots": []
         },
-        "flow_confirmation": "supports"
+        "flow_confirmation": "diverges"
+      },
+      {
+        "id": "communication_services",
+        "name": "Communication Services",
+        "price_as_of": "2026-10-16",
+        "return_21d": -0.014943,
+        "return_63d": -0.001051,
+        "return_126d": -0.07069,
+        "excess_21d": -0.018276,
+        "excess_63d": -0.031646,
+        "excess_126d": -0.147866,
+        "relative_strength": -0.089756,
+        "acceleration": -0.007727,
+        "absolute_trend": -0.479777,
+        "above_200d": false,
+        "phase": "lagging",
+        "fund_flow": {
+          "as_of": "2026-10-15",
+          "aum_usd": 23927949882.19,
+          "flow_1d_usd": 106821205.3,
+          "flow_5d_usd": -42562900.05,
+          "flow_20d_usd": 1296963678.2,
+          "flow_5d_pct_aum": -0.001782,
+          "flow_20d_pct_aum": 0.057393,
+          "flow_20d_z": 3.0,
+          "history_observations": 252,
+          "split_adjustments": 0
+        },
+        "price_score": 29.5,
+        "rank": 7,
+        "ticker": "XLC",
+        "options_activity": {
+          "evidence_level": "cleared_activity",
+          "direction": null,
+          "trade_side": "unavailable",
+          "open_close": "unavailable",
+          "as_of": "2026-10-09",
+          "week_start": "2026-10-05",
+          "week_end": "2026-10-09",
+          "sessions": 5,
+          "call_volume": 2969,
+          "put_volume": 1188,
+          "total_volume": 4157,
+          "put_call_ratio": 0.4001,
+          "prior_month_daily_average": 2755.43,
+          "activity_ratio": 0.302,
+          "excluded_adjusted_roots": [
+            "2XLC"
+          ]
+        },
+        "flow_confirmation": "diverges"
       },
       {
         "id": "industrials",
         "name": "Industrials",
-        "price_as_of": "2026-10-15",
-        "return_21d": -0.002188,
-        "return_63d": -0.063681,
-        "return_126d": -0.009287,
-        "excess_21d": -0.027922,
-        "excess_63d": -0.103787,
-        "excess_126d": -0.109604,
-        "relative_strength": -0.106696,
-        "acceleration": 0.006673,
-        "absolute_trend": -0.087381,
+        "price_as_of": "2026-10-16",
+        "return_21d": -0.004739,
+        "return_63d": -0.057239,
+        "return_126d": -0.02856,
+        "excess_21d": -0.008072,
+        "excess_63d": -0.087834,
+        "excess_126d": -0.105736,
+        "relative_strength": -0.096785,
+        "acceleration": 0.021207,
+        "absolute_trend": -0.269654,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {
@@ -3056,8 +3107,8 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 30.5,
-        "rank": 7,
+        "price_score": 27.0,
+        "rank": 8,
         "ticker": "XLI",
         "options_activity": {
           "evidence_level": "cleared_activity",
@@ -3083,16 +3134,16 @@
       {
         "id": "consumer_discretionary",
         "name": "Consumer Discretionary",
-        "price_as_of": "2026-10-15",
-        "return_21d": 0.031094,
-        "return_63d": -0.015541,
-        "return_126d": -0.032344,
-        "excess_21d": 0.00536,
-        "excess_63d": -0.055648,
-        "excess_126d": -0.13266,
-        "relative_strength": -0.094154,
-        "acceleration": 0.02391,
-        "absolute_trend": -0.241591,
+        "price_as_of": "2026-10-16",
+        "return_21d": 0.01176,
+        "return_63d": -0.016737,
+        "return_126d": -0.064114,
+        "excess_21d": 0.008428,
+        "excess_63d": -0.047333,
+        "excess_126d": -0.141291,
+        "relative_strength": -0.094312,
+        "acceleration": 0.024206,
+        "absolute_trend": -0.47841,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {
@@ -3107,8 +3158,8 @@
           "history_observations": 252,
           "split_adjustments": 1
         },
-        "price_score": 30.0,
-        "rank": 8,
+        "price_score": 26.5,
+        "rank": 9,
         "ticker": "XLY",
         "options_activity": {
           "evidence_level": "cleared_activity",
@@ -3132,69 +3183,18 @@
         "flow_confirmation": "diverges"
       },
       {
-        "id": "communication_services",
-        "name": "Communication Services",
-        "price_as_of": "2026-10-15",
-        "return_21d": -0.001678,
-        "return_63d": 0.019338,
-        "return_126d": -0.049386,
-        "excess_21d": -0.027412,
-        "excess_63d": -0.020768,
-        "excess_126d": -0.149702,
-        "relative_strength": -0.085235,
-        "acceleration": -0.020489,
-        "absolute_trend": -0.341085,
-        "above_200d": false,
-        "phase": "lagging",
-        "fund_flow": {
-          "as_of": "2026-10-15",
-          "aum_usd": 23927949882.19,
-          "flow_1d_usd": 106821205.3,
-          "flow_5d_usd": -42562900.05,
-          "flow_20d_usd": 1296963678.2,
-          "flow_5d_pct_aum": -0.001782,
-          "flow_20d_pct_aum": 0.057393,
-          "flow_20d_z": 3.0,
-          "history_observations": 252,
-          "split_adjustments": 0
-        },
-        "price_score": 29.5,
-        "rank": 9,
-        "ticker": "XLC",
-        "options_activity": {
-          "evidence_level": "cleared_activity",
-          "direction": null,
-          "trade_side": "unavailable",
-          "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
-          "sessions": 5,
-          "call_volume": 2969,
-          "put_volume": 1188,
-          "total_volume": 4157,
-          "put_call_ratio": 0.4001,
-          "prior_month_daily_average": 2755.43,
-          "activity_ratio": 0.302,
-          "excluded_adjusted_roots": [
-            "2XLC"
-          ]
-        },
-        "flow_confirmation": "diverges"
-      },
-      {
         "id": "real_estate",
         "name": "Real Estate",
-        "price_as_of": "2026-10-15",
-        "return_21d": -0.010958,
-        "return_63d": -0.070139,
-        "return_126d": -0.025324,
-        "excess_21d": -0.036692,
-        "excess_63d": -0.110245,
-        "excess_126d": -0.12564,
-        "relative_strength": -0.117943,
-        "acceleration": 5.6e-05,
-        "absolute_trend": -0.282179,
+        "price_as_of": "2026-10-16",
+        "return_21d": -0.00995,
+        "return_63d": -0.061907,
+        "return_126d": -0.036461,
+        "excess_21d": -0.013282,
+        "excess_63d": -0.092502,
+        "excess_126d": -0.113637,
+        "relative_strength": -0.10307,
+        "acceleration": 0.017552,
+        "absolute_trend": -0.40546,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {
@@ -3209,7 +3209,7 @@
           "history_observations": 252,
           "split_adjustments": 0
         },
-        "price_score": 13.5,
+        "price_score": 17.0,
         "rank": 10,
         "ticker": "XLRE",
         "options_activity": {
@@ -3236,16 +3236,16 @@
       {
         "id": "utilities",
         "name": "Utilities",
-        "price_as_of": "2026-10-15",
-        "return_21d": 0.015281,
-        "return_63d": -0.073806,
-        "return_126d": -0.093229,
-        "excess_21d": -0.010453,
-        "excess_63d": -0.113912,
-        "excess_126d": -0.193545,
-        "relative_strength": -0.153729,
-        "acceleration": 0.027518,
-        "absolute_trend": -0.892286,
+        "price_as_of": "2026-10-16",
+        "return_21d": 0.019722,
+        "return_63d": -0.055345,
+        "return_126d": -0.075765,
+        "excess_21d": 0.01639,
+        "excess_63d": -0.08594,
+        "excess_126d": -0.152942,
+        "relative_strength": -0.119441,
+        "acceleration": 0.045037,
+        "absolute_trend": -0.712642,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {

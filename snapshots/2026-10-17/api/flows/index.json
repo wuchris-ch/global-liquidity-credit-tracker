@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-17T02:02:59.999688",
+  "computed_at": "2026-10-17T14:36:53.159848",
   "as_of": "2026-10-16",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -898,14 +898,10 @@
       "series_id": "zcash_price",
       "name": "Zcash",
       "group": "Crypto",
-      "last_date": "2026-10-09",
-      "flow_z": 0.19,
+      "last_date": "2026-10-16",
+      "flow_z": 0.06,
       "glci_corr_52w": 0.12,
       "spark": [
-        {
-          "date": "2025-10-17",
-          "value": 217.7688
-        },
         {
           "date": "2025-10-24",
           "value": 271.0498
@@ -1109,11 +1105,15 @@
         {
           "date": "2026-10-09",
           "value": 1207.6221
+        },
+        {
+          "date": "2026-10-16",
+          "value": 1148.4075
         }
       ],
-      "ret_4w": 0.0381,
-      "ret_13w": 1.4206,
-      "ret_26w": 2.223
+      "ret_4w": -0.2628,
+      "ret_13w": 1.0998,
+      "ret_26w": 2.4897
     },
     {
       "id": "sp500",
@@ -1392,7 +1392,7 @@
         },
         {
           "date": "2026-01-09",
-          "value": 258.4766
+          "value": 258.4765
         },
         {
           "date": "2026-01-16",
@@ -1412,7 +1412,7 @@
         },
         {
           "date": "2026-02-13",
-          "value": 261.1881
+          "value": 261.1882
         },
         {
           "date": "2026-02-20",
@@ -1448,7 +1448,7 @@
         },
         {
           "date": "2026-04-17",
-          "value": 274.409
+          "value": 274.4091
         },
         {
           "date": "2026-04-24",
@@ -1460,7 +1460,7 @@
         },
         {
           "date": "2026-05-08",
-          "value": 282.7574
+          "value": 282.7573
         },
         {
           "date": "2026-05-15",
@@ -1816,7 +1816,7 @@
         },
         {
           "date": "2025-12-05",
-          "value": 84.8678
+          "value": 84.8679
         },
         {
           "date": "2025-12-12",
@@ -1892,7 +1892,7 @@
         },
         {
           "date": "2026-04-17",
-          "value": 85.0765
+          "value": 85.0764
         },
         {
           "date": "2026-04-24",
@@ -2640,14 +2640,14 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-10-17T02:03:18.497802Z",
+    "computed_at": "2026-10-17T14:37:07.680180Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
     "benchmark": "SPY",
     "price_as_of": "2026-10-16",
     "fund_flow_as_of": "2026-10-15",
-    "options_as_of": "2026-10-09",
+    "options_as_of": "2026-10-16",
     "price_basis": "yahoo_adjusted_close",
     "coverage": {
       "expected_sectors": 11,
@@ -2719,9 +2719,9 @@
         "technology"
       ],
       "most_active_options": [
-        "utilities",
+        "consumer_staples",
         "real_estate",
-        "financials"
+        "health_care"
       ]
     },
     "sectors": [
@@ -2760,16 +2760,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 325974,
-          "put_volume": 253437,
-          "total_volume": 579411,
-          "put_call_ratio": 0.7775,
+          "call_volume": 414585,
+          "put_volume": 295107,
+          "total_volume": 709692,
+          "put_call_ratio": 0.7118,
           "prior_month_daily_average": 174244.43,
-          "activity_ratio": 0.665,
+          "activity_ratio": 0.815,
           "excluded_adjusted_roots": [
             "2XLE"
           ]
@@ -2811,16 +2811,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 24794,
-          "put_volume": 32969,
-          "total_volume": 57763,
-          "put_call_ratio": 1.3297,
+          "call_volume": 72838,
+          "put_volume": 108078,
+          "total_volume": 180916,
+          "put_call_ratio": 1.4838,
           "prior_month_daily_average": 20136.9,
-          "activity_ratio": 0.574,
+          "activity_ratio": 1.797,
           "excluded_adjusted_roots": [
             "2XLV"
           ]
@@ -2862,16 +2862,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 57220,
-          "put_volume": 82698,
-          "total_volume": 139918,
-          "put_call_ratio": 1.4453,
+          "call_volume": 67919,
+          "put_volume": 93022,
+          "total_volume": 160941,
+          "put_call_ratio": 1.3696,
           "prior_month_daily_average": 32537.24,
-          "activity_ratio": 0.86,
+          "activity_ratio": 0.989,
           "excluded_adjusted_roots": [
             "2XLK"
           ]
@@ -2913,16 +2913,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 29988,
-          "put_volume": 76978,
-          "total_volume": 106966,
-          "put_call_ratio": 2.567,
+          "call_volume": 84854,
+          "put_volume": 371895,
+          "total_volume": 456749,
+          "put_call_ratio": 4.3828,
           "prior_month_daily_average": 21240.9,
-          "activity_ratio": 1.007,
+          "activity_ratio": 4.301,
           "excluded_adjusted_roots": [
             "2XLP"
           ]
@@ -2964,16 +2964,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 682564,
-          "put_volume": 799502,
-          "total_volume": 1482066,
-          "put_call_ratio": 1.1713,
+          "call_volume": 729014,
+          "put_volume": 769840,
+          "total_volume": 1498854,
+          "put_call_ratio": 1.056,
           "prior_month_daily_average": 235058.33,
-          "activity_ratio": 1.261,
+          "activity_ratio": 1.275,
           "excluded_adjusted_roots": [
             "2XLF"
           ]
@@ -3015,16 +3015,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 8758,
-          "put_volume": 9257,
-          "total_volume": 18015,
-          "put_call_ratio": 1.057,
+          "call_volume": 19554,
+          "put_volume": 17718,
+          "total_volume": 37272,
+          "put_call_ratio": 0.9061,
           "prior_month_daily_average": 6588.9,
-          "activity_ratio": 0.547,
+          "activity_ratio": 1.131,
           "excluded_adjusted_roots": []
         },
         "flow_confirmation": "diverges"
@@ -3064,16 +3064,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 2969,
-          "put_volume": 1188,
-          "total_volume": 4157,
-          "put_call_ratio": 0.4001,
+          "call_volume": 11128,
+          "put_volume": 4791,
+          "total_volume": 15919,
+          "put_call_ratio": 0.4305,
           "prior_month_daily_average": 2755.43,
-          "activity_ratio": 0.302,
+          "activity_ratio": 1.155,
           "excluded_adjusted_roots": [
             "2XLC"
           ]
@@ -3092,7 +3092,7 @@
         "excess_126d": -0.105736,
         "relative_strength": -0.096785,
         "acceleration": 0.021207,
-        "absolute_trend": -0.269654,
+        "absolute_trend": -0.269655,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {
@@ -3115,16 +3115,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 70835,
-          "put_volume": 56931,
-          "total_volume": 127766,
-          "put_call_ratio": 0.8037,
+          "call_volume": 42994,
+          "put_volume": 111214,
+          "total_volume": 154208,
+          "put_call_ratio": 2.5867,
           "prior_month_daily_average": 33763.29,
-          "activity_ratio": 0.757,
+          "activity_ratio": 0.913,
           "excluded_adjusted_roots": [
             "2XLI"
           ]
@@ -3166,16 +3166,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 12862,
-          "put_volume": 40549,
-          "total_volume": 53411,
-          "put_call_ratio": 3.1526,
+          "call_volume": 24984,
+          "put_volume": 30980,
+          "total_volume": 55964,
+          "put_call_ratio": 1.24,
           "prior_month_daily_average": 12771.67,
-          "activity_ratio": 0.836,
+          "activity_ratio": 0.876,
           "excluded_adjusted_roots": [
             "2XLY"
           ]
@@ -3217,16 +3217,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 3478,
-          "put_volume": 2124,
-          "total_volume": 5602,
-          "put_call_ratio": 0.6107,
+          "call_volume": 4818,
+          "put_volume": 2911,
+          "total_volume": 7729,
+          "put_call_ratio": 0.6042,
           "prior_month_daily_average": 685.05,
-          "activity_ratio": 1.636,
+          "activity_ratio": 2.256,
           "excluded_adjusted_roots": [
             "2XLRE"
           ]
@@ -3268,16 +3268,16 @@
           "direction": null,
           "trade_side": "unavailable",
           "open_close": "unavailable",
-          "as_of": "2026-10-09",
-          "week_start": "2026-10-05",
-          "week_end": "2026-10-09",
+          "as_of": "2026-10-16",
+          "week_start": "2026-10-12",
+          "week_end": "2026-10-16",
           "sessions": 5,
-          "call_volume": 749874,
-          "put_volume": 128460,
-          "total_volume": 878334,
-          "put_call_ratio": 0.1713,
+          "call_volume": 400244,
+          "put_volume": 107481,
+          "total_volume": 507725,
+          "put_call_ratio": 0.2685,
           "prior_month_daily_average": 101132.05,
-          "activity_ratio": 1.737,
+          "activity_ratio": 1.004,
           "excluded_adjusted_roots": [
             "1XLU",
             "2XLU"

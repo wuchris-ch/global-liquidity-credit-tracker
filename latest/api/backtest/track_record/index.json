@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-17T14:36:51.315410",
+  "computed_at": "2026-10-18T02:00:38.467676",
   "date_range": {
     "start": "2024-07-12",
     "end": "2026-10-16"
@@ -2486,7 +2486,7 @@
           "neutral": {
             "4": {
               "median": 0.022242,
-              "p25": -0.00927,
+              "p25": -0.009269,
               "p75": 0.05348,
               "hit_rate": 0.6923,
               "n": 52,
@@ -2505,7 +2505,7 @@
             "13": {
               "median": 0.062983,
               "p25": 0.010446,
-              "p75": 0.124747,
+              "p75": 0.124748,
               "hit_rate": 0.7917,
               "n": 48,
               "ci_median_low": 0.011886,
@@ -2526,7 +2526,7 @@
               "p75": 0.191933,
               "hit_rate": 0.9167,
               "n": 48,
-              "ci_median_low": 0.069681,
+              "ci_median_low": 0.069682,
               "ci_median_high": 0.180844,
               "ci_hit_rate_low": 0.7143,
               "ci_hit_rate_high": 1.0,
@@ -2577,12 +2577,12 @@
               "fdr_significant": false
             },
             "26": {
-              "median": -0.016451,
+              "median": -0.016452,
               "p25": -0.088877,
               "p75": 0.123133,
               "hit_rate": 0.4167,
               "n": 36,
-              "ci_median_low": -0.085479,
+              "ci_median_low": -0.08548,
               "ci_median_high": 0.13831,
               "ci_hit_rate_low": 0.0606,
               "ci_hit_rate_high": 0.9,
@@ -2674,7 +2674,7 @@
             },
             "13": {
               "median": 0.076473,
-              "p25": 0.035202,
+              "p25": 0.035203,
               "p75": 0.146326,
               "hit_rate": 0.8333,
               "n": 30,
@@ -2713,7 +2713,7 @@
             "4": {
               "median": 0.012179,
               "p25": -0.035414,
-              "p75": 0.037844,
+              "p75": 0.037845,
               "hit_rate": 0.6,
               "n": 50,
               "ci_median_low": -0.018404,
@@ -2748,7 +2748,7 @@
             },
             "26": {
               "median": 0.142381,
-              "p25": 0.117559,
+              "p25": 0.11756,
               "p75": 0.182531,
               "hit_rate": 1.0,
               "n": 40,
@@ -4594,7 +4594,7 @@
       "category": "Fixed Income",
       "base_rates": {
         "4": {
-          "median": -0.001807,
+          "median": -0.001806,
           "hit_rate": 0.4825,
           "n": 114
         },
@@ -4675,7 +4675,7 @@
               "hit_rate": 0.6346,
               "n": 52,
               "ci_median_low": -0.008016,
-              "ci_median_high": 0.01535,
+              "ci_median_high": 0.015349,
               "ci_hit_rate_low": 0.463,
               "ci_hit_rate_high": 0.7857,
               "edge": 0.1522,
@@ -4711,7 +4711,7 @@
               "hit_rate": 0.5208,
               "n": 48,
               "ci_median_low": -0.01557,
-              "ci_median_high": 0.025579,
+              "ci_median_high": 0.02558,
               "ci_hit_rate_low": 0.3111,
               "ci_hit_rate_high": 0.7403,
               "edge": 0.1404,
@@ -4726,12 +4726,12 @@
           "loose": {
             "4": {
               "median": -0.010013,
-              "p25": -0.032141,
+              "p25": -0.03214,
               "p75": 0.012476,
               "hit_rate": 0.3704,
               "n": 54,
               "ci_median_low": -0.016297,
-              "ci_median_high": 0.004817,
+              "ci_median_high": 0.004818,
               "ci_hit_rate_low": 0.2154,
               "ci_hit_rate_high": 0.5556,
               "edge": -0.1121,
@@ -4895,7 +4895,7 @@
           },
           "loose": {
             "4": {
-              "median": -0.001588,
+              "median": -0.001587,
               "p25": -0.013846,
               "p75": 0.013811,
               "hit_rate": 0.48,
@@ -4965,9 +4965,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 179,
+      "vintage_count": 180,
       "unique_signal_dates": 15,
-      "duplicate_vintages": 164,
+      "duplicate_vintages": 165,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-10-16"
     },

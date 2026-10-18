@@ -3,7 +3,7 @@
     "series_id": "fed_total_assets",
     "pillar": "liquidity",
     "last_date": "2026-10-14",
-    "days_old": 3,
+    "days_old": 4,
     "is_stale": false
   },
   {
@@ -17,28 +17,28 @@
     "series_id": "fed_reverse_repo",
     "pillar": "liquidity",
     "last_date": "2026-10-16",
-    "days_old": 1,
+    "days_old": 2,
     "is_stale": false
   },
   {
     "series_id": "fed_treasury_general_account",
     "pillar": "liquidity",
     "last_date": "2026-10-14",
-    "days_old": 3,
+    "days_old": 4,
     "is_stale": false
   },
   {
     "series_id": "ecb_total_assets",
     "pillar": "liquidity",
     "last_date": "2026-10-09",
-    "days_old": 8,
+    "days_old": 9,
     "is_stale": false
   },
   {
     "series_id": "boj_total_assets",
     "pillar": "liquidity",
     "last_date": "2026-09-01",
-    "days_old": 46,
+    "days_old": 47,
     "is_stale": false
   },
   {
@@ -108,28 +108,28 @@
     "series_id": "ice_bofa_us_high_yield_spread",
     "pillar": "stress",
     "last_date": "2026-10-15",
-    "days_old": 2,
+    "days_old": 3,
     "is_stale": false
   },
   {
     "series_id": "ice_bofa_us_ig_spread",
     "pillar": "stress",
     "last_date": "2026-10-15",
-    "days_old": 2,
+    "days_old": 3,
     "is_stale": false
   },
   {
     "series_id": "sofr",
     "pillar": "stress",
     "last_date": "2026-10-15",
-    "days_old": 2,
+    "days_old": 3,
     "is_stale": false
   },
   {
     "series_id": "fed_funds_rate",
     "pillar": "stress",
     "last_date": "2026-10-15",
-    "days_old": 2,
+    "days_old": 3,
     "is_stale": false
   },
   {

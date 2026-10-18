@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-17T14:36:53.159848",
+  "computed_at": "2026-10-18T02:00:40.886650",
   "as_of": "2026-10-16",
   "flow_window_weeks": 13,
   "flow_history_weeks": 156,
@@ -1804,7 +1804,7 @@
         },
         {
           "date": "2025-11-14",
-          "value": 85.2373
+          "value": 85.2372
         },
         {
           "date": "2025-11-21",
@@ -1816,7 +1816,7 @@
         },
         {
           "date": "2025-12-05",
-          "value": 84.8679
+          "value": 84.8678
         },
         {
           "date": "2025-12-12",
@@ -2640,7 +2640,7 @@
   "schema_version": "2.0",
   "sector_rotation": {
     "schema_version": "1.0",
-    "computed_at": "2026-10-17T14:37:07.680180Z",
+    "computed_at": "2026-10-18T02:00:58.983786Z",
     "status": "complete",
     "signal_status": "descriptive_not_backtested",
     "universe": "select_sector_spdr_11",
@@ -3092,7 +3092,7 @@
         "excess_126d": -0.105736,
         "relative_strength": -0.096785,
         "acceleration": 0.021207,
-        "absolute_trend": -0.269655,
+        "absolute_trend": -0.269654,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {
@@ -3245,7 +3245,7 @@
         "excess_126d": -0.152942,
         "relative_strength": -0.119441,
         "acceleration": 0.045037,
-        "absolute_trend": -0.712642,
+        "absolute_trend": -0.712641,
         "above_200d": false,
         "phase": "improving",
         "fund_flow": {

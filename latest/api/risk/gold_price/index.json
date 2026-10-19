@@ -4,7 +4,7 @@
   "category": "Commodities",
   "current_sharpe": 0.63,
   "annualized_return": 12.92,
-  "annualized_volatility": 16.43,
+  "annualized_volatility": 16.44,
   "max_drawdown": -26.4,
   "sharpe_by_regime": {
     "tight": 4.48,
@@ -18,10 +18,6 @@
   },
   "correlation_with_glci": 0.112,
   "rolling_sharpe": [
-    {
-      "date": "2017-10-20",
-      "value": 0.047
-    },
     {
       "date": "2017-10-23",
       "value": 0.054

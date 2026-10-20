@@ -7,14 +7,14 @@
   "annualized_volatility": 23.02,
   "max_drawdown": -41.13,
   "sharpe_by_regime": {
-    "tight": 0.41,
-    "neutral": -0.68,
-    "loose": 1.79
+    "tight": 0.54,
+    "neutral": -0.73,
+    "loose": 1.68
   },
   "return_by_regime": {
-    "tight": 20.77,
-    "neutral": -9.27,
-    "loose": 37.75
+    "tight": 24.43,
+    "neutral": -10.44,
+    "loose": 35.07
   },
   "correlation_with_glci": 0.293,
   "rolling_sharpe": [
@@ -4460,7 +4460,7 @@
     },
     {
       "date": "2022-03-23",
-      "value": -0.03
+      "value": -0.031
     },
     {
       "date": "2022-03-24",

@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-10-19T17:56:42.577928",
+  "computed_at": "2026-10-20T02:32:52.856953",
   "date_range": {
     "start": "2024-07-12",
     "end": "2026-10-16"
@@ -2415,7 +2415,7 @@
           "n": 114
         },
         "13": {
-          "median": 0.054419,
+          "median": 0.054418,
           "hit_rate": 0.7333,
           "n": 105
         },
@@ -2526,8 +2526,8 @@
               "p75": 0.191933,
               "hit_rate": 0.9167,
               "n": 48,
-              "ci_median_low": 0.069682,
-              "ci_median_high": 0.180844,
+              "ci_median_low": 0.069681,
+              "ci_median_high": 0.180843,
               "ci_hit_rate_low": 0.7143,
               "ci_hit_rate_high": 1.0,
               "edge": 0.1884,
@@ -2577,12 +2577,12 @@
               "fdr_significant": false
             },
             "26": {
-              "median": -0.016451,
-              "p25": -0.088876,
+              "median": -0.016452,
+              "p25": -0.088877,
               "p75": 0.123133,
               "hit_rate": 0.4167,
               "n": 36,
-              "ci_median_low": -0.085479,
+              "ci_median_low": -0.08548,
               "ci_median_high": 0.13831,
               "ci_hit_rate_low": 0.0606,
               "ci_hit_rate_high": 0.9,
@@ -2673,8 +2673,8 @@
               "fdr_significant": false
             },
             "13": {
-              "median": 0.076472,
-              "p25": 0.035203,
+              "median": 0.076473,
+              "p25": 0.035202,
               "p75": 0.146326,
               "hit_rate": 0.8333,
               "n": 30,
@@ -2713,7 +2713,7 @@
             "4": {
               "median": 0.012179,
               "p25": -0.035414,
-              "p75": 0.037844,
+              "p75": 0.037845,
               "hit_rate": 0.6,
               "n": 50,
               "ci_median_low": -0.018404,
@@ -2748,7 +2748,7 @@
             },
             "26": {
               "median": 0.142381,
-              "p25": 0.11756,
+              "p25": 0.117559,
               "p75": 0.182531,
               "hit_rate": 1.0,
               "n": 40,
@@ -4858,7 +4858,7 @@
             },
             "13": {
               "median": -0.019765,
-              "p25": -0.031992,
+              "p25": -0.031991,
               "p75": 0.009933,
               "hit_rate": 0.3,
               "n": 30,
@@ -4895,7 +4895,7 @@
           },
           "loose": {
             "4": {
-              "median": -0.001587,
+              "median": -0.001588,
               "p25": -0.013846,
               "p75": 0.013811,
               "hit_rate": 0.48,
@@ -4965,9 +4965,9 @@
       "min_observations": 20
     },
     "ledger": {
-      "vintage_count": 183,
+      "vintage_count": 184,
       "unique_signal_dates": 15,
-      "duplicate_vintages": 168,
+      "duplicate_vintages": 169,
       "first_signal_date": "2026-07-10",
       "latest_signal_date": "2026-10-16"
     },

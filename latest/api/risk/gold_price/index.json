@@ -3,25 +3,21 @@
   "name": "Gold",
   "category": "Commodities",
   "current_sharpe": 0.63,
-  "annualized_return": 12.92,
+  "annualized_return": 12.88,
   "annualized_volatility": 16.44,
   "max_drawdown": -26.4,
   "sharpe_by_regime": {
     "tight": 4.48,
-    "neutral": 0.92,
+    "neutral": 0.89,
     "loose": 0.44
   },
   "return_by_regime": {
     "tight": 123.04,
-    "neutral": 24.19,
+    "neutral": 23.53,
     "loose": 15.07
   },
   "correlation_with_glci": 0.113,
   "rolling_sharpe": [
-    {
-      "date": "2017-10-23",
-      "value": 0.054
-    },
     {
       "date": "2017-10-24",
       "value": 0.039
@@ -9049,6 +9045,10 @@
     {
       "date": "2026-10-16",
       "value": -0.029
+    },
+    {
+      "date": "2026-10-19",
+      "value": -0.13
     }
   ]
 }

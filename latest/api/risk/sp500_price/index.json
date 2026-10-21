@@ -3,25 +3,21 @@
   "name": "S&P 500",
   "category": "Large Cap Equities",
   "current_sharpe": 0.66,
-  "annualized_return": 14.47,
+  "annualized_return": 14.5,
   "annualized_volatility": 18.08,
   "max_drawdown": -33.92,
   "sharpe_by_regime": {
     "tight": 0.62,
-    "neutral": 0.35,
+    "neutral": 0.37,
     "loose": 1.35
   },
   "return_by_regime": {
     "tight": 26.22,
-    "neutral": 9.23,
+    "neutral": 9.47,
     "loose": 20.91
   },
   "correlation_with_glci": 0.395,
   "rolling_sharpe": [
-    {
-      "date": "2017-10-20",
-      "value": 2.472
-    },
     {
       "date": "2017-10-23",
       "value": 2.413
@@ -9057,6 +9053,10 @@
     {
       "date": "2026-10-19",
       "value": 0.931
+    },
+    {
+      "date": "2026-10-20",
+      "value": 0.913
     }
   ]
 }
